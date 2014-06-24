@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>注册页面</title>
+<script type="text/javascript" src="<?php echo $this->baseUrl()?>/assets/jquery/jquery-1.11.0.js"></script>
+<style type="text/css">
+#demo { width:200px; height:30px; background:#ccc; border:1px sold #000; font-weight:bold; text-align:center;} 
+</style>
+<script type="text/javascript">
+var baseUrl="<?php echo $this->baseUrl()?>";
+$(function(){
+	var ajaxTarget=null;
+	
+	$(document).ajaxStop(function(){
+		if(ajaxTarget=='#submitReg'){
+			$('#submitReg').attr('disabled',false);
+		}
+	});
+	
+	$('#submitReg').bind('click',function(){
+		var username=$('#username').val();
+		var userpass1=$('#userpass1').val();
+		var userpass2=$('#userpass2').val();
+		var email=$('#email').val();
+		var msg=$('#msg');
+		//验证
+		var strPattern=/^[a-z0-9A-Z]{5,25}$/;
+		if(username.length<5 || userpass1.length<5 || userpass2.length<5){	
+			msg.html('用户名和密码为长度介于5——25的数字或字母');	
+			return; 
+		}
+		if(userpass1 != userpass2){
+			msg.html('两次密码输入不匹配');	
+			$('#userpass1').val('');
+			$('#userpass2').val('')
+			return; 
+		}
+		if(email.length>50){
+			msg.html('邮箱长度超过50');
+			$('#email').val('');
+			return;
+		}
+		var mailPattern=/^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+		if(!mailPattern.test(email)){
+			msg.html('无效邮箱地址');
+			$('#email').val('');
+			return;
+		}
+		//提交
+		ajaxTarget='#submitReg';
+		$(this).attr('disabled',true);
+		$.post(baseUrl+'/member/register',{
+				username:username,
+				userpass:userpass1,
+				email:email
+			},function(data){
+			var callback=$.parseJSON(data);
+			msg.html(callback.message);
+			if(callback.success==1){
+				setTimeout(function(){
+					window.location.href=baseUrl+'/index';
+				},5000);
+			}	
+		});
+	});
+});
+</script>
+</head>
+
+<body>
+<div id="demo">用户注册页面</div>
+<table>
+<tr><td></td><td><span id="msg"></span></td></tr>
+<tr><td>用户名</td><td><input type="text" id="username"/></td></tr>
+<tr><td>输入密码</td><td><input type="password" id="userpass1"/></td></tr>
+<tr><td>确认密码</td><td><input type="password" id="userpass2"/></td></tr>
+<tr><td>邮箱</td><td><input type="text" id="email"/></td></tr>
+<tr><td><input id="submitReg" type="button" value="提交"/></td>
+<td><input type="reset" value="重置"/></td></tr>
+</table>
+</body>
+</html>

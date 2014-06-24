@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>json测试</title>
+<script type="text/javascript" src="<?php echo $this->baseUrl()?>/assets/jquery/jquery-1.11.0.js"></script>
+<style type="text/css">
+#txtBlock{ width:150px; height:200px; background-color:#ccc; list-style:none;}
+</style>
+<script type="text/javascript">
+var baseUrl="<?php echo $this->baseUrl()?>";
+$(function(){
+	$(document).ajaxStart(function(){
+		console.log('data loading......');
+	});
+	$(document).ajaxStop(function(){
+		console.log('data loaded.......');
+		$('#button1').attr('disabled',false);
+	});
+	$('#button1').on('click',function(){
+		$(this).attr('disabled',true);
+		$.post(baseUrl+'/test/test1',function(data){
+			var txtBlock=$('#txtBlock');
+			txtBlock.empty();		//清空全部节点
+			var plist=$.parseJSON(data);
+			for(var i=0; i<plist.length; i++){
+				txtBlock.append('<li>'+plist[i].policyno+'</li>');
+			}
+		});
+		
+	});
+});
+</script>
+</head>
+
+<body>
+<button id="button1">点击测试</button>
+<h6>显示服务器回调信息</h6>
+<ul id="txtBlock"></ul>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>登录页面</title>
+<script type="text/javascript" src="<?php echo $this->baseUrl()?>/assets/jquery/jquery-1.11.0.js"></script>
+<script type="text/javascript">
+var baseUrl="<?php echo $this->baseUrl()?>";
+$(function(){
+	var ajaxTarget=null;
+	
+	$(document).ajaxStop(function(){
+		if(ajaxTarget=='#submitLogin'){
+			$('#submitLogin').attr('disabled',false);
+		}
+	});
+	
+	$('#submitLogin').bind('click',function(){
+		var username=$('#username').val();
+		var userpass=$('#userpass').val();
+		var msg=$('#msg');
+		
+		ajaxTarget='#submitLogin';
+		$(this).attr('disabled',true);
+		$.post(baseUrl+'/member/login',{
+				username:username,
+				userpass:userpass,
+			},function(data){
+			var callback=$.parseJSON(data);
+			msg.html(callback.message);
+			if(callback.success==1){
+				setTimeout(function(){
+					window.location.href=baseUrl+'/index';
+				},5000);
+			}	
+		});
+	});
+});
+</script>
+</head>
+<body>
+<table>
+<tr><td></td><td><span id="msg"></span></td></tr>
+<tr><td>帐号</td><td><input type="text" id="username"/></td></tr>
+<tr><td>密码</td><td><input type="password" id="userpass"/></td></tr>
+<tr><td>验证码</td><td>//暂时不放</td></tr>
+<tr><td></td><td><input type="button" id="submitLogin" value="进入系统"/></td></tr>
+</table>
+</body>
+</html>

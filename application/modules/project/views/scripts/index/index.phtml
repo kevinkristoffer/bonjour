@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+<?php echo $this->headTitle('项目全景图'); ?>
+<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+<meta http-equiv="description" content="项目全景图">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<script type="text/javascript">
+var baseUrl='<?php echo $this->baseUrl();?>';
+</script>
+<link rel="stylesheet" type="text/css" href="<?php echo $this->baseUrl();?>/assets/mikoUI/skins/mikoui-icons.css" />
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/jquery/jquery-1.7.2.js"></script>
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/plugins/cookie/jquery.cookie.js"></script>
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/js/client.js"></script>
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/mikoUI/js/mikoui.all.js"></script>
+<script type="text/javascript">
+var g=null;
+var combobox=null;
+$(function(){
+	$('#rootProject').mikoComboBox({
+		isMultiSelect:false,
+		isShowCheckBox:false,
+		selectBoxWidth:520,
+		selectBoxHeight:210,
+		valueField:'projectCode',
+		textField:'projectName',
+		valueFieldID:'projectCodeFieldID',
+		slide:true,
+		grid:{
+			url:'<?php echo $this->baseUrl();?>/project/project/query-root-project-snapshot',
+			pageSize:5,
+			pageSizeOptions:[5,10],
+			columns:[{
+				display:'项目名称',name:'projectName',width:160
+			},{
+				display:'项目编号',name:'projectCode',width:120
+			},{
+				display:'创建人',name:'creatorName',width:60
+			},{
+				display:'创建日期',name:'createDate',width:80
+			},{
+				display:'子块数',name:'pCnt',width:60
+			}]
+		},
+		onSelected:function(selectedValue){
+			if(selectedValue!=''){
+				g.setParm('code',selectedValue);
+				g.reload();
+			}
+		}
+	});
+	$('#rootProjectButton').mikoButton({
+		width:90,
+		click:function(){
+			openDialog('<?php echo $this->baseUrl();?>/project/project/manage-root-project','根项目管理',450,800);
+			return;
+		}
+	});
+	$('#mainModuleButton').mikoButton({
+		width:90,
+		click:function(){
+			var projectCode=$('#projectCodeFieldID').val();
+			if(projectCode==''){
+				$.mikoDialog.error('请先选择根项目');
+				return;
+			}
+			openDialog('<?php echo $this->baseUrl();?>/project/project/add-project?nodeType=P&parentNode='+projectCode+'&rootNode='+projectCode,'新建主项目',400,620);
+		}
+	});
+	$('#refreshButton').mikoButton({
+		width:90,
+		click:function(){
+			if(g!=null)
+				g.reload();
+			if(combobox!=null)
+				combobox.reload();
+		}
+	});
+	//项目树
+	$('#projectTreeGrid').mikoGrid({
+		url:'<?php echo $this->baseUrl();?>/project/project/query-project-tree',
+		delayLoad:true,
+		usePager:false,
+		columns:[{
+			display:'项目编码',name:'projectCode',id:'projectCode',width:150
+		},{
+			display:'项目名称',name:'projectName',width:180
+		},{
+			display:'创建人',name:'creatorName',width:80
+		},{
+			display:'负责人',name:'responsibleName',width:80
+		},{
+			display:'创建日期',name:'createDate',width:80
+		},{
+			display:'当前状态',name:'currentStatus',width:80
+		},{
+			display:'操作',columns:[{
+				display:'明细',width:70,render:function(rowdata,rowindex,value){
+					return "<button>查看</button>";
+				}
+			},{
+				display:'新建子项目',width:70,render:function(rowdata,rowindex,value){
+					var url='<?php echo $this->baseUrl();?>/project/project/add-project?nodeType=S&parentNode='+
+					rowdata.projectCode+'&rootNode='+rowdata.rootNode;
+					var title=rowdata.projectName+' 新建子项目';
+					return '<button onclick="javascript:openDialog(\''+url+'\',\''+title+'\',400,620);">新建</button>';
+				}
+			},{
+				display:'项目报表',width:70,render:function(rowdata,rowindex,value){
+					return "<button>查看</button>";
+				}
+			}]
+		}],
+		tree:{
+			columnId:'projectCode',
+			idField:'projectCode',
+			parentIDField:'parentNode',
+			isExpand: false
+		},
+		onAfterShowData:function(data){
+			g.collapseAll();	//收缩全部
+		}
+	});
+	g=$('#projectTreeGrid').mikoGetGridManager();
+	combobox=$('#rootProject').mikoGetComboBoxManager();
+});
+function openDialog(url,title,height,width){
+	$.mikoDialog.open({
+		top:30,
+		height:height,
+		width:width,
+		title:title,
+		url:url,
+		showMax:true,
+		showMin:false,
+		isResize:true,
+		slide:true
+	});
+}
+</script>
+<style type="text/css">
+body { margin:0; padding:0; }
+#wrapper { float: left; margin: 20px 30px 20px 30px; display: inline; width: 900px; height: 600px; }
+#top { float: left; margin-left: 0px; margin-top: 0px; display: inline; width: 900px; height: 30px; }
+#top ul { list-style: none; }
+#top ul li { float: left; margin-left: 15px; }
+#main { float: left; margin-left: 0px; display: inline; width: 900px; height: 500px; border-top: solid 2px #cccccc; margin-top: 12px; padding-top:18px; }
+</style>
+</head>
+
+<body>
+<div id="wrapper">
+  <div id="top">
+    <ul>
+      <li>
+      	<label>根项目：</label>
+      </li>
+      <li>
+      	<input type="text" id="rootProject"/>
+      </li>
+      <li>
+        <button id="rootProjectButton" style="width:100px;">根项目管理</button>
+      </li>
+      <li>
+        <button id="mainModuleButton">新建主模块</button>
+      </li>
+      <li>
+        <button id="refreshButton">刷新项目</button>
+      </li>
+    </ul>
+  </div>
+  <div id="main">
+  	<div id="projectTreeGrid"></div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<?php echo $this->headTitle('项目管理首页'); ?>
+<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+<meta http-equiv="description" content="项目管理">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<script type="text/javascript">
+var baseUrl='<?php echo $this->baseUrl();?>';
+</script>
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/jquery/jquery-1.7.2.js"></script>
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/plugins/cookie/jquery.cookie.js"></script>
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/js/client.js"></script>
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/mikoUI/js/mikoui.all.js"></script>
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/js/index/index.js"></script>
+<style type="text/css">
+body { padding:0px; }
+a { text-decoration: none; cursor: pointer;}
+a img { border: 0;}
+#frametop .top { margin:0 auto; height:80px; width:1010px; background-color:#fff; }
+#frametop .top .logo { float:left; margin-left:0px; height:80px; width:590px; display:inline;}
+#frametop .top .right { float:left; margin-left:0px; height:80px; width:420px;}
+#top_toolbar { float: left; margin-left:90px; display:inline; margin-top:10px; height:60px; width:322px; background: url('images/top_toolbar.gif') no-repeat;}
+#top_toolbar ul { float: left; margin-left:10px; margin-top:2px; height:25px; width:302px; overflow:hidden; }
+#top_toolbar ul li { float: left;  width:41px; line-height: 25px; height: 25px; }
+#top_toolbar ul .seperator { border-right: 1px dotted #ccc;}
+#top_toolbar ul li .skinItem { display: block; width:25px; height:25px; line-height: 25px; margin-left: 8px; }
+.tree_nav { margin-top:5px; }
+</style>
+</head>
+
+<body>
+<div id="wrapper">
+  <div id="frametop" position="top">
+  <div class="top">
+  <div class="logo">这里是logo</div>
+  <div class="right">
+  <div id="top_toolbar">
+  	<ul>
+  	<li><a class="skinItem" title="Orange"><img src="<?php echo $this->baseUrl();?>/assets/images/skin_orange.jpg" title="温暖橘色"/></a></li>
+  	<li class="seperator"><a class="skinItem" title="Ocean"><img src="<?php echo $this->baseUrl();?>/assets/images/skin_ocean.jpg" title="清新海洋"/></a></li>
+  	</ul>
+  	<ul>
+  	<li></li>
+  	<li></li>
+  	</ul>
+  </div>
+  </div>
+  </div>
+  </div>
+  <div id="left" position="left" title="导航菜单">
+    <?php foreach($this->menus as $item):?>
+    <div title="<?php echo $item->menuName; ?>">
+      <ul class="tree_nav" mid="<?php echo $item->menuID; ?>"></ul>
+    </div>
+    <?php endforeach; ?>
+  </div>
+  <div id="framecenter" position="center">
+  	<div tabid="home" title="系统主页" style="height:800px" >
+  		<iframe frameborder="0" name="home" id="home" src="<?php echo $this->baseUrl();?>/index/welcome"></iframe>
+  	</div> 
+  </div>
+</div>
+</body>
+</html>

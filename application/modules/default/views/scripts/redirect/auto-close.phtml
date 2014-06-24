@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<?php echo $this->headTitle('自动关闭页面'); ?>
+<script type="text/javascript">
+var counter=5;
+setInterval(function(){
+	counter--;
+	document.getElementById('timer').innerHTML=counter;
+	if(counter==0){
+		closeme();
+	}
+},1000);
+
+function closeme(){ 
+	var browserName=navigator.appName; 
+	if (browserName=="Netscape") { 
+		window.open('','_parent',''); 
+		window.close(); 
+	} else if (browserName=="Microsoft Internet Explorer") { 
+		window.opener = "whocares"; 
+		window.close(); 
+	} 
+} 
+</script>
+</head>
+<body>
+<h3>页面将在<span id="timer">5</span>秒后关闭...</h3>
+<h4>如果未关闭请点击<a href="javascript:closeme();">此处</a>关闭...</h4>
+</body>
+</html>

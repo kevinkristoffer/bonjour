@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+<?php echo $this->headTitle('新建项目'); ?>
+<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+<meta http-equiv="description" content="新建项目">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<script type="text/javascript">
+var baseUrl='<?php echo $this->baseUrl();?>';
+</script>
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/jquery/jquery-1.7.2.js"></script>
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/plugins/cookie/jquery.cookie.js"></script>
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/js/client.js"></script>
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/mikoUI/js/mikoui.all.js"></script>
+<script type="text/javascript">
+var groupicon = "<?php echo $this->baseUrl();?>/assets/mikoUI/skins/icons/communication.gif";
+var form1=null;
+$(function(){
+	$('#form1').mikoForm({
+		inputWidth: 110, labelWidth: 90, space: 40, labelAlign:'right',
+		fields:[{
+			display:'项目名称',name:'f01',type:'text',newline:true,width:350,group:'基本信息',groupicon: groupicon
+		},{
+			display:'项目描述',name:'f02',type:'textarea',newline:true,width:400
+		},{
+			display:'预估启动日期',name:'f03',type:'date',newline:true
+		},{
+			display:'预估天数',name:'f04',type:'spinner',newline:false,options:{type:'int',value:5}
+		},{
+			display:'负责人',name:'f05',type:'combobox',newline:true,textField:'userName',
+			editor:{
+				isMultiSelect:false,
+				isShowCheckBox:false,
+				selectBoxWidth:320,
+				selectBoxHeight:230,
+				textField:'userName',
+				valueField:'userID',
+				slide:true,
+				grid:{
+					url:'<?php echo $this->baseUrl();?>/system/user/query-valid-user',
+					pageSize:5,
+					pageSizeOptions:[5,10,20],
+					columns:[{
+						display:'用户编号',name:'userID',width:60
+					},{
+						display:'姓名',name:'userName',width:110
+					},{
+						display:'用户角色',name:'roleName',width:100
+					}]
+				},
+				condition:{fields:[{ name:'keyword',label:'关键字',width:90}]}
+			}
+		},{
+			name:'f11',type:'hidden',initValue:'<?php echo $this->params['nodeType']; ?>'
+		},{
+			name:'f12',type:'hidden',initValue:'<?php echo $this->params['parentNode']; ?>'
+		},{
+			name:'f13',type:'hidden',initValue:'<?php echo $this->params['rootNode']; ?>'
+		}]
+	});
+	$('#saveButton').bind({
+		'ajaxStart':function(){ $(this).attr('disabled',true); },
+		'ajaxStop':function(){ $(this).attr('disabled',false); }
+	});
+	$('#saveButton').mikoButton({
+		click:function(){
+			var formData=form1.getData();
+			//验证参数
+			if(formData.f01.length<3 || formData.f01.length>100) { msg('项目名称字数应在3-100之间',180); return;}
+			//日期组件只能取到locale格式的日期，需格式化
+			var f03=null;
+			if(formData.f03 != null){
+				var date1=new Date(formData.f03);
+				f03=date1.getFullYear()*10000+(date1.getMonth()+1)*100+date1.getDate();
+			}
+			if(formData.f04<=0) { msg('预估天数应大于0'); return;}
+			if(formData.f05==null || formData.f05=='') { msg('负责人不能为空'); return;}
+			var f05=formData.f05+'|'+formData.userName;
+			$.post('<?php echo $this->baseUrl();?>/project/project/add-project', 
+				{ f01:formData.f01, f02:formData.f02, f03:f03, f04:formData.f04,f05:f05,
+				f11:formData.f11, f12:formData.f12, f13:formData.f13},
+				function(data){
+					if(data == '0000') window.location.href='<?php echo $this->baseUrl();?>/redirect/success';
+				});
+		}
+	});
+	form1=$.mikoui.get('form1');
+	
+});
+function msg(content,width){
+	$('#formTip').mikoTip({content:content,width:width});
+	setTimeout(function(){
+		$('#formTip').mikoHideTip();
+	},3000);
+}
+
+
+</script>
+<style type="text/css">
+body { margin:0; padding:10px; }
+#formTip { float:left; margin-top:120px; }
+</style>
+</head>
+<body>
+<div><button id="saveButton">保存</button></div><div id="formTip"></div>
+<div id="form1"></div> 
+</body>
+</html>

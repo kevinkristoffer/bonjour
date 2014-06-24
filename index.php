@@ -7,7 +7,8 @@ define('PS', PATH_SEPARATOR);
 defined('APPLICATION_PATH') || define('APPLICATION_PATH', realpath(dirname(__FILE__) . DS . 'application'));
 
 // Define application environment
-defined('APPLICATION_ENV') || define('APPLICATION_ENV', (getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV') : 'production'));
+// Switch to production
+defined('APPLICATION_ENV') || define('APPLICATION_ENV', (getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV') : 'development'));
 
 // Include class path
 $paths = array(realpath(APPLICATION_PATH . '/../library'));

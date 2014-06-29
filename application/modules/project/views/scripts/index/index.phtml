@@ -96,18 +96,18 @@ $(function(){
 		},{
 			display:'操作',columns:[{
 				display:'明细',width:70,render:function(rowdata,rowindex,value){
-					return "<button>查看</button>";
+					return "<a>查看</a>";
 				}
 			},{
 				display:'新建子项目',width:70,render:function(rowdata,rowindex,value){
 					var url='<?php echo $this->baseUrl();?>/project/project/add-project?nodeType=S&parentNode='+
 					rowdata.projectCode+'&rootNode='+rowdata.rootNode;
 					var title=rowdata.projectName+' 新建子项目';
-					return '<button onclick="javascript:openDialog(\''+url+'\',\''+title+'\',400,620);">新建</button>';
+					return '<a href="#" onclick="javascript:openDialog(\''+url+'\',\''+title+'\',400,620);">新建</a>';
 				}
 			},{
 				display:'项目报表',width:70,render:function(rowdata,rowindex,value){
-					return "<button>查看</button>";
+					return "<a>查看</a>";
 				}
 			}]
 		}],
@@ -140,6 +140,8 @@ function openDialog(url,title,height,width){
 </script>
 <style type="text/css">
 body { margin:0; padding:0; }
+a { color:#111; }
+a:hover { color:#999; }
 #wrapper { float: left; margin: 20px 30px 20px 30px; display: inline; width: 900px; height: 600px; }
 #top { float: left; margin-left: 0px; margin-top: 0px; display: inline; width: 900px; height: 30px; }
 #top ul { list-style: none; }

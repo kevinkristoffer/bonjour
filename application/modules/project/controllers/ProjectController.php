@@ -201,6 +201,17 @@ class Project_ProjectController extends Bonjour_Controller_Base{
 		}
 	}
 	/**
+	 * 项目明细页面
+	 */
+	public function queryProjectDetailAction(){
+		if($this->_request->isGet()){
+			$projectCode=$this->_request->getParam('code');
+			if(!isset($projectCode) || !preg_match('/^[RPS]20[0-9]{2}(0[0-9]|1[0-2])[0-9]{5}$/', $projectCode)){
+				
+			}
+		}
+	}
+	/**
 	 * 根项目管理
 	 */
 	public function manageRootProjectAction(){

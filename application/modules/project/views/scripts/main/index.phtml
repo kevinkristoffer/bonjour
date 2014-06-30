@@ -8,11 +8,16 @@
 <script type="text/javascript">
 var baseUrl='<?php echo $this->baseUrl();?>';
 </script>
-<link rel="stylesheet" type="text/css" href="<?php echo $this->baseUrl();?>/assets/mikoUI/skins/mikoui-icons.css" />
-<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/jquery/jquery-1.7.2.js"></script>
-<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/plugins/cookie/jquery.cookie.js"></script>
-<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/js/client.js"></script>
-<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/mikoUI/js/mikoui.all.js"></script>
+<link rel="stylesheet" type="text/css"
+  href="<?php echo $this->baseUrl();?>/assets/mikoUI/skins/mikoui-icons.css" />
+<script type="text/javascript"
+  src="<?php echo $this->baseUrl();?>/assets/jquery/jquery-1.7.2.js"></script>
+<script type="text/javascript"
+  src="<?php echo $this->baseUrl();?>/assets/plugins/cookie/jquery.cookie.js"></script>
+<script type="text/javascript"
+  src="<?php echo $this->baseUrl();?>/assets/js/client.js"></script>
+<script type="text/javascript"
+  src="<?php echo $this->baseUrl();?>/assets/mikoUI/js/mikoui.all.js"></script>
 <script type="text/javascript">
 var g=null;
 var combobox=null;
@@ -82,7 +87,10 @@ $(function(){
 		delayLoad:true,
 		usePager:false,
 		columns:[{
-			display:'项目编码',name:'projectCode',id:'projectCode',width:150
+			display:'项目编码',name:'projectCode',id:'projectCode',width:150,render:function(rowdata,rowindex,value){
+				var locked=rowdata.lockedStatus==1 ? '<img src="<?php echo $this->baseUrl();?>/assets/images/lock.png"/>' : '';
+				return locked+' '+rowdata.projectCode;
+			}
 		},{
 			display:'项目名称',name:'projectName',width:180
 		},{
@@ -96,14 +104,20 @@ $(function(){
 		},{
 			display:'操作',columns:[{
 				display:'明细',width:70,render:function(rowdata,rowindex,value){
-					return "<a>查看</a>";
+					var url='<?php echo $this->baseUrl();?>/project/main/query-project-detail/code/'+rowdata.projectCode;
+					var title=rowdata.projectName+' 项目明细';
+					return '<a href="#" onclick="javascript:openDialog(\''+url+'\',\''+title+'\',400,800);">查看</a>';
 				}
 			},{
 				display:'新建子项目',width:70,render:function(rowdata,rowindex,value){
-					var url='<?php echo $this->baseUrl();?>/project/main/add-project?nodeType=S&parentNode='+
-					rowdata.projectCode+'&rootNode='+rowdata.rootNode;
-					var title=rowdata.projectName+' 新建子项目';
-					return '<a href="#" onclick="javascript:openDialog(\''+url+'\',\''+title+'\',400,620);">新建</a>';
+					if(rowdata.lockedStatus==0 && parseInt(rowdata.flag.substr(0,1))<2){
+						var url='<?php echo $this->baseUrl();?>/project/main/add-project?nodeType=S&parentNode='+
+						rowdata.projectCode+'&rootNode='+rowdata.rootNode;
+						var title=rowdata.projectName+' 新建子项目';
+						return '<a href="#" onclick="javascript:openDialog(\''+url+'\',\''+title+'\',400,620);">新建</a>';
+					}else{
+						return '-';
+					}
 				}
 			},{
 				display:'项目报表',width:70,render:function(rowdata,rowindex,value){
@@ -139,41 +153,78 @@ function openDialog(url,title,height,width){
 }
 </script>
 <style type="text/css">
-body { margin:0; padding:0; }
-a { color:#111; }
-a:hover { color:#999; }
-#wrapper { float: left; margin: 20px 30px 20px 30px; display: inline; width: 900px; height: 600px; }
-#top { float: left; margin-left: 0px; margin-top: 0px; display: inline; width: 900px; height: 30px; }
-#top ul { list-style: none; }
-#top ul li { float: left; margin-left: 15px; }
-#main { float: left; margin-left: 0px; display: inline; width: 900px; height: 500px; border-top: solid 2px #cccccc; margin-top: 12px; padding-top:18px; }
+body {
+	margin: 0;
+	padding: 0;
+}
+
+a {
+	color: #111;
+}
+
+a:hover {
+	color: #999;
+}
+
+#wrapper {
+	float: left;
+	margin: 20px 30px 20px 30px;
+	display: inline;
+	width: 900px;
+	height: 600px;
+}
+
+#top {
+	float: left;
+	margin-left: 0px;
+	margin-top: 0px;
+	display: inline;
+	width: 900px;
+	height: 30px;
+}
+
+#top ul {
+	list-style: none;
+}
+
+#top ul li {
+	float: left;
+	margin-left: 15px;
+}
+
+#main {
+	float: left;
+	margin-left: 0px;
+	display: inline;
+	width: 900px;
+	height: 500px;
+	border-top: solid 2px #cccccc;
+	margin-top: 12px;
+	padding-top: 18px;
+}
 </style>
 </head>
 
 <body>
-<div id="wrapper">
-  <div id="top">
-    <ul>
-      <li>
-      	<label>根项目：</label>
-      </li>
-      <li>
-      	<input type="text" id="rootProject"/>
-      </li>
-      <li>
-        <button id="rootProjectButton" style="width:100px;">根项目管理</button>
-      </li>
-      <li>
-        <button id="mainModuleButton">新建主模块</button>
-      </li>
-      <li>
-        <button id="refreshButton">刷新项目</button>
-      </li>
-    </ul>
+  <div id="wrapper">
+    <div id="top">
+      <ul>
+        <li><label>根项目：</label></li>
+        <li><input type="text" id="rootProject" /></li>
+        <li>
+          <button id="rootProjectButton" style="width: 100px;">根项目管理</button>
+        </li>
+        <li>
+          <button id="mainModuleButton">新建主模块</button>
+        </li>
+        <li>
+          <button id="refreshButton">刷新项目</button>
+        </li>
+      </ul>
+    </div>
+    <div id="main">
+      <div id="projectTreeGrid"></div>
+    </div>
   </div>
-  <div id="main">
-  	<div id="projectTreeGrid"></div>
-  </div>
-</div>
 </body>
 </html>

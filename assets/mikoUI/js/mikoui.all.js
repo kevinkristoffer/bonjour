@@ -2384,14 +2384,14 @@
                 });
             } 
             g.updateSelectBoxPosition();
-            $(document).bind("click.combobox", function (e)
+            /*$(document).bind("click.combobox", function (e)
             {
                 var tag = (e.target || e.srcElement).tagName.toLowerCase(); 
                 if (tag == "html" || tag == "body")
                 {
                     g._toggleSelectBox(true);
                 }
-            });
+            });*/
         },
         destroy: function ()
         {
@@ -17113,12 +17113,13 @@
             var g = this, p = this.options;
             if (value)
             {
-                this.inputText.attr("readonly", "readonly");
+                //this.inputText.attr("readonly", "readonly");
+            	this.inputText.attr("disabled",true);
                 this.wrapper.addClass("l-text-disabled");
             }
             else if (!p.readonly)
             {
-                this.inputText.removeAttr("readonly");
+            	this.inputText.attr("disabled",false);
                 this.wrapper.removeClass('l-text-disabled');
             }
         },

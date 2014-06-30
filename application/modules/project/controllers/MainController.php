@@ -225,7 +225,9 @@ class Project_MainController extends Bonjour_Controller_Base{
 				$factory->setDbAdapter($db);
 				$factory->registGateway('Project');
 				
-				$project=$factory->__gateway('Project')->
+				$project=$factory->__gateway('Project')->queryProjectDetail($projectCode);
+				
+				$this->view->assign('project',$project);
 			}catch(Exception $e){
 				$this->_redirect('error');
 			}

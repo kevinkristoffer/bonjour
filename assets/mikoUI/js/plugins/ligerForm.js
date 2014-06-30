@@ -85,6 +85,7 @@
                 id: id,
                 name: id
             } );
+            
             if ( p.readonly ) editor.attr( "readonly", true );
             container.append( editor );
             return editor;

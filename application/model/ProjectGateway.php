@@ -122,7 +122,7 @@ class Bonjour_Model_ProjectGateway extends Bonjour_Core_Model_GateWay {
 	public function queryProjectByRootNode($rootNode,$include_root=false){
 		$query="select projectCode,projectName,parentNode,rootNode,creatorName,responsibleName,createDate,".
 				"case when substring(flag,1,1)='0' then '初始值' when substring(flag,1,1)='1' then '正常开启'".
-				" when substring(flag,1,1)='2' then '正常关闭' end currentStatus".
+				" when substring(flag,1,1)='2' then '正常关闭' end currentStatus,lockedStatus,flag".
 				" from " . $this->prefix . "project_main where substring(flag,1,1)!='3' and rootNode=?";
 		if(!$include_root)
 			$query=$query." and nodeType!='R'";
@@ -169,10 +169,9 @@ class Bonjour_Model_ProjectGateway extends Bonjour_Core_Model_GateWay {
 	 */
 	public function queryProjectDetail($projectCode) {
 		$query = "select projectCode,projectName,nodeCodeRoute,nodeNameRoute,createDate,estimateStartDate,".
-				"estimateDuration,realStartDate,creatorName,responsibleID,responsibleName,description,".
-				"case when lockedStatus=0 then '开启状态' else '锁定状态' end lockedStatus,".
+				"estimateDuration,realStartDate,creatorName,responsibleID,responsibleName,description,lockedStatus,".
 				"case when substring(flag,1,1)='0' then '初始值' when substring(flag,1,1)='1' then '正常开启'".
-				"when substring(flag,1,1)='2' then '正常关闭' end currentStatus from " . $this->prefix . "project_main".
+				"when substring(flag,1,1)='2' then '正常关闭' end currentStatus,flag from " . $this->prefix . "project_main".
 				" where projectCode=?";
 		$result = $this->db->query ( $query, $projectCode )->fetch ();
 		return $result;

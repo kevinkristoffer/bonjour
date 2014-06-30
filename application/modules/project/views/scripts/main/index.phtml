@@ -27,7 +27,7 @@ $(function(){
 		valueFieldID:'projectCodeFieldID',
 		slide:true,
 		grid:{
-			url:'<?php echo $this->baseUrl();?>/project/project/query-root-project-snapshot',
+			url:'<?php echo $this->baseUrl();?>/project/main/query-root-project-snapshot',
 			pageSize:5,
 			pageSizeOptions:[5,10],
 			columns:[{
@@ -52,7 +52,7 @@ $(function(){
 	$('#rootProjectButton').mikoButton({
 		width:90,
 		click:function(){
-			openDialog('<?php echo $this->baseUrl();?>/project/project/manage-root-project','根项目管理',450,800);
+			openDialog('<?php echo $this->baseUrl();?>/project/main/manage-root-project','根项目管理',450,800);
 			return;
 		}
 	});
@@ -64,7 +64,7 @@ $(function(){
 				$.mikoDialog.error('请先选择根项目');
 				return;
 			}
-			openDialog('<?php echo $this->baseUrl();?>/project/project/add-project?nodeType=P&parentNode='+projectCode+'&rootNode='+projectCode,'新建主项目',400,620);
+			openDialog('<?php echo $this->baseUrl();?>/project/main/add-project?nodeType=P&parentNode='+projectCode+'&rootNode='+projectCode,'新建主项目',400,620);
 		}
 	});
 	$('#refreshButton').mikoButton({
@@ -78,7 +78,7 @@ $(function(){
 	});
 	//项目树
 	$('#projectTreeGrid').mikoGrid({
-		url:'<?php echo $this->baseUrl();?>/project/project/query-project-tree',
+		url:'<?php echo $this->baseUrl();?>/project/main/query-project-tree',
 		delayLoad:true,
 		usePager:false,
 		columns:[{
@@ -100,7 +100,7 @@ $(function(){
 				}
 			},{
 				display:'新建子项目',width:70,render:function(rowdata,rowindex,value){
-					var url='<?php echo $this->baseUrl();?>/project/project/add-project?nodeType=S&parentNode='+
+					var url='<?php echo $this->baseUrl();?>/project/main/add-project?nodeType=S&parentNode='+
 					rowdata.projectCode+'&rootNode='+rowdata.rootNode;
 					var title=rowdata.projectName+' 新建子项目';
 					return '<a href="#" onclick="javascript:openDialog(\''+url+'\',\''+title+'\',400,620);">新建</a>';

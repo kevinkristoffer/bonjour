@@ -37,17 +37,10 @@ class Bonjour_Model_ProjectGateway extends Bonjour_Core_Model_GateWay {
 	 * @param unknown $projectCode        	
 	 * @return number
 	 */
-	public function lockProject($projectCode) {
-		return 0;
-	}
-	
-	/**
-	 * 解锁项目
-	 * @param unknown $projectCode        	
-	 * @return number
-	 */
-	public function unlockProject($ProjectCode) {
-		return 0;
+	public function modifyProjectLockedStatus($projectCode) {
+		$query="update " . $this->prefix . "project_main set lockedStatus=1-lockedStatus*lockedStatus where projectCode=?";
+		$affected_rows=$this->db->query($query,$projectCode)->rowCount();
+		return $affected_rows;
 	}
 	
 	// /////////////////////////////// 查询操作 /////////////////////////////////
@@ -169,9 +162,20 @@ class Bonjour_Model_ProjectGateway extends Bonjour_Core_Model_GateWay {
 		$result = $this->db->query ( $query, $projectCode )->fetch ();
 		return $result == null ? false : true;
 	}
-	
-	public function queryProjectDetail($ProjectCode) {
-		$query = "select * from " . $this->prefix . "project_main where ProjectCode=?";
+	/**
+	 * 查询项目详情
+	 * @param unknown $projectCode
+	 * @return unknown
+	 */
+	public function queryProjectDetail($projectCode) {
+		$query = "select projectCode,projectName,nodeCodeRoute,nodeNameRoute,createDate,estimateStartDate,".
+				"estimateDuration,realStartDate,creatorName,responsibleID,responsibleName,description,".
+				"case when lockedStatus=0 then '开启状态' else '锁定状态' end lockedStatus,".
+				"case when substring(flag,1,1)='0' then '初始值' when substring(flag,1,1)='1' then '正常开启'".
+				"when substring(flag,1,1)='2' then '正常关闭' end currentStatus from " . $this->prefix . "project_main".
+				" where projectCode=?";
+		$result = $this->db->query ( $query, $projectCode )->fetch ();
+		return $result;
 	}
 	public function searchProject() {
 	}

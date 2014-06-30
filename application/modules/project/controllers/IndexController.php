@@ -13,13 +13,7 @@ class Project_IndexController extends Bonjour_Controller_Base {
 	public function init() {
 		
 	}
-	/**
-	 * Default action
-	 * 项目全景图
-	 */
-	public function indexAction() {
-		
-	}
+	
 	
 	
 	

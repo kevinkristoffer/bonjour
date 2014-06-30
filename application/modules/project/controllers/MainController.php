@@ -1,7 +1,7 @@
 <?php
 
 
-class Project_ProjectController extends Bonjour_Controller_Base{
+class Project_MainController extends Bonjour_Controller_Base{
 	
 	/**
 	 * Constructor
@@ -11,7 +11,13 @@ class Project_ProjectController extends Bonjour_Controller_Base{
 	public function init() {
 		parent::init();		//初始化session
 	}
+	/**
+	 * Default action
+	 * 项目全景图
+	 */
+	public function indexAction() {
 	
+	}
 	/**
 	 * 添加项目
 	 */
@@ -205,9 +211,55 @@ class Project_ProjectController extends Bonjour_Controller_Base{
 	 */
 	public function queryProjectDetailAction(){
 		if($this->_request->isGet()){
-			$projectCode=$this->_request->getParam('code');
-			if(!isset($projectCode) || !preg_match('/^[RPS]20[0-9]{2}(0[0-9]|1[0-2])[0-9]{5}$/', $projectCode)){
+			try{
+				$projectCode=$this->_request->getParam('code');
+				//验证项目编号
+				if(!isset($projectCode) || !preg_match('/^[RPS]20[0-9]{2}(0[0-9]|1[0-2])[0-9]{5}$/', $projectCode)){
+					throw new Exception();
+				}
+				$factory=Bonjour_Core_Model_Factory::getInstance();
+				$db=Bonjour_Core_Db_Connection::getConnection('slave');
+				if($db == null){
+					throw new Exception();
+				}
+				$factory->setDbAdapter($db);
+				$factory->registGateway('Project');
 				
+				$project=$factory->__gateway('Project')->
+			}catch(Exception $e){
+				$this->_redirect('error');
+			}
+		}
+	}
+	/**
+	 * 锁定/解锁项目
+	 */
+	public function lockProjectAction(){
+		$this->_helper->viewRenderer->setNoRender ( true );
+		header ( 'content-type:text/html;charset=utf-8' );
+		
+		if ($this->_request->isPost ()) {
+			try{
+				if (! isset ( $_SERVER ['HTTP_X_REQUESTED_WITH'] ) || strtolower ( $_SERVER ['HTTP_X_REQUESTED_WITH'] ) != 'xmlhttprequest') {
+					throw new Exception ();
+				}
+				$projectCode=$this->_request->getParam('code');
+				if(!isset($projectCode) || !preg_match('/^[RPS]20[0-9]{2}(0[0-9]|1[0-2])[0-9]{5}$/', $projectCode))
+					throw new Exception();
+		
+				$factory=Bonjour_Core_Model_Factory::getInstance();
+				$db=Bonjour_Core_Db_Connection::getConnection('master');
+				if($db == null){
+					throw new Exception();
+				}
+				$factory->setDbAdapter($db);
+				$factory->registGateway('Project');
+				
+				$affected_rows=$factory->__gateway('Project')->modifyProjectLockedStatus($projectCode);
+				if($affected_rows != 1) throw new Exception ();
+				echo Bonjour_Core_GlobalConstant::BONJOUR_SUCCESS;
+			}catch(Exception $e){
+				echo Bonjour_Core_GlobalConstant::BONJOUR_ERROR;
 			}
 		}
 	}

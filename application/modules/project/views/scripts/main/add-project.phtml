@@ -13,7 +13,7 @@ var baseUrl='<?php echo $this->baseUrl();?>';
 <script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/js/client.js"></script>
 <script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/mikoUI/js/mikoui.all.js"></script>
 <script type="text/javascript">
-var groupicon = "<?php echo $this->baseUrl();?>/assets/mikoUI/skins/icons/communication.gif";
+var groupicon = baseUrl+"/assets/mikoUI/skins/icons/communication.gif";
 var form1=null;
 $(function(){
 	$('#form1').mikoForm({
@@ -37,7 +37,7 @@ $(function(){
 				valueField:'userID',
 				slide:true,
 				grid:{
-					url:'<?php echo $this->baseUrl();?>/system/user/query-valid-user',
+					url:baseUrl+'/system/user/query-valid-user',
 					pageSize:5,
 					pageSizeOptions:[5,10,20],
 					columns:[{
@@ -76,11 +76,11 @@ $(function(){
 			if(formData.f04<=0) { msg('预估天数应大于0'); return;}
 			if(formData.f05==null || formData.f05=='') { msg('负责人不能为空'); return;}
 			var f05=formData.f05+'|'+formData.userName;
-			$.post('<?php echo $this->baseUrl();?>/project/project/add-project', 
+			$.post(baseUrl+'/project/main/add-project', 
 				{ f01:formData.f01, f02:formData.f02, f03:f03, f04:formData.f04,f05:f05,
 				f11:formData.f11, f12:formData.f12, f13:formData.f13},
 				function(data){
-					if(data == '0000') window.location.href='<?php echo $this->baseUrl();?>/redirect/success';
+					if(data == '0000') window.location.href=baseUrl+'/redirect/success';
 				});
 		}
 	});

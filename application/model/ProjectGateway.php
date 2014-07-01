@@ -17,8 +17,8 @@ class Bonjour_Model_ProjectGateway extends Bonjour_Core_Model_GateWay {
 	 * @param unknown $project        	
 	 * @return number
 	 */
-	public function modifyProject($project) {
-		$affected_rows = $this->db->update ( $this->prefix . 'project_main', $project, 'ProjectCode=' . $project ['ProjectCode'] );
+	public function modifyProject($set,$where) {
+		$affected_rows = $this->db->update ( $this->prefix . 'project_main', $set ,$where );
 		return $affected_rows;
 	}
 	

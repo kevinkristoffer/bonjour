@@ -13,7 +13,10 @@ var baseUrl='<?php echo $this->baseUrl();?>';
 <script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/js/client.js"></script>
 <script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/mikoUI/js/mikoui.all.js"></script>
 <script type="text/javascript">
-var groupicon = "<?php echo $this->baseUrl();?>/assets/mikoUI/skins/icons/communication.gif";
+var proj=$.parseJSON('<?php echo $this->projectStr; ?>');
+</script>
+<script type="text/javascript">
+var groupicon = baseUrl+"/assets/mikoUI/skins/icons/communication.gif";
 var form1=null;
 var flistData=[{
 	name:'好莱坞'
@@ -25,7 +28,7 @@ var flistData=[{
 
 $(function(){
 	$('#form1').mikoForm({
-		inputWidth: 110, labelWidth: 90, space: 40, labelAlign:'right',
+		inputWidth: 110, labelWidth: 95, space: 40, labelAlign:'right',
 		fields:[{
 			label:'项目号',name:'f00',type:'text',width:100,space:0,group:'基本信息',
 			groupicon: groupicon,options:{disabled:true}
@@ -40,13 +43,14 @@ $(function(){
 		},{
 			label:'创建日期',name:'d03',type:'text',width:100,space:0,options:{disabled:true}
 		},{
-			display:'预估启动日期',name:'f03',type:'date',newline:false,labelWidth:95,space:0,
-			options:{initValue:'<?php $estimateStartDate=strval($this->project->estimateStartDate); 
-			echo substr($estimateStartDate,0,4).'-'.substr($estimateStartDate,4,2).'-'.substr($estimateStartDate,6,2); ?>'} //setData无法读取
+			label:'预估启动日期',name:'f03',type:'date',newline:false,space:0,
+			options:{initValue:proj.estimateStartDate} //setData无法读取
 		},{
 			label:'预估天数',name:'f04',type:'spinner',newline:false,labelWidth:70,options:{type:'int'}
 		},{
-			label:'创建人',name:'d04',type:'text',width:100,space:0,options:{disabled:true}
+			label:'实际启动日期',name:'d05',type:'text',width:100,space:0,options:{disabled:true}
+		},{
+			label:'创建人',name:'d04',type:'text',newline:false,width:100,space:0,labelWidth:60,options:{disabled:true}
 		},{
 			label:'负责人',name:'f05',type:'combobox',newline:false,labelWidth:60,textField:'userName',
 			editor:{
@@ -56,7 +60,7 @@ $(function(){
 				valueField:'userID',
 				slide:true,
 				grid:{
-					url:'<?php echo $this->baseUrl();?>/system/user/query-valid-user',
+					url:baseUrl+'/system/user/query-valid-user',
 					pageSize:5,
 					pageSizeOptions:[5,10,20],
 					columns:[{
@@ -75,118 +79,133 @@ $(function(){
 			group:'文件列表',groupicon: groupicon
 		},{
 			
-		},{
-			name:'f11',type:'hidden',initValue:'<?php echo $this->params['nodeType']; ?>'
-		},{
-			name:'f12',type:'hidden',initValue:'<?php echo $this->params['parentNode']; ?>'
-		},{
-			name:'f13',type:'hidden',initValue:'<?php echo $this->params['rootNode']; ?>'
 		}]
 	});
-	<?php if($this->project->lockedStatus==0 && intval(substr($this->project->flag,0,1))<2):?>
-	$('#saveButton').mikoButton({
-		width:90,
-		click:function(){
-			var formData=form1.getData();
-			//验证参数
-			if(formData.f01.length<3 || formData.f01.length>100) { msg('项目名称字数应在3-100之间',180); return;}
-			//日期组件只能取到locale格式的日期，需格式化
-			var f03=null;
-			if(formData.f03 != null){
-				var date1=new Date(formData.f03);
-				f03=date1.getFullYear()*10000+(date1.getMonth()+1)*100+date1.getDate();
+	//未锁定且非关闭状态
+	if(proj.lockedStatus==0 && parseInt(proj.flag.substr(0,1))<2){
+		$('#saveButton').mikoButton({
+			width:90,
+			click:function(){
+				var formData=form1.getData();
+				//验证参数
+				if(formData.f01.length<3 || formData.f01.length>100) { msg('项目名称字数应在3-100之间',180); return;}
+				//日期组件只能取到locale格式的日期，需格式化
+				var f03=null;
+				if(formData.f03 != null){
+					var date1=new Date(formData.f03);
+					f03=date1.getFullYear()*10000+(date1.getMonth()+1)*100+date1.getDate();
+				}
+				if(formData.f04<=0) { msg('预估天数应大于0'); return;}
+				if(formData.f05==null || formData.f05=='') { msg('负责人不能为空'); return;}
+				var f05=formData.f05+'|'+formData.userName;
+				$.post(baseUrl+'/project/main/modify-project', 
+					{ f00:formData.f00,f01:formData.f01,f02:formData.f02,f03:f03,f04:formData.f04,f05:f05},
+					function(data){
+						if(data == '0000') tip('项目更新提示','保存成功');
+						else tip('项目更新提示','保存失败');
+					});
 			}
-			if(formData.f04<=0) { msg('预估天数应大于0'); return;}
-			if(formData.f05==null || formData.f05=='') { msg('负责人不能为空'); return;}
-			var f05=formData.f05+'|'+formData.userName;
-			$.post('<?php echo $this->baseUrl();?>/project/project/add-project', 
-				{ f01:formData.f01, f02:formData.f02, f03:f03, f04:formData.f04,f05:f05,
-				f11:formData.f11, f12:formData.f12, f13:formData.f13},
-				function(data){
-					if(data == '0000') window.location.href='<?php echo $this->baseUrl();?>/redirect/success';
-				});
-		}
-	});
-	$('#saveButton').bind({
-		'ajaxStart':function(){ $(this).attr('disabled',true); },
-		'ajaxStop':function(){ $(this).attr('disabled',false); }
-	});
-	$('#uploadFileButton').mikoButton({
-		width:90,
-		click:function(){
-			alert('OK');
-		}
-	});
-	$('#downloadFileButton').mikoButton({
-		width:90,
-		click:function(){
-			alert('OK');
-		}
-	});
-	$('#deleteFileButton').mikoButton({
-		width:90,
-		click:function(){
-			alert('OK');
-		}
-	});
-	<?php endif;?>
-	<?php if($this->project->lockedStatus==0 && intval(substr($this->project->flag,0,1))==2):?>
-	$('#restartButton').mikoButton({
-		width:90,
-		click:function(){
-			alert('restart');
-		}
-	});
-	<?php endif;?>
+		});
+		$('#saveButton').bind({
+			'ajaxStart':function(){ $(this).attr('disabled',true); },
+			'ajaxStop':function(){ $(this).attr('disabled',false); }
+		});
+		$('#uploadFileButton').mikoButton({
+			width:90,
+			click:function(){
+				alert('OK');
+			}
+		});
+		$('#downloadFileButton').mikoButton({
+			width:90,
+			click:function(){
+				alert('OK');
+			}
+		});
+		$('#deleteFileButton').mikoButton({
+			width:90,
+			click:function(){
+				alert('OK');
+			}
+		});
+	}
+	//未锁定且正常关闭状态
+	if(proj.lockedStatus==0 && proj.flag.substr(0,1)=='2'){
+		$('#restartButton').mikoButton({
+			width:90,
+			click:function(){
+				alert('restart');
+			}
+		});
+	}
 	$('#lockButton').mikoButton({
 		width:90,
 		click:function(){
-			alert('OK');
+			var message=proj.lockedStatus==0 ? '锁定后项目将不能被编辑，确认操作吗？' :'项目将被解除锁定,确认操作吗？';
+			$.mikoDialog.confirm(message,function(value){
+				if(value){
+					$.post(baseUrl+'/project/main/lock-project',{code:proj.projectCode},
+						function(data){
+							if(data=='0000') window.location.reload();
+							else msg('锁定失败，请稍后再试');
+						});
+				}
+			});
 		}
 	});
-	<?php if($this->project->lockedStatus==0 && substr($this->project->flag,0,1)=='0'):?>
-	$('#submitButton').mikoButton({
-		width:90,
-		click:function(){
-			alert('submitted');
-		}
+	$('#lockButton').bind({
+		'ajaxStart':function(){ $(this).attr('disabled',true); },
+		'ajaxStop':function(){ $(this).attr('disabled',false); }
 	});
-	$('#cancelButton').mikoButton({
-		width:90,
-		click:function(){
-			alert('canceled');
-		}
-	});
-	<?php endif;?>
-	<?php if($this->project->lockedStatus==0 && substr($this->project->flag,0,1)=='1'):?>
-	$('#newReqButton').mikoButton({
-		width:90,
-		click:function(){
-			alert('new requirement');
-		}
-	});
-	$('#closeButton').mikoButton({
-		width:90,
-		click:function(){
-			alert('closed');
-		}
-	});
-	<?php endif;?>
+	//未锁定且初始值状态
+	if(proj.lockedStatus==0 && proj.flag.substr(0,1)=='0'){
+		$('#submitButton').mikoButton({
+			width:90,
+			click:function(){
+				alert('submitted');
+			}
+		});
+		$('#cancelButton').mikoButton({
+			width:90,
+			click:function(){
+				alert('canceled');
+			}
+		});
+	}
+	//未锁定且正常开启状态
+	if(proj.lockedStatus==0 && proj.flag.substr(0,1)=='1'){
+		$('#newReqButton').mikoButton({
+			width:90,
+			click:function(){
+				alert('new requirement');
+			}
+		});
+		$('#closeButton').mikoButton({
+			width:90,
+			click:function(){
+				alert('closed');
+			}
+		});
+	}
 	form1=$.mikoui.get('form1');
 	//设置表单值
 	form1.setData({
-		f00:'<?php echo $this->project->projectCode; ?>',
-		d01:'<?php echo $this->project->lockedStatus==0 ? '开启' : '已锁'; ?>',
-		d02:'<?php echo $this->project->currentStatus; ?>',
-		f01:'<?php echo $this->project->projectName; ?>',
-		f02:'<?php echo $this->project->description; ?>',
-		d03:'<?php $createDate=strval($this->project->createDate); 
-		echo substr($createDate,0,4).'-'.substr($createDate,4,2).'-'.substr($createDate,6,2); ?>',
-		f04:'<?php echo $this->project->estimateDuration; ?>',
-		d04:'<?php echo $this->project->creatorName; ?>',
-		f05:'<?php echo $this->project->responsibleID; ?>',
-		userName:'<?php echo $this->project->responsibleName; ?>'
+		f00:proj.projectCode,
+		d01:proj.lockStatus==1 ? '开启' : '锁定',
+		d02:proj.currentStatus,
+		f01:proj.projectName,
+		f02:proj.description,
+		d03:proj.createDate,
+		f04:proj.estimateDuration,
+		d04:proj.creatorName,
+		d05:proj.realStartDate,
+		f05:proj.responsibleID,
+		userName:proj.responsibleName
 	});
+
+	//如果锁定项目则不能编辑
+	if(proj.lockedStatus==1)
+		$('#form1').disable();
 });
 function msg(content,width){
 	$('#formTip').mikoTip({content:content,width:width});
@@ -194,8 +213,13 @@ function msg(content,width){
 		$('#formTip').mikoHideTip();
 	},3000);
 }
-
-
+function tip(title,content){
+	//提示信息
+	var tip=$.mikoDialog.tip({  title: title,content:content });
+	setTimeout(function(){
+		if(tip)	tip.hide();
+	},3000);
+}
 </script>
 <style type="text/css">
 body { margin:0; padding:10px; }
@@ -208,7 +232,7 @@ body { margin:0; padding:10px; }
 <?php if($this->project->lockedStatus==0 && intval(substr($this->project->flag,0,1))<2):?>
 <button id="saveButton">保存项目</button>
 <?php endif;?>
-<?php if($this->project->lockedStatus==0 && intval(substr($this->project->flag,0,1))==2):?>
+<?php if($this->project->lockedStatus==0 && substr($this->project->flag,0,1)=='2'):?>
 <button id="restartButton">重启项目</button><!-- 重启是关闭的逆操作，需要父项目重启后才能启动当前项目 -->
 <?php endif;?>
 <button id="lockButton"><?php echo $this->project->lockedStatus==0 ? '锁定项目' : '解锁项目'; ?></button>

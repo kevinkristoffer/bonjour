@@ -130,9 +130,60 @@ class Project_MainController extends Bonjour_Controller_Base{
 			}
 		}
 	}
-	
+	/**
+	 * 修改保存项目
+	 */
 	public function modifyProjectAction(){
-		
+		$this->_helper->viewRenderer->setNoRender ( true );
+		header ( 'content-type:text/html;charset=utf-8' );
+		if($this->_request->isPost()){
+			try{
+				if (! isset ( $_SERVER ['HTTP_X_REQUESTED_WITH'] ) || strtolower ( $_SERVER ['HTTP_X_REQUESTED_WITH'] ) != 'xmlhttprequest') {
+					throw new Exception ();
+				}
+				//检验参数有效性
+				$projectCode=$this->_request->getParam('f00');
+				if(!isset($projectCode) || !preg_match('/^[RPS]20[0-9]{2}(0[0-9]|1[0-2])[0-9]{5}$/', $projectCode)) throw new Exception();
+				$projectName=$this->_request->getParam('f01');
+				if(!isset($projectName) || strlen($projectName)<3 || strlen($projectName)>100)	throw new Exception();
+				$description=$this->_request->getParam('f02');
+				$estimateStartDate=$this->_request->getParam('f03');
+				if(!isset($estimateStartDate) || !preg_match('/^20[0-9]{6}$/', $estimateStartDate)){
+					$estimateStartDate=null;
+				}
+				$estimateDuration=$this->_request->getParam('f04');
+				if(isset($estimateDuration) && $estimateDuration<=0) throw new Exception();
+				$responsible=$this->_request->getParam('f05');
+				if(!isset($responsible) || !preg_match('/|/', $responsible)) throw new Exception();
+				$responsible2=explode('|', $responsible);
+				$responsibleID=$responsible2[0];
+				$responsibleName=$responsible2[1];
+				
+				//连接数据库
+				$factory=Bonjour_Core_Model_Factory::getInstance();
+				$db=Bonjour_Core_Db_Connection::getConnection('master');
+				if($db == null){
+					throw new Exception ();
+				}
+				$factory->setDbAdapter($db);
+				$factory->registGateway('Project');
+				
+				//检验项目状态
+				$project=$factory->__gateway('Project')->queryProjectDetail($projectCode);
+				if(!($project->lockedStatus==0 && intval(substr($project->flag,0,1))<2)) throw new Exception();
+				
+				//更新
+				$set=array('projectName'=>$projectName,
+						'estimateStartDate'=>$estimateStartDate,'estimateDuration'=>$estimateDuration,
+						'responsibleID'=>$responsibleID,'responsibleName'=>$responsibleName,'description'=>$description);
+				$where['projectCode=?']=$projectCode;
+				$affected_rows=$factory->__gateway('Project')->modifyProject($set,$where);
+				
+				echo Bonjour_Core_GlobalConstant::BONJOUR_SUCCESS;
+			}catch(Exception $e){
+				echo Bonjour_Core_GlobalConstant::BONJOUR_ERROR;
+			}
+		}
 	}
 	
 	/**
@@ -225,9 +276,22 @@ class Project_MainController extends Bonjour_Controller_Base{
 				$factory->setDbAdapter($db);
 				$factory->registGateway('Project');
 				
-				$project=$factory->__gateway('Project')->queryProjectDetail($projectCode);
+				$result=$factory->__gateway('Project')->queryProjectDetail($projectCode);
+				//格式化日期
+				$createDate=$result->createDate;
+				$result->createDate=substr($createDate,0,4).'-'.substr($createDate,4,2).'-'.substr($createDate,6,2);
+				if($result->estimateStartDate!=null){
+					$estimateStartDate=$result->estimateStartDate;
+					$result->estimateStartDate=substr($estimateStartDate,0,4).'-'.substr($estimateStartDate,4,2).'-'.substr($estimateStartDate,6,2);
+				}
+				if($result->realStartDate!=null){
+					$realStartDate=$result->realStartDate;
+					$result->realStartDate=substr($realStartDate,0,4).'-'.substr($realStartDate,4,2).'-'.substr($realStartDate,6,2);
+				}
+				$projectStr=Zend_Json::encode($result);
 				
-				$this->view->assign('project',$project);
+				$this->view->assign('project',$result);
+				$this->view->assign('projectStr',$projectStr);
 			}catch(Exception $e){
 				$this->_redirect('error');
 			}
@@ -259,6 +323,7 @@ class Project_MainController extends Bonjour_Controller_Base{
 				
 				$affected_rows=$factory->__gateway('Project')->modifyProjectLockedStatus($projectCode);
 				if($affected_rows != 1) throw new Exception ();
+				
 				echo Bonjour_Core_GlobalConstant::BONJOUR_SUCCESS;
 			}catch(Exception $e){
 				echo Bonjour_Core_GlobalConstant::BONJOUR_ERROR;

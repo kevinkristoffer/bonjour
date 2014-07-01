@@ -1,4 +1,10 @@
 (function($) {
+	//禁用全局输入
+	$.fn.disable=function(){
+		return $(this).find('*').each(function(){
+			$(this).attr('disabled','disabled');
+		});
+	};
 
 	$.extend({
 		loadScript : function(url) {

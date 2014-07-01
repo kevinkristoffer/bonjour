@@ -32,7 +32,7 @@ $(function(){
 		valueFieldID:'projectCodeFieldID',
 		slide:true,
 		grid:{
-			url:'<?php echo $this->baseUrl();?>/project/main/query-root-project-snapshot',
+			url:baseUrl+'/project/main/query-root-project-snapshot',
 			pageSize:5,
 			pageSizeOptions:[5,10],
 			columns:[{
@@ -83,12 +83,12 @@ $(function(){
 	});
 	//项目树
 	$('#projectTreeGrid').mikoGrid({
-		url:'<?php echo $this->baseUrl();?>/project/main/query-project-tree',
+		url:baseUrl+'/project/main/query-project-tree',
 		delayLoad:true,
 		usePager:false,
 		columns:[{
 			display:'项目编码',name:'projectCode',id:'projectCode',width:150,render:function(rowdata,rowindex,value){
-				var locked=rowdata.lockedStatus==1 ? '<img src="<?php echo $this->baseUrl();?>/assets/images/lock.png"/>' : '';
+				var locked=rowdata.lockedStatus==1 ? '<img src="'+baseUrl+'/assets/images/lock.png"/>' : '';
 				return locked+' '+rowdata.projectCode;
 			}
 		},{
@@ -106,7 +106,7 @@ $(function(){
 				display:'明细',width:70,render:function(rowdata,rowindex,value){
 					var url='<?php echo $this->baseUrl();?>/project/main/query-project-detail/code/'+rowdata.projectCode;
 					var title=rowdata.projectName+' 项目明细';
-					return '<a href="#" onclick="javascript:openDialog(\''+url+'\',\''+title+'\',400,800);">查看</a>';
+					return '<a href="#" onclick="javascript:openDialog(\''+url+'\',\''+title+'\',530,800);">查看</a>';
 				}
 			},{
 				display:'新建子项目',width:70,render:function(rowdata,rowindex,value){

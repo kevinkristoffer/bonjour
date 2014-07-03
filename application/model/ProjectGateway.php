@@ -171,7 +171,7 @@ class Bonjour_Model_ProjectGateway extends Bonjour_Core_Model_GateWay {
 		$query = "select projectCode,projectName,nodeCodeRoute,nodeNameRoute,createDate,estimateStartDate,".
 				"estimateDuration,realStartDate,creatorName,responsibleID,responsibleName,description,lockedStatus,".
 				"case when substring(flag,1,1)='0' then '初始值' when substring(flag,1,1)='1' then '正常开启'".
-				"when substring(flag,1,1)='2' then '正常关闭' end currentStatus,flag from " . $this->prefix . "project_main".
+				"when substring(flag,1,1)='2' then '正常关闭' end currentStatus,flag,moduleName from " . $this->prefix . "project_main".
 				" where projectCode=?";
 		$result = $this->db->query ( $query, $projectCode )->fetch ();
 		return $result;

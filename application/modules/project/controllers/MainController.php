@@ -274,9 +274,11 @@ class Project_MainController extends Bonjour_Controller_Base{
 					throw new Exception();
 				}
 				$factory->setDbAdapter($db);
-				$factory->registGateway('Project');
+				$factory->registGateway('Project')
+						->registGateway('Attach');
 				
 				$result=$factory->__gateway('Project')->queryProjectDetail($projectCode);
+				if($result == null) throw new Exception();
 				//格式化日期
 				$createDate=$result->createDate;
 				$result->createDate=substr($createDate,0,4).'-'.substr($createDate,4,2).'-'.substr($createDate,6,2);
@@ -289,9 +291,13 @@ class Project_MainController extends Bonjour_Controller_Base{
 					$result->realStartDate=substr($realStartDate,0,4).'-'.substr($realStartDate,4,2).'-'.substr($realStartDate,6,2);
 				}
 				$projectStr=Zend_Json::encode($result);
+				//查询文件列表
+				$attachlist=$factory->__gateway('Attach')->queryAttachByCode($result->moduleName,$projectCode);
+				$attachlistStr=Zend_Json::encode($attachlist);
 				
 				$this->view->assign('project',$result);
 				$this->view->assign('projectStr',$projectStr);
+				$this->view->assign('attachlistStr',$attachlistStr);
 			}catch(Exception $e){
 				$this->_redirect('error');
 			}
@@ -343,11 +349,70 @@ class Project_MainController extends Bonjour_Controller_Base{
 		
 	}
 	
+	/////////////////////ftp文件管理/////////////////////
 	/**
-	 * 查询项目
+	 * 上传文件
+	 * @throws Exception
 	 */
-	public function queryProjectAction(){
+	public function uploadAttachmentAction(){
+		if($this->_request->isGet()){
+			$projectCode=$this->_request->getParam('code');
+			$this->view->assign('code',$projectCode);
+			//设置令牌，防止表单重复提交
+			$timestamp=time();
+			$token=md5('unique_bj'.$timestamp);
+			$this->view->assign('timestamp',$timestamp);
+			$this->view->assign('token',$token);
+		}
+		if($this->_request->isPost()){
+			$this->_helper->viewRenderer->setNoRender ( true );
+			header ( 'content-type:text/html;charset=utf-8' );
+			try{
+				//检查令牌
+				$timestamp=$this->_request->getParam('timestamp');
+				$token=$this->_request->getParam('token');
+				if(!isset($timestamp) || !preg_match('/^[0-9]{10}$/',$timestamp)) throw new Exception();
+				if(!isset($token) || !preg_match('/^[a-zA-Z0-9]{32}$/',$token)) throw new Exception();
+				if($token !== md5('unique_bj'.$timestamp)) throw new Exception();
+				$projectCode=$this->_request->getParam('code');
+				if(!isset($projectCode) || !preg_match('/^[RPS]20[0-9]{2}(0[0-9]|1[0-2])[0-9]{5}$/', $projectCode))
+					throw new Exception();
+					
+				$factory=Bonjour_Core_Model_Factory::getInstance();
+				$db=Bonjour_Core_Db_Connection::getConnection('slave');
+				if($db == null){
+					throw new Exception();
+				}
+				$factory->setDbAdapter($db);
+				$factory->registGateway('Project')->registGateway('Attach');
+					
+				$project=$factory->__gateway('Project')->queryProjectDetail($projectCode);
+				if($project==null)	throw new Exception();
+					
+				$dir=Bonjour_Core_Utility_File::createDirs($project->moduleName.DS.$projectCode);
+				$adapter=new Zend_File_Transfer_Adapter_Http();
+				$adapter->setDestination($dir.DS);
+				$adapter->addValidator ( 'Extension', true, 'exe' )
+				->addValidator ( 'Size', false, 1024*1024 );
+				$fileInfos=$adapter->getFileInfo()[1];
+				var_dump($fileInfos);
+				//$fileInfo=$fileInfos['Filedata'];
+				//$fileName=$fileInfo['name'];
+				/*require_once 'util/util.func.php';
+				$name=md5(time().generate_rand(5));//新的文件名
+				$ext=substr($fileName,strpos($fileName,'.'));
+				$fileName=$name.$ext;
+				$adapter->addFilter('Rename', array('target' => $fileName, 'overwrite' => true));//执行重命名*/
+					
+				//echo Bonjour_Core_GlobalConstant::BONJOUR_SUCCESS;
+			}catch(Exception $e){
+				echo Bonjour_Core_GlobalConstant::BONJOUR_ERROR;
+			}
+		}
+	}
 	
+	public function downloadAttachmentAction(){
+		
 	}
 }
 

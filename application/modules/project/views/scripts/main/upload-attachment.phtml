@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<?php echo $this->headTitle('文件上传'); ?>
+<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+<meta http-equiv="description" content="文件上传">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<script type="text/javascript">
+var baseUrl='<?php echo $this->baseUrl(); ?>';
+var code='<?php echo $this->code; ?>';
+var timestamp='<?php echo $this->timestamp; ?>';
+var token='<?php echo $this->token; ?>';
+</script>
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/jquery/jquery-1.7.2.js"></script>
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/plugins/cookie/jquery.cookie.js"></script>
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/js/client.js"></script>
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/mikoUI/js/mikoui.all.js"></script>
+<!-- uploadify -->
+<link rel="stylesheet" type="text/css" href="<?php echo $this->baseUrl();?>/assets/plugins/uploadify/uploadify.css" />
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/plugins/uploadify/jquery.uploadify.min.js"></script>
+<script type="text/javascript">
+$(function(){
+	$('#file_upload').uploadify({
+		'swf' : baseUrl+'/assets/plugins/uploadify/uploadify.swf',
+		'uploader' : baseUrl+'/project/main/upload-attachment/code/'+code,
+		'auto' : false,
+		'buttonText' : '选择文件',
+		'fileSizeLimit' : '4096KB',
+		'formData' : {'code':code, 'timestamp':timestamp, 'token':token},
+		'method' : 'post',
+		'multi' : true,
+		'queueID' : 'file_queue',
+		'onUploadSuccess' : function(file,data,response){
+			alert(data);
+		},
+		'onUploadError' : function(file,errorCode,errorMsg,errorString){
+			alert(file.name+'上传失败');
+		}
+	});
+	$('#backButton').mikoButton({
+		width:60,
+		click:function(){
+			window.history.go(-1);
+		}
+	});
+	$('#uploadButton').mikoButton({
+		width:60,
+		click:function(){
+			$('#file_upload').uploadify('upload','*');
+		}
+	});
+	$('#stopButton').mikoButton({
+		width:60,
+		click:function(){
+			$('#file_upload').uploadify('stop');
+		}
+	});
+	$('#cancelButton').mikoButton({
+		width:60,
+		click:function(){
+			$('#file_upload').uploadify('cancel','*');
+		}
+	});
+});
+</script>
+<style type="text/css">
+body { margin:0; padding:20px; }
+.btnGrp { margin-top:0px; height:25px;}
+#file_queue{
+	background-color: #FFF;
+    border:solid 1px #ddd;
+    height: 320px;
+    margin-bottom: 10px;
+    overflow: auto;
+    padding: 5px 10px;
+    width: 300px;
+}
+</style>
+</head>
+<body>
+<div class="btnGrp">
+<button id="backButton">返回</button>
+<button id="uploadButton">上传</button>
+<button id="stopButton">停止</button>
+<button id="cancelButton">清空</button>
+</div>
+<div>
+<form>
+<div id="file_queue"></div>
+<input id="file_upload" name="file_upload" type="file" multiple="true">
+</form>
+</div>
+</body>
+</html>

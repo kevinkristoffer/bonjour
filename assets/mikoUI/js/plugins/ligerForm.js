@@ -294,6 +294,7 @@
         },
         _setWidth : function(value)
         {
+        	
             var g = this, p = this.options;
             if (value) g.form.width(value);
         },

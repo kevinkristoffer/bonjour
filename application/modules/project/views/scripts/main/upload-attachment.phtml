@@ -31,7 +31,7 @@ $(function(){
 		'multi' : true,
 		'queueID' : 'file_queue',
 		'onUploadSuccess' : function(file,data,response){
-			alert(data);
+			$('<li></li>').appendTo('#upload_msg').html(data);
 		},
 		'onUploadError' : function(file,errorCode,errorMsg,errorString){
 			alert(file.name+'上传失败');
@@ -56,33 +56,41 @@ $(function(){
 		}
 	});
 	$('#cancelButton').mikoButton({
-		width:60,
+		width:90,
 		click:function(){
 			$('#file_upload').uploadify('cancel','*');
+		}
+	});
+	$('#clearButton').mikoButton({
+		width:90,
+		click:function(){
+			$('#upload_msg').empty();
 		}
 	});
 });
 </script>
 <style type="text/css">
 body { margin:0; padding:20px; }
-.btnGrp { margin-top:0px; height:25px;}
+.btn_grp { margin-top:0px; height:25px;}
 #file_queue{
 	background-color: #FFF;
     border:solid 1px #ddd;
-    height: 320px;
+    height: 240px;
     margin-bottom: 10px;
     overflow: auto;
     padding: 5px 10px;
     width: 300px;
 }
+#upload_msg {margin-top:10px;}
 </style>
 </head>
 <body>
-<div class="btnGrp">
+<div class="btn_grp">
 <button id="backButton">返回</button>
 <button id="uploadButton">上传</button>
 <button id="stopButton">停止</button>
-<button id="cancelButton">清空</button>
+<button id="cancelButton">清空队列</button>
+<button id="clearButton">清空消息</button>
 </div>
 <div>
 <form>
@@ -90,5 +98,6 @@ body { margin:0; padding:20px; }
 <input id="file_upload" name="file_upload" type="file" multiple="true">
 </form>
 </div>
+<ol id="upload_msg"></ol>
 </body>
 </html>

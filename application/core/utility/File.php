@@ -32,7 +32,21 @@ class Bonjour_Core_Utility_File {
 		}	
 		return $currDir; 
 	}
-	
+	/**
+	 * 返回文件大小字串
+	 * @param unknown $size
+	 * @return string
+	 */
+	public static function getFileSize($size){
+		if($size<1024)
+			return $size.'B';
+		else if($size<1024*1024)
+			return floor($size/1024).'KB';
+		else if($size<1024*1024*1024)
+			return floor($size/(1024*1024)).'MB';
+		else
+			floor($size/(1024*1024*1024)).'GB';
+	}
 }
 
 ?>

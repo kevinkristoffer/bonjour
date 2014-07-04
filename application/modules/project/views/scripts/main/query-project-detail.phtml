@@ -75,8 +75,8 @@ $(function(){
 				condition:{fields:[{ name:'keyword',label:'关键字',width:90}]}
 			}
 		},{
-			name:'c01',type:'checkboxlist',newline:true,
-			options:{textField:'name',data:flistData,rowSize:1},
+			name:'c01',type:'checkboxlist',newline:true,width:500,
+			options:{textField:'fileName',data:attachlist,rowSize:1},
 			group:'文件列表',groupicon: groupicon
 		},{
 			
@@ -114,7 +114,7 @@ $(function(){
 		$('#uploadFileButton').mikoButton({
 			width:90,
 			click:function(){
-				alert('OK');
+				window.location.href=baseUrl+'/project/main/upload-attachment/code/'+proj.projectCode;
 			}
 		});
 		$('#downloadFileButton').mikoButton({
@@ -188,6 +188,12 @@ $(function(){
 			}
 		});
 	}
+	$('#refreshButton').mikoButton({
+		width:90,
+		click:function(){
+			window.location.reload();
+		}
+	});
 	form1=$.mikoui.get('form1');
 	//设置表单值
 	form1.setData({
@@ -245,6 +251,7 @@ body { margin:0; padding:10px; }
 <button id="newReqButton">新建需求</button>
 <button id="closeButton">关闭项目</button><!-- 只有子项目全部关闭后才能关闭当前项目 -->
 <?php endif;?>
+<button id="refreshButton">刷新页面</button>
 </div>
 <?php if($this->project->lockedStatus==0 && intval(substr($this->project->flag,0,1))<2):?>
 <div class="btnGrp"><button id="uploadFileButton">上传文件</button>

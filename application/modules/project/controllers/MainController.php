@@ -356,17 +356,35 @@ class Project_MainController extends Bonjour_Controller_Base{
 	 */
 	public function uploadAttachmentAction(){
 		if($this->_request->isGet()){
-			$projectCode=$this->_request->getParam('code');
-			$this->view->assign('code',$projectCode);
-			//设置令牌，防止表单重复提交
-			$timestamp=time();
-			$token=md5('unique_bj'.$timestamp);
-			$this->view->assign('timestamp',$timestamp);
-			$this->view->assign('token',$token);
+			try{
+				//检查编码有效性
+				$projectCode=$this->_request->getParam('code');
+				if(!isset($projectCode) || !preg_match('/^[RPS]20[0-9]{2}(0[0-9]|1[0-2])[0-9]{5}$/', $projectCode))
+					throw new Exception();
+				$factory=Bonjour_Core_Model_Factory::getInstance();
+				$db=Bonjour_Core_Db_Connection::getConnection('slave');
+				if($db == null){
+					throw new Exception();
+				}
+				$factory->setDbAdapter($db);
+				$factory->registGateway('Project');
+				if(!$factory->__gateway('Project')->checkExistedProject($projectCode)) throw new Exception();	//项目不存在
+				
+				//设置令牌，防止表单重复提交
+				$timestamp=time();
+				$token=md5('unique_bj'.$timestamp);
+				
+				$this->view->assign('code',$projectCode);
+				$this->view->assign('timestamp',$timestamp);
+				$this->view->assign('token',$token);
+			}catch (Exception $e){
+				$this->_redirect('error');
+			}
 		}
 		if($this->_request->isPost()){
 			$this->_helper->viewRenderer->setNoRender ( true );
 			header ( 'content-type:text/html;charset=utf-8' );
+			$fileName='';
 			try{
 				//检查令牌
 				$timestamp=$this->_request->getParam('timestamp');
@@ -391,22 +409,44 @@ class Project_MainController extends Bonjour_Controller_Base{
 					
 				$dir=Bonjour_Core_Utility_File::createDirs($project->moduleName.DS.$projectCode);
 				$adapter=new Zend_File_Transfer_Adapter_Http();
-				$adapter->setDestination($dir.DS);
-				$adapter->addValidator ( 'Extension', true, 'exe' )
-				->addValidator ( 'Size', false, 1024*1024 );
-				$fileInfos=$adapter->getFileInfo()[1];
-				var_dump($fileInfos);
-				//$fileInfo=$fileInfos['Filedata'];
-				//$fileName=$fileInfo['name'];
-				/*require_once 'util/util.func.php';
-				$name=md5(time().generate_rand(5));//新的文件名
+				$adapter->setDestination($dir);
+				$adapter->addValidator ( 'Size', false, 4*1024*1024 );
+				$filedata=$adapter->getFileInfo()['Filedata'];
+				$fileName=$filedata['name'];
 				$ext=substr($fileName,strpos($fileName,'.'));
-				$fileName=$name.$ext;
-				$adapter->addFilter('Rename', array('target' => $fileName, 'overwrite' => true));//执行重命名*/
-					
-				//echo Bonjour_Core_GlobalConstant::BONJOUR_SUCCESS;
+				$userID=0;
+				$authNamespace = new Zend_Session_Namespace ( 'Bonjour_Auth' );
+				if(isset($authNamespace->currentUser)){
+					$userID=$authNamespace->currentUser['userID'];
+				}
+				$storageName=md5($userID.rand(1,99999).time()).$ext;//防止重名
+				$adapter->addFilter('Rename', array('target' => $storageName, 'overwrite' => true));//执行重命名
+				
+				if (!$adapter->receive()) {
+					//返回上传错误信息
+					$messages = $adapter->getMessages();
+					echo implode("\n", $messages);
+					return;
+				}else{
+					//更新数据库
+					$attachmentID=time().sprintf ( '%05d', rand(0, 99999) );
+					$fileSize=Bonjour_Core_Utility_File::getFileSize($filedata['size']);
+					$createTime=strval(date('Y-m-d H:i:s'));
+					$realPath=$dir.DS.$storageName;
+					try{
+						$attach=array('attachmentID'=>$attachmentID,'moduleName'=>$project->moduleName,'moduleCode'=>$projectCode,
+						'realPath'=>$realPath,'fileName'=>$fileName,'fileSize'=>$fileSize,'createTime'=>$createTime);
+						$affected_rows=$factory->__gateway('Attach')->addAttach($attach);
+						if($affected_rows!=1) throw new Exception();
+						echo $fileName.'上传成功';
+					}catch(Exception $exp){
+						//删除上传的文件
+						if(file_exists($realPath))	@unlink($realPath);
+						throw new Exception();
+					}
+				}
 			}catch(Exception $e){
-				echo Bonjour_Core_GlobalConstant::BONJOUR_ERROR;
+				echo $fileName.'文件上传失败';
 			}
 		}
 	}

@@ -45,7 +45,7 @@ class Bonjour_Model_AttachGateway extends Bonjour_Core_Model_GateWay{
 	 * @return unknown
 	 */
 	public function queryAttachByCode($moduleName,$moduleCode){
-		$query="select attachmentID,fileName,fileSize from " . $this->prefix . "attachment".
+		$query="select attachmentID,fileName,fileSize,downloadTimes,createTime from " . $this->prefix . "attachment".
 				" where moduleName=? and moduleCode=?";
 		$results=$this->db->query($query,array($moduleName,$moduleCode))->fetchAll();
 		return $results;
@@ -68,7 +68,7 @@ class Bonjour_Model_AttachGateway extends Bonjour_Core_Model_GateWay{
 	 * @return unknown
 	 */
 	public function queryAttachDetail($attachmentID){
-		$query="select downloadUrl,realPath,fileName,fileSize from bonjour_attachment where attachmentID=?";
+		$query="select realPath,fileName,fileSize from bonjour_attachment where attachmentID=?";
 		$result=$this->db->query($query,$attachmentID)->fetch();
 		return $result;
 	}

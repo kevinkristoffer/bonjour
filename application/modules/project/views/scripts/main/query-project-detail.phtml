@@ -19,14 +19,6 @@ var attachlist=$.parseJSON('<?php echo $this->attachlistStr?>')
 <script type="text/javascript">
 var groupicon = baseUrl+"/assets/mikoUI/skins/icons/communication.gif";
 var form1=null;
-var flistData=[{
-	name:'好莱坞'
-},{
-	name:'喜洋洋'
-},{
-	name:'赛文奥特曼'
-}];
-
 $(function(){
 	$('#form1').mikoForm({
 		inputWidth: 110, labelWidth: 95, space: 40, labelAlign:'right',
@@ -76,7 +68,7 @@ $(function(){
 			}
 		},{
 			name:'c01',type:'checkboxlist',newline:true,width:500,
-			options:{textField:'fileName',data:attachlist,rowSize:1},
+			options:{valueField:'id',textField:'output',data:attachlist,rowSize:1},
 			group:'文件列表',groupicon: groupicon
 		},{
 			
@@ -120,7 +112,12 @@ $(function(){
 		$('#downloadFileButton').mikoButton({
 			width:90,
 			click:function(){
-				alert('OK');
+				var fl=form1.getData().c01;
+				if(fl==null){
+					msg('请勾选需要下载的文件');
+					return;
+				}
+				window.location.href=baseUrl+'/ftp/attach/download?fl='+fl;
 			}
 		});
 		$('#deleteFileButton').mikoButton({
@@ -160,16 +157,36 @@ $(function(){
 	});
 	//未锁定且初始值状态
 	if(proj.lockedStatus==0 && proj.flag.substr(0,1)=='0'){
-		$('#submitButton').mikoButton({
+		$('#startButton').mikoButton({
 			width:90,
 			click:function(){
-				alert('submitted');
+				var message='确定启动项目吗？'
+				$.mikoDialog.confirm(message,function(value){
+					if(value){
+						$.post(baseUrl+'/project/main/start-project',{code:proj.projectCode},
+							function(data){
+								if(data=='0000') window.location.reload();
+								else if(data=='0001') msg('启动失败，请稍后再试');
+								else msg(data);
+							});
+					}
+				});
 			}
 		});
 		$('#cancelButton').mikoButton({
 			width:90,
 			click:function(){
-				alert('canceled');
+				var message='项目撤消后前台将不可见，确认操作吗？';
+				$.mikoDialog.confirm(message,function(value){
+					if(value){
+						$.post(baseUrl+'/project/main/cancel-project',{code:proj.projectCode},
+							function(data){
+								if(data=='0000') window.location.reload();
+								else if(data=='0001') msg('撤销失败，请稍后再试');
+								else msg(data);
+							});
+					}
+				});
 			}
 		});
 	}
@@ -244,7 +261,7 @@ body { margin:0; padding:10px; }
 <?php endif;?>
 <button id="lockButton"><?php echo $this->project->lockedStatus==0 ? '锁定项目' : '解锁项目'; ?></button>
 <?php if($this->project->lockedStatus==0 && substr($this->project->flag,0,1)=='0'):?>
-<button id="submitButton">启动项目</button><!-- 启动项目后才能新建需求 -->
+<button id="startButton">启动项目</button><!-- 启动项目后才能新建需求 -->
 <button id="cancelButton">撤销项目</button><!-- 项目取消后需到项目回收站才能恢复 -->
 <?php endif;?>
 <?php if($this->project->lockedStatus==0 && substr($this->project->flag,0,1)=='1'):?>

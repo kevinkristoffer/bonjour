@@ -169,15 +169,17 @@ class Project_MainController extends Bonjour_Controller_Base{
 				$factory->registGateway('Project');
 				
 				//检验项目状态
-				$project=$factory->__gateway('Project')->queryProjectDetail($projectCode);
-				if(!($project->lockedStatus==0 && intval(substr($project->flag,0,1))<2)) throw new Exception();
+				$fields=array('lockedStatus','flag');
+				$where1="projectCode=? and lockedStatus=0 and substring(flag,1,1) in ('0','1')";
+				$project=$factory->__gateway('Project')->advancedQueryProjectDetail($fields,$where1,$projectCode);
+				if($project==null) throw new Exception();
 				
 				//更新
 				$set=array('projectName'=>$projectName,
 						'estimateStartDate'=>$estimateStartDate,'estimateDuration'=>$estimateDuration,
 						'responsibleID'=>$responsibleID,'responsibleName'=>$responsibleName,'description'=>$description);
-				$where['projectCode=?']=$projectCode;
-				$affected_rows=$factory->__gateway('Project')->modifyProject($set,$where);
+				$where2['projectCode=?']=$projectCode;
+				$affected_rows=$factory->__gateway('Project')->modifyProject($set,$where2);
 				
 				echo Bonjour_Core_GlobalConstant::BONJOUR_SUCCESS;
 			}catch(Exception $e){
@@ -277,7 +279,8 @@ class Project_MainController extends Bonjour_Controller_Base{
 				$factory->registGateway('Project')
 						->registGateway('Attach');
 				
-				$result=$factory->__gateway('Project')->queryProjectDetail($projectCode);
+				$condition="and substring(flag,1,1)!='3'";
+				$result=$factory->__gateway('Project')->queryProjectDetail($projectCode,$condition);
 				if($result == null) throw new Exception();
 				//格式化日期
 				$createDate=$result->createDate;
@@ -292,7 +295,12 @@ class Project_MainController extends Bonjour_Controller_Base{
 				}
 				$projectStr=Zend_Json::encode($result);
 				//查询文件列表
-				$attachlist=$factory->__gateway('Attach')->queryAttachByCode($result->moduleName,$projectCode);
+				$results=$factory->__gateway('Attach')->queryAttachByCode($result->moduleName,$projectCode);
+				$attachlist=array();
+				for($i=0 ; $i<count($results) ; $i++){
+					$output='<b> '.$results[$i]->fileName.'</b>'.' [ '.$results[$i]->fileSize.' 下载'.$results[$i]->downloadTimes.'次 '.$results[$i]->createTime.' ]';
+					array_push($attachlist,array('id'=>$results[$i]->attachmentID,'output'=>$output));
+				}
 				$attachlistStr=Zend_Json::encode($attachlist);
 				
 				$this->view->assign('project',$result);
@@ -309,7 +317,6 @@ class Project_MainController extends Bonjour_Controller_Base{
 	public function lockProjectAction(){
 		$this->_helper->viewRenderer->setNoRender ( true );
 		header ( 'content-type:text/html;charset=utf-8' );
-		
 		if ($this->_request->isPost ()) {
 			try{
 				if (! isset ( $_SERVER ['HTTP_X_REQUESTED_WITH'] ) || strtolower ( $_SERVER ['HTTP_X_REQUESTED_WITH'] ) != 'xmlhttprequest') {
@@ -337,6 +344,151 @@ class Project_MainController extends Bonjour_Controller_Base{
 		}
 	}
 	/**
+	 * 撤销项目
+	 */
+	public function cancelProjectAction(){
+		//需将全部子项目全部撤销以后才能撤销当前项目
+		$this->_helper->viewRenderer->setNoRender ( true );
+		header ( 'content-type:text/html;charset=utf-8' );
+		if ($this->_request->isPost ()) {
+			try{
+				if (! isset ( $_SERVER ['HTTP_X_REQUESTED_WITH'] ) || strtolower ( $_SERVER ['HTTP_X_REQUESTED_WITH'] ) != 'xmlhttprequest') {
+					throw new Exception ();
+				}
+				$projectCode=$this->_request->getParam('code');
+				if(!isset($projectCode) || !preg_match('/^[RPS]20[0-9]{2}(0[0-9]|1[0-2])[0-9]{5}$/', $projectCode))
+					throw new Exception();
+		
+				$factory=Bonjour_Core_Model_Factory::getInstance();
+				$db=Bonjour_Core_Db_Connection::getConnection('master');
+				if($db == null){
+					throw new Exception();
+				}
+				$factory->setDbAdapter($db);
+				$factory->registGateway('Project');
+				
+				//检验项目状态，不存在或锁定则跳出
+				$fields=array('projectCode');
+				$where1="projectCode=? and lockedStatus=0 and substring(flag,1,1)='0'";
+				$project=$factory->__gateway('Project')->advancedQueryProjectDetail($fields,$where1,$projectCode);
+				if($project==null) throw new Exception();
+				
+				//查询未撤销的子项目个数，项目撤销以后无法在正常全景图中查询了
+				$cnt=$factory->__gateway('Project')->countChildNodeByStatus($projectCode,3,'!=');
+				if($cnt>0){
+					echo '请检查全部子项目是否已撤销';
+					return;
+				}
+				
+				$set=array('flag'=>'30000000');
+				$where2['projectCode=?']=$projectCode;
+				$affected_rows=$factory->__gateway('Project')->modifyProject($set,$where2);
+				if($affected_rows != 1) throw new Exception ();
+		
+				echo Bonjour_Core_GlobalConstant::BONJOUR_SUCCESS;
+			}catch(Exception $e){
+				echo Bonjour_Core_GlobalConstant::BONJOUR_ERROR;
+			}
+		}
+	}
+	/**
+	 * 关闭项目
+	 */
+	public function closeProjectAction(){
+		//需将全部子项目全部关闭以后才能关闭当前项目
+		$this->_helper->viewRenderer->setNoRender ( true );
+		header ( 'content-type:text/html;charset=utf-8' );
+		if ($this->_request->isPost ()) {
+			try{
+				if (! isset ( $_SERVER ['HTTP_X_REQUESTED_WITH'] ) || strtolower ( $_SERVER ['HTTP_X_REQUESTED_WITH'] ) != 'xmlhttprequest') {
+					throw new Exception ();
+				}
+				$projectCode=$this->_request->getParam('code');
+				if(!isset($projectCode) || !preg_match('/^[RPS]20[0-9]{2}(0[0-9]|1[0-2])[0-9]{5}$/', $projectCode))
+					throw new Exception();
+		
+				$factory=Bonjour_Core_Model_Factory::getInstance();
+				$db=Bonjour_Core_Db_Connection::getConnection('master');
+				if($db == null){
+					throw new Exception();
+				}
+				$factory->setDbAdapter($db);
+				$factory->registGateway('Project');
+				
+				//检验项目状态，不存在或锁定则跳出
+				$fields=array('projectCode');
+				$where1="projectCode=? and lockedStatus=0 and substring(flag,1,1)='1'";
+				$project=$factory->__gateway('Project')->advancedQueryProjectDetail($fields,$where1,$projectCode);
+				if($project==null) throw new Exception();
+				
+				//查询未关闭或锁定的子项目个数
+				$cnt=$factory->__gateway('Project')->countChildNodeByStatus($projectCode,2,'<','or lockedStatus=1');
+				if($cnt>0){
+					echo '请确保全部子项目未锁定且已撤销';
+					return;
+				}
+				
+				$set=array('flag'=>'20000000');
+				$where2['projectCode=?']=$projectCode;
+				$affected_rows=$factory->__gateway('Project')->modifyProject($set,$where2);
+				if($affected_rows != 1) throw new Exception ();
+		
+				echo Bonjour_Core_GlobalConstant::BONJOUR_SUCCESS;
+			}catch(Exception $e){
+				echo Bonjour_Core_GlobalConstant::BONJOUR_ERROR;
+			}
+		}
+	}
+	/**
+	 * 开启项目
+	 */
+	public function startProjectAction(){
+		$this->_helper->viewRenderer->setNoRender ( true );
+		header ( 'content-type:text/html;charset=utf-8' );
+		if ($this->_request->isPost ()) {
+			try{
+				if (! isset ( $_SERVER ['HTTP_X_REQUESTED_WITH'] ) || strtolower ( $_SERVER ['HTTP_X_REQUESTED_WITH'] ) != 'xmlhttprequest') {
+					throw new Exception ();
+				}
+				$projectCode=$this->_request->getParam('code');
+				if(!isset($projectCode) || !preg_match('/^[RPS]20[0-9]{2}(0[0-9]|1[0-2])[0-9]{5}$/', $projectCode))
+					throw new Exception();
+		
+				$factory=Bonjour_Core_Model_Factory::getInstance();
+				$db=Bonjour_Core_Db_Connection::getConnection('master');
+				if($db == null){
+					throw new Exception();
+				}
+				$factory->setDbAdapter($db);
+				$factory->registGateway('Project');
+		
+				//检验项目状态，不存在或锁定则跳出
+				$fields=array('projectCode');
+				$where1="projectCode=? and lockedStatus=0 and substring(flag,1,1)='0'";
+				$project=$factory->__gateway('Project')->advancedQueryProjectDetail($fields,$where1,$projectCode);
+				if($project==null) throw new Exception();
+				
+				//检查非根节点父类项目是否已经开启
+				if(substr($projectCode,0,1) != 'R'){
+					$status=$factory->__gateway('Project')->queryParentNodeStatus($projectCode);
+					if($status==null || intval($status)!=1){
+						echo '请检查父类项目是否存在且已启动？';
+						return;
+					}
+				}
+		
+				$set=array('flag'=>'10000000');
+				$where2['projectCode=?']=$projectCode;
+				$affected_rows=$factory->__gateway('Project')->modifyProject($set,$where2);
+				if($affected_rows != 1) throw new Exception ();
+				
+				echo Bonjour_Core_GlobalConstant::BONJOUR_SUCCESS;
+			}catch(Exception $e){
+				echo Bonjour_Core_GlobalConstant::BONJOUR_ERROR;
+			}
+		}
+	}
+	/**
 	 * 根项目管理
 	 */
 	public function manageRootProjectAction(){
@@ -346,7 +498,39 @@ class Project_MainController extends Bonjour_Controller_Base{
 	 * 查询根项目
 	 */
 	public function queryRootProjectAction(){
-		
+		$this->_helper->viewRenderer->setNoRender ( true );
+		header ( 'content-type:text/html;charset=utf-8' );
+		if ($this->_request->isPost ()) {
+			try{
+				if (! isset ( $_SERVER ['HTTP_X_REQUESTED_WITH'] ) || strtolower ( $_SERVER ['HTTP_X_REQUESTED_WITH'] ) != 'xmlhttprequest') {
+					throw new Exception ();
+				}
+				//验证参数
+				$page=$this->_request->getParam('page');
+				$pagesize=$this->_request->getParam('pagesize');
+				if(!isset($page) || !isset($pagesize) || ! preg_match('/^(\d+)$/', $page) || ! preg_match('/^(\d+)$/', $pagesize)){
+					throw new Exception ();
+				}
+					
+				$factory=Bonjour_Core_Model_Factory::getInstance();
+				$db=Bonjour_Core_Db_Connection::getConnection('slave');
+				if($db == null){
+					throw new Exception();
+				}
+				$factory->setDbAdapter($db);
+				$factory->registGateway('Project');
+					
+				//分页查询根目录
+				$condition="and substring(flag,1,1)!='3'";
+				$rows=$factory->__gateway('Project')->queryRootProject(($page-1)*$pagesize,$pagesize,$condition);
+				$total=$factory->__gateway('Project')->countRootProject($condition);
+				$callback=array('Rows'=>$rows,'Total'=>$total);
+					
+				echo Zend_Json::encode($callback);
+			}catch(Exception $e){
+				echo Bonjour_Core_GlobalConstant::BONJOUR_ERROR;
+			}
+		}
 	}
 	
 	/////////////////////ftp文件管理/////////////////////
@@ -368,7 +552,12 @@ class Project_MainController extends Bonjour_Controller_Base{
 				}
 				$factory->setDbAdapter($db);
 				$factory->registGateway('Project');
-				if(!$factory->__gateway('Project')->checkExistedProject($projectCode)) throw new Exception();	//项目不存在
+				
+				//检验项目状态
+				$fields=array('projectCode');
+				$where1="projectCode=? and lockedStatus=0 and substring(flag,1,1) in ('0','1')";
+				$project=$factory->__gateway('Project')->advancedQueryProjectDetail($fields,$where1,$projectCode);
+				if($project==null) throw new Exception();
 				
 				//设置令牌，防止表单重复提交
 				$timestamp=time();

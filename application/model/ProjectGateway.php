@@ -45,20 +45,17 @@ class Bonjour_Model_ProjectGateway extends Bonjour_Core_Model_GateWay {
 	
 	// /////////////////////////////// 查询操作 /////////////////////////////////
 	/**
-	 * 计数正常的根项目快照
-	 */
-	public function countRootProjectSnapshot(){
-		$query="select count(*) cnt from bonjour_project_main".
-				" where nodeType='R' and substring(flag,1,1)!='3'";
-		$result=$this->db->query($query)->fetch();
-		return $result->cnt;
-	}
-	/**
 	 * 查询正常的根项目快照
 	 * @param unknown $offset
 	 * @param unknown $limit
 	 * @return array
 	 */
+	public function countRootProjectSnapshot(){
+		$query="select count(*) cnt from " . $this->prefix . "project_main".
+				" where nodeType='R' and substring(flag,1,1)!='3'";
+		$result=$this->db->query($query)->fetch();
+		return $result->cnt;
+	}
 	public function queryRootProjectSnapshot($offset,$limit) {
 		$query=" select a.projectCode,a.projectName,creatorName,createDate,count(b.projectCode) pCnt from (".
 				" select projectCode,projectName,creatorName,createDate from " . $this->prefix . "project_main".
@@ -76,14 +73,17 @@ class Bonjour_Model_ProjectGateway extends Bonjour_Core_Model_GateWay {
 	 * @param string $on        	
 	 * @return Array
 	 */
-	public function queryRootProject($on = true) {
-		$query = "select projectCode,projectName,createDate,createName,lockedStatus".
-		" from " . $this->prefix . "project_main where nodeType='R'";
-		if ($on) {
-			$query = $query . " and substring(flag,1,1)='0' order by createDate desc";
-		} else {
-			$query = $query . " order by createDate desc";
-		}
+	public function countRootProject($condition=''){
+		$query =" select count(*) cnt from " . $this->prefix . "project_main where nodeType='R' ".$condition;
+		$results = $this->db->query ( $query )->fetchAll ();
+		return $results;
+	}
+	public function queryRootProject($offset,$limit,$condition='') {
+		$query =" select projectCode,projectName,createDate,creatorName,".
+				" case when substring(flag,1,1)='0' then '初始值' when substring(flag,1,1)='1' then '正常开启'".
+				" when substring(flag,1,1)='2' then '正常关闭' end currentStatus,lockedStatus,flag".
+				" from " . $this->prefix . "project_main where nodeType='R' ".$condition.
+				" order by createDate desc limit $offset,$limit";
 		$results = $this->db->query ( $query )->fetchAll ();
 		return $results;
 	}
@@ -135,7 +135,7 @@ class Bonjour_Model_ProjectGateway extends Bonjour_Core_Model_GateWay {
 	 * @return unknown
 	 */
 	public function queryParentNode($projectCode){
-		$query="select b.projectCode,b.projectName from " . $this->prefix . "project_main a,bonjour_project_main b ".
+		$query="select b.projectCode,b.projectName from " . $this->prefix . "project_main a," . $this->prefix . "project_main b ".
 				"where a.parentNode=b.projectCode and a.projectCode=?";
 		$result=$this->db->query($query,$projectCode)->fetch();
 		return $result;
@@ -165,18 +165,56 @@ class Bonjour_Model_ProjectGateway extends Bonjour_Core_Model_GateWay {
 	/**
 	 * 查询项目详情
 	 * @param unknown $projectCode
+	 * @param string $condition	特殊条件
 	 * @return unknown
 	 */
-	public function queryProjectDetail($projectCode) {
+	public function queryProjectDetail($projectCode,$condition='') {
 		$query = "select projectCode,projectName,nodeCodeRoute,nodeNameRoute,createDate,estimateStartDate,".
 				"estimateDuration,realStartDate,creatorName,responsibleID,responsibleName,description,lockedStatus,".
 				"case when substring(flag,1,1)='0' then '初始值' when substring(flag,1,1)='1' then '正常开启'".
 				"when substring(flag,1,1)='2' then '正常关闭' end currentStatus,flag,moduleName from " . $this->prefix . "project_main".
-				" where projectCode=?";
+				" where projectCode=? $condition";
 		$result = $this->db->query ( $query, $projectCode )->fetch ();
 		return $result;
 	}
-	public function searchProject() {
+	/**
+	 * 项目详情高级查询，可自定义字段和条件，只允许返回一条数据
+	 * @param array $fields
+	 * @param unknown $where
+	 * @param unknown $params
+	 * @return unknown
+	 */
+	public function advancedQueryProjectDetail($fields,$where,$params){
+		$glued_fields=implode(',', $fields);	//字段片段
+		$query="select $glued_fields from " . $this->prefix . "project_main where $where";
+		$result = $this->db->query ( $query, $params )->fetch ();
+		return $result;
+	}
+	
+	/**
+	 * 查询某个状态下的子节点个数，用在关闭、撤销操作前检验
+	 * @param unknown $parentNode
+	 * @param unknown $status
+	 * @param unknown $operator
+	 * @param string $condition	特殊条件
+	 */
+	public function countChildNodeByStatus($parentNode,$status,$operator,$condition=''){
+		$query="select count(*) cnt from bonjour_project_main where parentNode=? ".
+			   " and substring(flag,1,1)".$operator."? ".$condition;
+		$result=$this->db->query($query,array($parentNode,strval($status)))->fetch();
+		return $result->cnt;
+	}
+	/**
+	 * 查询父类项目的当前状态
+	 * @param unknown $projectCode
+	 */
+	public function queryParentNodeStatus($projectCode){
+		$query="select substring(a.flag,1,1) currentStatus from bonjour_project_main a".
+				" where a.projectCode=(".
+				" select parentNode from bonjour_project_main b".
+				" where b.projectCode=?)";
+		$result=$this->db->query($query,$projectCode)->fetch();
+		return $result->currentStatus;
 	}
 }
 

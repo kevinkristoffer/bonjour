@@ -18,6 +18,10 @@ var mainGrid=null;
 $(function(){
 	$('#mainGrid').mikoGrid({
 		title:'全部根项目',
+		url:baseUrl+'/project/main/query-root-project',
+		pageSize:8,
+		pageSizeOptions:[8,15],
+		rownumbers:true,
 		toolbar:{
 			items:[{
 				text:'新建',icon:'add',click:function(item){
@@ -26,7 +30,14 @@ $(function(){
 			},{
 				text:'其他',icon:'save'
 			}]
-		}
+		},
+		columns:[{
+			display:'项目编码',name:'projectCode'
+		},{
+			display:'项目名称',name:'projectName'
+		},{
+			display:'创建人',name:'creatorName'
+		}]
 	});
 });
 function openDialog(url,title){

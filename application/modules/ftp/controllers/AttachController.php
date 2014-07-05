@@ -56,7 +56,7 @@ class Ftp_AttachController extends Bonjour_Controller_Base{
 				if($attachment == null) continue;
 				if(!file_exists($attachment->realPath)) continue;
 				$zip->addFile($attachment->realPath);
-				$zip->renameIndex($i, $attachment->fileName);
+				$zip->renameIndex($i, iconv('utf-8', 'gb2312', $attachment->fileName));
 				//更新下载次数
 				$attachment=$factory->__gateway('Attach')->increaseDownloadTimes($fileArray[$i]);
 			}

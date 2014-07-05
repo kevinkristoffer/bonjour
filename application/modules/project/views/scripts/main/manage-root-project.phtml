@@ -19,32 +19,52 @@ $(function(){
 	$('#mainGrid').mikoGrid({
 		title:'全部根项目',
 		url:baseUrl+'/project/main/query-root-project',
-		pageSize:8,
-		pageSizeOptions:[8,15],
+		pageSize:7,
+		pageSizeOptions:[7,15],
 		rownumbers:true,
 		toolbar:{
 			items:[{
 				text:'新建',icon:'add',click:function(item){
-					openDialog('<?php echo $this->baseUrl();?>/project/main/add-project?nodeType=R&parentNode=000000000000','新建项目');
+					openDialog('<?php echo $this->baseUrl();?>/project/main/add-project?nodeType=R&parentNode=000000000000','新建项目',400,620);
 				}
 			},{
 				text:'其他',icon:'save'
 			}]
 		},
 		columns:[{
-			display:'项目编码',name:'projectCode'
+			display:'项目编码',name:'projectCode',width:130,render:function(rowdata,rowindex,value){
+				var locked=rowdata.lockedStatus==1 ? '<img src="'+baseUrl+'/assets/images/lock.png"/>' : '';
+				return locked+' '+rowdata.projectCode;
+			}
 		},{
-			display:'项目名称',name:'projectName'
+			display:'项目名称',name:'projectName',width:180
 		},{
-			display:'创建人',name:'creatorName'
+			display:'创建人',name:'creatorName',width:80
+		},{
+			display:'负责人',name:'responsibleName',width:80
+		},{
+			display:'创建日期',name:'createDate',width:80
+		},{
+			display:'当前状态',name:'currentStatus',width:80
+		},{
+			display:'操作',columns:[{
+				display:'明细',width:70,render:function(rowdata,rowindex,value){
+					var url='<?php echo $this->baseUrl();?>/project/main/query-project-detail/code/'+rowdata.projectCode;
+					return "<a href=\""+url+"\">查看</a>";
+				}
+			},{
+				display:'项目报表',width:70,render:function(rowdata,rowindex,value){
+					return "<a>查看</a>";
+				}
+			}]
 		}]
 	});
 });
-function openDialog(url,title){
+function openDialog(url,title,height,width){
 	$.mikoDialog.open({
 		top:10,
-		height:400,
-		width:620,
+		height:height,
+		width:width,
 		title:title,
 		url:url,
 		isResize:true,
@@ -53,7 +73,19 @@ function openDialog(url,title){
 }
 </script>
 <style type="text/css">
-body { margin:0; padding:0; }
+body {
+	margin: 0;
+	padding: 0;
+}
+
+a {
+	color: #111;
+}
+
+a:hover {
+	color: #999;
+}
+
 </style>
 </head>
 <body>

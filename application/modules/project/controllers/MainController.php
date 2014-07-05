@@ -477,7 +477,7 @@ class Project_MainController extends Bonjour_Controller_Base{
 					}
 				}
 		
-				$set=array('flag'=>'10000000');
+				$set=array('realStartDate'=>intval(date('Ymd')),'flag'=>'10000000');
 				$where2['projectCode=?']=$projectCode;
 				$affected_rows=$factory->__gateway('Project')->modifyProject($set,$where2);
 				if($affected_rows != 1) throw new Exception ();

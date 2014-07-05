@@ -8,16 +8,11 @@
 <script type="text/javascript">
 var baseUrl='<?php echo $this->baseUrl();?>';
 </script>
-<link rel="stylesheet" type="text/css"
-  href="<?php echo $this->baseUrl();?>/assets/mikoUI/skins/mikoui-icons.css" />
-<script type="text/javascript"
-  src="<?php echo $this->baseUrl();?>/assets/jquery/jquery-1.7.2.js"></script>
-<script type="text/javascript"
-  src="<?php echo $this->baseUrl();?>/assets/plugins/cookie/jquery.cookie.js"></script>
-<script type="text/javascript"
-  src="<?php echo $this->baseUrl();?>/assets/js/client.js"></script>
-<script type="text/javascript"
-  src="<?php echo $this->baseUrl();?>/assets/mikoUI/js/mikoui.all.js"></script>
+<link rel="stylesheet" type="text/css" href="<?php echo $this->baseUrl();?>/assets/mikoUI/skins/mikoui-icons.css" />
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/jquery/jquery-1.7.2.js"></script>
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/plugins/cookie/jquery.cookie.js"></script>
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/js/client.js"></script>
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/mikoUI/js/mikoui.all.js"></script>
 <script type="text/javascript">
 var g=null;
 var combobox=null;
@@ -57,7 +52,7 @@ $(function(){
 	$('#rootProjectButton').mikoButton({
 		width:90,
 		click:function(){
-			openDialog('<?php echo $this->baseUrl();?>/project/main/manage-root-project','根项目管理',450,800);
+			openDialog('<?php echo $this->baseUrl();?>/project/main/manage-root-project','根项目管理',440,820);
 			return;
 		}
 	});

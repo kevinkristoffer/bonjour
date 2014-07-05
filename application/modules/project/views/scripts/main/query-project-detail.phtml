@@ -109,17 +109,6 @@ $(function(){
 				window.location.href=baseUrl+'/project/main/upload-attachment/code/'+proj.projectCode;
 			}
 		});
-		$('#downloadFileButton').mikoButton({
-			width:90,
-			click:function(){
-				var fl=form1.getData().c01;
-				if(fl==null){
-					msg('请勾选需要下载的文件');
-					return;
-				}
-				window.location.href=baseUrl+'/ftp/attach/download?fl='+fl;
-			}
-		});
 		$('#deleteFileButton').mikoButton({
 			width:90,
 			click:function(){
@@ -127,6 +116,17 @@ $(function(){
 			}
 		});
 	}
+	$('#downloadFileButton').mikoButton({
+		width:90,
+		click:function(){
+			var fl=form1.getData().c01;
+			if(fl==null){
+				msg('请勾选需要下载的文件');
+				return;
+			}
+			window.location.href=baseUrl+'/ftp/attach/download?fl='+fl;
+		}
+	});
 	//未锁定且正常关闭状态
 	if(proj.lockedStatus==0 && proj.flag.substr(0,1)=='2'){
 		$('#restartButton').mikoButton({
@@ -227,9 +227,11 @@ $(function(){
 		userName:proj.responsibleName
 	});
 
-	//如果锁定项目则不能编辑
-	if(proj.lockedStatus==1)
+	//如果锁定项目则不能编辑，下载文件除外
+	if(proj.lockedStatus==1){
 		$('#form1').disable();
+		$(':checkbox').removeAttr('disabled');
+	}
 });
 function msg(content,width){
 	$('#formTip').mikoTip({content:content,width:width});
@@ -270,11 +272,13 @@ body { margin:0; padding:10px; }
 <?php endif;?>
 <button id="refreshButton">刷新页面</button>
 </div>
+<div class="btnGrp">
 <?php if($this->project->lockedStatus==0 && intval(substr($this->project->flag,0,1))<2):?>
-<div class="btnGrp"><button id="uploadFileButton">上传文件</button>
-<button id="downloadFileButton">下载文件</button>
-<button id="deleteFileButton">删除文件</button></div>
+<button id="uploadFileButton">上传文件</button>
+<button id="deleteFileButton">删除文件</button>
 <?php endif;?>
+<button id="downloadFileButton">下载文件</button>
+</div>
 <div id="formTip"></div>
 <div id="form1"></div> 
 </body>

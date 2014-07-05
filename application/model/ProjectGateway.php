@@ -75,11 +75,11 @@ class Bonjour_Model_ProjectGateway extends Bonjour_Core_Model_GateWay {
 	 */
 	public function countRootProject($condition=''){
 		$query =" select count(*) cnt from " . $this->prefix . "project_main where nodeType='R' ".$condition;
-		$results = $this->db->query ( $query )->fetchAll ();
-		return $results;
+		$result = $this->db->query ( $query )->fetch ();
+		return $result->cnt;
 	}
 	public function queryRootProject($offset,$limit,$condition='') {
-		$query =" select projectCode,projectName,createDate,creatorName,".
+		$query =" select projectCode,projectName,createDate,creatorName,responsibleName,".
 				" case when substring(flag,1,1)='0' then '初始值' when substring(flag,1,1)='1' then '正常开启'".
 				" when substring(flag,1,1)='2' then '正常关闭' end currentStatus,lockedStatus,flag".
 				" from " . $this->prefix . "project_main where nodeType='R' ".$condition.

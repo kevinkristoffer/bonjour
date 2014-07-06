@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+<?php echo $this->headTitle('新建需求'); ?>
+<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+<meta http-equiv="description" content="新建需求">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<script type="text/javascript">
+var baseUrl='<?php echo $this->baseUrl();?>';
+var code='<?php echo $this->projectCode; ?>';
+</script>
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/jquery/jquery-1.7.2.js"></script>
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/plugins/cookie/jquery.cookie.js"></script>
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/js/client.js"></script>
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/mikoUI/js/mikoui.all.js"></script>
+<script type="text/javascript">
+var groupicon = baseUrl+"/assets/mikoUI/skins/icons/communication.gif";
+var form1=null;
+$(function(){
+	$('#form1').mikoForm({
+		inputWidth: 110, labelWidth: 90, space: 40, labelAlign:'right',
+		fields:[{
+			label:'所属项目编号',name:'f00',type:'text',width:150,options:{disabled:true},
+			group:'基本信息',groupicon: groupicon
+		},{
+			label:'需求名称',name:'f01',type:'text',width:350
+		},{
+			label:'需求描述',name:'f02',type:'textarea',width:400
+		},{
+			label:'验收标准',name:'f03',type:'textarea',width:400
+		},{
+			label:'依赖需求',name:'f04',type:'combobox',
+			editor:{
+				isMultiSelect:false,
+				isShowCheckBox:false,
+				selectBoxWidth:400,
+				selectBoxHeight:230,
+				textField:'requirementID',
+				valueField:'requirementID',
+				slide:true,
+				grid:{
+					url:baseUrl+'/project/req/query-req-snap/code/'+code,
+					pageSize:5,
+					pageSizeOptions:[5,10,20],
+					columns:[{
+						display:'需求名称',name:'requirementName',width:280
+					},{
+						display:'创建日期',name:'createDate',width:90
+					}]
+				},
+				condition:{fields:[{ name:'keyword',label:'关键字',width:90}]}
+			}
+		},{
+			label:'优先级',name:'f05',type:'spinner',options:{type:'int',value:1,minValue:1,maxValue:9}
+		},{
+			label:'指派人',name:'f06',type:'combobox',textField:'userName1',
+			editor:{
+				isMultiSelect:false,
+				isShowCheckBox:false,
+				selectBoxWidth:320,
+				selectBoxHeight:230,
+				textField:'userName',
+				valueField:'userID',
+				slide:true,
+				grid:{
+					url:baseUrl+'/system/user/query-valid-user',
+					pageSize:5,
+					pageSizeOptions:[5,10,20],
+					columns:[{
+						display:'用户编号',name:'userID',width:60
+					},{
+						display:'姓名',name:'userName',width:110
+					},{
+						display:'用户角色',name:'roleName',width:100
+					}]
+				},
+				condition:{fields:[{ name:'keyword',label:'关键字',width:90}]}
+			}
+		},{
+			label:'评审人',name:'f07',type:'combobox',textField:'userName2',newline:false,
+			editor:{
+				isMultiSelect:false,
+				isShowCheckBox:false,
+				selectBoxWidth:320,
+				selectBoxHeight:230,
+				textField:'userName',
+				valueField:'userID',
+				slide:true,
+				grid:{
+					url:baseUrl+'/system/user/query-valid-user',
+					pageSize:5,
+					pageSizeOptions:[5,10,20],
+					columns:[{
+						display:'用户编号',name:'userID',width:60
+					},{
+						display:'姓名',name:'userName',width:110
+					},{
+						display:'用户角色',name:'roleName',width:100
+					}]
+				},
+				condition:{fields:[{ name:'keyword',label:'关键字',width:90}]}
+			}
+		}]
+	});
+	$('#saveButton').bind({
+		'ajaxStart':function(){ $(this).attr('disabled',true); },
+		'ajaxStop':function(){ $(this).attr('disabled',false); }
+	});
+	$('#saveButton').mikoButton({
+		width:100,
+		click:function(){
+			var formData=form1.getData();
+			//验证参数
+			if(formData.f01.length<5 || formData.f01.length>150) { msg('需求名称字数应在5-150之间',180); return;}
+			var f06='',f07='';
+			if(formData.f06!='') f06=formData.f06+'|'+formData.userName1;
+			if(formData.f07!='') f07=formData.f07+'|'+formData.userName2;
+			$.post(baseUrl+'/project/req/add-req', 
+				{ f00:formData.f00, f01:formData.f01, f02:formData.f02, f03:formData.f03, 
+				f04:formData.f04,f05:formData.f05,f06:f06,f07:f07},
+				function(data){
+					if(data == '0000') window.location.href=baseUrl+'/redirect/success';
+					else msg('保存失败',100); 
+				});
+		}
+	});
+	$('#backButton').mikoButton({
+		width:100,
+		click:function(){
+			window.location.href=baseUrl+'/project/main/query-project-detail/code/'+code;
+		}
+	});
+	form1=$.mikoui.get('form1');
+	form1.setData({
+		f00:code
+	});
+});
+function msg(content,width){
+	$('#formTip').mikoTip({content:content,width:width});
+	setTimeout(function(){
+		$('#formTip').mikoHideTip();
+	},3000);
+}
+
+
+</script>
+<style type="text/css">
+body { margin:0; padding:10px; }
+#formTip { float:left; margin-top:120px; }
+</style>
+</head>
+<body>
+<div>
+<button id="backButton">返回项目</button>
+<button id="saveButton">保存需求</button></div>
+<div id="formTip">
+</div>
+<div id="form1"></div> 
+</body>
+</html>

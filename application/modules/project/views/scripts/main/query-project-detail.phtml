@@ -195,13 +195,13 @@ $(function(){
 		$('#newReqButton').mikoButton({
 			width:90,
 			click:function(){
-				alert('new requirement');
+				window.location.href=baseUrl+'/project/req/add-req/code/'+proj.projectCode;
 			}
 		});
 		$('#closeButton').mikoButton({
 			width:90,
 			click:function(){
-				alert('closed');
+				alert('OK');
 			}
 		});
 	}

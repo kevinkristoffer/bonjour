@@ -40,8 +40,7 @@ class System_UserController extends Bonjour_Controller_Base{
 				$factory=Bonjour_Core_Model_Factory::getInstance();
 				$db=Bonjour_Core_Db_Connection::getConnection('slave');
 				if($db == null){
-					$this->_redirect('error/db-disconnect');
-					return;
+					throw new Exception();
 				}
 				$factory->setDbAdapter($db);
 				$factory->registGateway('User');
@@ -52,7 +51,7 @@ class System_UserController extends Bonjour_Controller_Base{
 					
 				echo Zend_Json::encode($callback);
 			}catch(Exception $e){
-				$this->_redirect('error');
+				echo Bonjour_Core_GlobalConstant::BONJOUR_ERROR;
 			}
 		}else{
 			$this->_redirect('error');

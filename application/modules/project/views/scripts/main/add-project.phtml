@@ -19,15 +19,15 @@ $(function(){
 	$('#form1').mikoForm({
 		inputWidth: 110, labelWidth: 90, space: 40, labelAlign:'right',
 		fields:[{
-			display:'项目名称',name:'f01',type:'text',newline:true,width:350,group:'基本信息',groupicon: groupicon
+			label:'项目名称',name:'f01',type:'text',newline:true,width:350,group:'基本信息',groupicon: groupicon
 		},{
-			display:'项目描述',name:'f02',type:'textarea',newline:true,width:400
+			label:'项目描述',name:'f02',type:'textarea',newline:true,width:400
 		},{
-			display:'预估启动日期',name:'f03',type:'date',newline:true
+			label:'预估启动日期',name:'f03',type:'date',newline:true
 		},{
-			display:'预估天数',name:'f04',type:'spinner',newline:false,options:{type:'int',value:5}
+			label:'预估天数',name:'f04',type:'spinner',newline:false,options:{type:'int',value:5,isNegative:false}
 		},{
-			display:'负责人',name:'f05',type:'combobox',newline:true,textField:'userName',
+			label:'负责人',name:'f05',type:'combobox',newline:true,textField:'userName',
 			editor:{
 				isMultiSelect:false,
 				isShowCheckBox:false,

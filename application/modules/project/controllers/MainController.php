@@ -62,7 +62,7 @@ class Project_MainController extends Bonjour_Controller_Base{
 				$estimateDuration=$this->_request->getParam('f04');
 				if(isset($estimateDuration) && $estimateDuration<=0) throw new Exception();
 				$responsible=$this->_request->getParam('f05');
-				if(!isset($responsible) || !preg_match('/|/', $responsible)) throw new Exception();
+				if(!isset($responsible) || !preg_match('/\|/', $responsible)) throw new Exception();
 				$responsible2=explode('|', $responsible);
 				$responsibleID=$responsible2[0];
 				$responsibleName=$responsible2[1];
@@ -154,7 +154,7 @@ class Project_MainController extends Bonjour_Controller_Base{
 				$estimateDuration=$this->_request->getParam('f04');
 				if(isset($estimateDuration) && $estimateDuration<=0) throw new Exception();
 				$responsible=$this->_request->getParam('f05');
-				if(!isset($responsible) || !preg_match('/|/', $responsible)) throw new Exception();
+				if(!isset($responsible) || !preg_match('/\|/', $responsible)) throw new Exception();
 				$responsible2=explode('|', $responsible);
 				$responsibleID=$responsible2[0];
 				$responsibleName=$responsible2[1];
@@ -238,7 +238,7 @@ class Project_MainController extends Bonjour_Controller_Base{
 					throw new Exception ();
 				}
 				$rootNode=$this->_request->getParam('code');
-				if(!isset($rootNode) || !preg_match('/^[RPS]20[0-9]{2}(0[0-9]|1[0-2])[0-9]{5}$/', $rootNode))
+				if(!isset($rootNode) || !preg_match('/^[R]20[0-9]{2}(0[0-9]|1[0-2])[0-9]{5}$/', $rootNode))
 					throw new Exception();
 				
 				$factory=Bonjour_Core_Model_Factory::getInstance();

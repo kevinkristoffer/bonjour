@@ -61,7 +61,7 @@ class Project_ReqController extends Bonjour_Controller_Base{
 				$distributor=$this->_request->getParam('f06');
 				$distributorID=null;
 				$distributorName=null;
-				if(isset($distributor) && preg_match('/|/', $distributor)){
+				if(isset($distributor) && preg_match('/\|/', $distributor)){
 					$distributor_array=explode('|', $distributor);
 					$distributorID=$distributor_array[0];
 					$distributorName=$distributor_array[1];
@@ -69,7 +69,7 @@ class Project_ReqController extends Bonjour_Controller_Base{
 				$reviewer=$this->_request->getParam('f07');
 				$reviewerID=null;
 				$reviewerName=null;
-				if(isset($reviewer) && preg_match('/|/', $reviewer)){
+				if(isset($reviewer) && preg_match('/\|/', $reviewer)){
 					$reviewer_array=explode('|', $reviewer);
 					$reviewerID=$reviewer_array[0];
 					$reviewerName=$reviewer_array[1];
@@ -106,8 +106,7 @@ class Project_ReqController extends Bonjour_Controller_Base{
 				
 				echo Bonjour_Core_GlobalConstant::BONJOUR_SUCCESS;
 			}catch(Exception $e){
-				//echo Bonjour_Core_GlobalConstant::BONJOUR_ERROR;
-				echo $e->getMessage();
+				echo Bonjour_Core_GlobalConstant::BONJOUR_ERROR;
 			}
 		}
 	}
@@ -165,7 +164,119 @@ class Project_ReqController extends Bonjour_Controller_Base{
 			}
 		}
 	}
-	
+	/**
+	 * 查询全部需求
+	 */
+	public function queryAllAction(){
+		if($this->_request->isGet()){}
+	}
+	/**
+	 * 查询项目树
+	 */
+	public function queryProjectTreeAction(){
+		$this->_helper->viewRenderer->setNoRender ( true );
+		header ( 'content-type:text/html;charset=utf-8' );
+		if ($this->_request->isPost ()) {
+			try{
+				if (! isset ( $_SERVER ['HTTP_X_REQUESTED_WITH'] ) || strtolower ( $_SERVER ['HTTP_X_REQUESTED_WITH'] ) != 'xmlhttprequest') {
+					throw new Exception ();
+				}
+				$rootNode=$this->_request->getParam('code');
+				if(!isset($rootNode) || !preg_match('/^[R]20[0-9]{2}(0[0-9]|1[0-2])[0-9]{5}$/', $rootNode))
+					throw new Exception();
+		
+				$factory=Bonjour_Core_Model_Factory::getInstance();
+				$db=Bonjour_Core_Db_Connection::getConnection('slave');
+				if($db == null){
+					throw new Exception();
+				}
+				$factory->setDbAdapter($db);
+				$factory->registGateway('Req');
+					
+				$rows=$factory->__gateway('Req')->queryProjectByRootNode($rootNode);
+				$total=count($rows);
+				$callback=array('Rows'=>$rows,'Total'=>$total);
+					
+				echo Zend_Json::encode($callback);
+			}catch(Exception $e){
+				echo Bonjour_Core_GlobalConstant::BONJOUR_ERROR;
+			}
+		}
+	}
+	/**
+	 * 筛选查询项目需求
+	 */
+	public function queryReqListAction(){
+		$this->_helper->viewRenderer->setNoRender ( true );
+		header ( 'content-type:text/html;charset=utf-8' );
+		if ($this->_request->isPost ()) {
+			try{
+				if (! isset ( $_SERVER ['HTTP_X_REQUESTED_WITH'] ) || strtolower ( $_SERVER ['HTTP_X_REQUESTED_WITH'] ) != 'xmlhttprequest') {
+					throw new Exception ();
+				}
+				//验证普通参数
+				$projectCode=$this->_request->getParam('code');
+				if(!isset($projectCode) || !preg_match('/^[RPS]20[0-9]{2}(0[0-9]|1[0-2])[0-9]{5}$/', $projectCode))
+					throw new Exception();
+				$page=$this->_request->getParam('page');
+				$pagesize=$this->_request->getParam('pagesize');
+				if(!isset($page) || !isset($pagesize) || ! preg_match('/^(\d+)$/', $page) || ! preg_match('/^(\d+)$/', $pagesize)){
+					throw new Exception ();
+				}
+				//验证高级参数
+				$orderby='';
+				$sort=$this->_request->getParam('sort');
+				if(isset($sort) && $sort!=''){
+					$orderby=str_replace(';', ',', $sort);
+					$orderby='order by '.$orderby;
+				}
+				$condition='';
+				$params=array();
+				$nameKeyword=$this->_request->getParam('p1');
+				if(isset($nameKeyword) && $nameKeyword!=''){
+					$condition=$condition.' and requirementName regexp ?';
+					$params=array_merge($params,array($nameKeyword));
+				}
+				$startdate=$this->_request->getParam('p2');
+				$enddate=$this->_request->getParam('p3');
+				if(isset($startdate) && isset($enddate) && preg_match('/^[0-9]{8}$/',$startdate) && preg_match('/^[0-9]{8}$/',$enddate)){
+					$condition=$condition.' and createDate between ? and ?';
+					$params=array_merge($params,array($startdate,$enddate));
+				}
+				$statusValue=$this->_request->getParam('p4');
+				if(isset($statusValue) && preg_match('/^[0-8]{1}$/',$statusValue)){
+					$condition=$condition.' and substring(flag,1,1)=?';
+					$params=array_merge($params,array($statusValue));
+				}
+				
+// 				echo 'orderby:'.$orderby.'<br/>';
+// 				echo 'condition:'.$condition.'<br/>';
+// 				var_dump($params);
+				$factory=Bonjour_Core_Model_Factory::getInstance();
+				$db=Bonjour_Core_Db_Connection::getConnection('slave');
+				if($db == null){
+					throw new Exception();
+				}
+				$factory->setDbAdapter($db);
+				$factory->registGateway('Req');
+					
+				$rows=$factory->__gateway('Req')->queryReqList($projectCode,$pagesize*($page-1),$pagesize,$condition,$params,$orderby);
+				$total=$factory->__gateway('Req')->countReqList($projectCode,$condition,$params,$orderby);
+				$callback=array('Rows'=>$rows,'Total'=>$total);
+					
+				echo Zend_Json::encode($callback);
+			}catch(Exception $e){
+// 				echo $e->getMessage();
+				echo Bonjour_Core_GlobalConstant::BONJOUR_ERROR;
+			}
+		}
+	}
+	/**
+	 * 查看需求明细
+	 */
+	public function queryReqDetailAction(){
+		
+	}
 }
 
 ?>

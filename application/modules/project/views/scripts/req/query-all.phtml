@@ -128,7 +128,11 @@ $(function(){
 			display:'当前状态',name:'currentStatus',width:60
 		},{
 			display:'操作',columns:[{
-				display:'明细',name:'',width:50
+				display:'明细',name:'',width:50,render:function(rowdata,rowindex,value){
+					var url='<?php echo $this->baseUrl();?>/project/req/query-req-detail/id/'+rowdata.requirementID;
+					var title='项目需求明细';
+					return '<a href="#" onclick="javascript:openDialog(\''+url+'\',\''+title+'\',530,800);">查看</a>';
+				}
 			},{
 				display:'报表',name:'',width:50
 			}]
@@ -140,13 +144,14 @@ $(function(){
 			}
 			$.mikoDialog.open({
 				top:30,
-				height:300,
+				height:320,
 				width:500,
 				title:'高级查询',
 				target: $("#target1"),
 				buttons:[{
 					text: '确定', onclick: function (item, dialog) {
 						var sortValues=miko.get('listbox2').getValue();
+						var descFlag=miko.get('descFlag').getValue();
 						var nameValue=miko.get('reqName').getValue();
 						var startdateValue=miko.get('reqStartDate').getValue();
 						var enddateValue=miko.get('reqEndDate').getValue();
@@ -170,6 +175,7 @@ $(function(){
 							g.setParm('p2',startdate);
 							g.setParm('p3',enddate);
 							g.setParm('p4',statusValue);
+							g.setParm('p6',descFlag);
 							g.reload();
 						}
 					},cls:'l-dialog-btn-highlight' 
@@ -212,6 +218,7 @@ $(function(){
             { text: '当前状态', id: '8' }
     ];
     miko.get("listbox1").setData(data);
+    $('#descFlag').mikoCheckBox();
     $('#reqName').mikoTextBox({ width:120 });
     $('#reqStartDate').mikoDateEditor({ width:120 });
     $('#reqEndDate').mikoDateEditor({ width:120 });
@@ -323,6 +330,11 @@ label { font-weight:bold; }
 			<div id="listbox2"></div> 
 		</div>
 		<table cellpadding="0" cellspacing="0" class="l-table-edit" >
+			<tr>
+                <td align="right" class="l-table-edit-td"><label>是否倒序</label></td>
+                <td align="left" class="l-table-edit-td"><input type="checkbox" id="descFlag"/></td>
+                <td align="left"></td>
+            </tr>
             <tr>
                 <td align="right" class="l-table-edit-td"><label>需求名称关键字</label></td>
                 <td align="left" class="l-table-edit-td"><input type="text" id="reqName"/></td>

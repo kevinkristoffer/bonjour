@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+<?php echo $this->headTitle('项目需求明细'); ?>
+<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+<meta http-equiv="description" content="项目需求明细">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<script type="text/javascript">
+var baseUrl='<?php echo $this->baseUrl();?>';
+</script>
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/jquery/jquery-1.7.2.js"></script>
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/plugins/cookie/jquery.cookie.js"></script>
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/js/client.js"></script>
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/mikoUI/js/mikoui.all.js"></script>
+<script type="text/javascript">
+var req=$.parseJSON('<?php echo $this->req; ?>');
+var attachlist=$.parseJSON('<?php echo $this->attachlistStr?>')
+</script>
+<script type="text/javascript">
+var groupicon = baseUrl+"/assets/mikoUI/skins/icons/communication.gif";
+var form1=null;
+$(function(){
+	$('#form1').mikoForm({
+		inputWidth: 110, labelWidth: 90, space: 40, labelAlign:'right',
+		fields:[{
+			label:'所属项目编号',name:'f00',type:'text',width:150,options:{disabled:true},
+			group:'基本信息',groupicon: groupicon
+		},{
+			label:'是否锁定',name:'s01',options:{ disabled:true },width:50,space:0
+		},{
+			label:'状态字',name:'s02',options:{ disabled:true },width:50,newline:false
+		},{
+			label:'需求名称',name:'f01',type:'text',width:350
+		},{
+			label:'需求描述',name:'f02',type:'textarea',width:400
+		},{
+			label:'验收标准',name:'f03',type:'textarea',width:400
+		},{
+			label:'依赖需求',name:'f04',type:'combobox',textField:'dependenceID',space:0,
+			editor:{
+				isMultiSelect:false,
+				isShowCheckBox:false,
+				selectBoxWidth:400,
+				selectBoxHeight:230,
+				textField:'requirementID',
+				valueField:'requirementID',
+				slide:true,
+				grid:{
+					url:baseUrl+'/project/req/query-req-snap/exclude/1/code/'+req.projectCode,
+					pageSize:5,
+					pageSizeOptions:[5,10,20],
+					columns:[{
+						display:'需求名称',name:'requirementName',width:280
+					},{
+						display:'创建日期',name:'createDate',width:90
+					}]
+				},
+				condition:{fields:[{ name:'keyword',label:'关键字',width:90}]}
+			}
+		},{
+			label:'是否完成',name:'d00',type:'text',options:{ disabled:true},width:50,space:0,newline:false
+		},{
+			label:'优先级',name:'f05',type:'spinner',options:{type:'int',minValue:1,maxValue:9},width:50,newline:false
+		},{
+			label:'创建日期',name:'d01',type:'text',options:{ disabled:true },space:0
+		},{
+			label:'最近修改时间',name:'d02',type:'text',options:{ disabled:true },width:150,newline:false
+		},{
+			label:'创建人',name:'d03',type:'text',options:{ disabled:true },space:0
+		},{
+			label:'指派人',name:'f06',type:'combobox',textField:'userName1',labelWidth:70,space:0,newline:false,
+			editor:{
+				isMultiSelect:false,
+				isShowCheckBox:false,
+				selectBoxWidth:320,
+				selectBoxHeight:230,
+				textField:'userName',
+				valueField:'userID',
+				slide:true,
+				grid:{
+					url:baseUrl+'/system/user/query-valid-user',
+					pageSize:5,
+					pageSizeOptions:[5,10,20],
+					columns:[{
+						display:'用户编号',name:'userID',width:60
+					},{
+						display:'姓名',name:'userName',width:110
+					},{
+						display:'用户角色',name:'roleName',width:100
+					}]
+				},
+				condition:{fields:[{ name:'keyword',label:'关键字',width:90}]}
+			}
+		},{
+			label:'评审人',name:'f07',type:'combobox',textField:'userName2',labelWidth:70,newline:false,
+			editor:{
+				isMultiSelect:false,
+				isShowCheckBox:false,
+				selectBoxWidth:320,
+				selectBoxHeight:230,
+				textField:'userName',
+				valueField:'userID',
+				slide:true,
+				grid:{
+					url:baseUrl+'/system/user/query-valid-user',
+					pageSize:5,
+					pageSizeOptions:[5,10,20],
+					columns:[{
+						display:'用户编号',name:'userID',width:60
+					},{
+						display:'姓名',name:'userName',width:110
+					},{
+						display:'用户角色',name:'roleName',width:100
+					}]
+				},
+				condition:{fields:[{ name:'keyword',label:'关键字',width:90}]}
+			}
+		},{
+			name:'f11',type:'hidden'
+		},{
+			name:'c01',type:'checkboxlist',newline:true,width:500,
+			options:{valueField:'id',textField:'output',data:attachlist,rowSize:1},
+			group:'文件列表',groupicon: groupicon
+		}]
+	});
+	$('#saveButton').bind({
+		'ajaxStart':function(){ $(this).attr('disabled',true); },
+		'ajaxStop':function(){ $(this).attr('disabled',false); }
+	});
+	$('#saveButton').mikoButton({
+		width:90,
+		click:function(){
+			var formData=form1.getData();
+			//验证参数
+			if(formData.f01.length<5 || formData.f01.length>150) { msg('需求名称字数应在5-150之间',180); return;}
+			if(formData.f11==formData.f04) { msg('依赖需求不能指向本身'); return;}
+			var f06='',f07='';
+			if(formData.f06!='') f06=formData.f06+'|'+formData.userName1;
+			if(formData.f07!='') f07=formData.f07+'|'+formData.userName2;
+			$.post(baseUrl+'/project/req/modify-req', 
+				{ f11:formData.f11, f01:formData.f01, f02:formData.f02, f03:formData.f03, 
+				f04:formData.f04,f05:formData.f05,f06:f06,f07:f07},
+				function(data){
+					if(data == '0000') tip('信息提示','保存成功');
+					else msg('保存失败',100);
+				});
+		}
+	});
+	$('#verifyButton').mikoButton({
+		width:90,
+		click:function(){
+			$.post(baseUrl+'/project/req/verify-req',{id:req.requirementID},
+				function(data){
+					if(data == '0000') tip('信息提示','审核提交成功');
+					else msg('提交失败',100);
+				});
+		}
+	});
+	$('#backButton').mikoButton({
+		width:90,
+		click:function(){
+			window.location.href=baseUrl+'/project/main/query-project-detail/code/'+req.projectCode;
+		}
+	});
+	$('#uploadFileButton').mikoButton({
+		width:90,
+		click:function(){
+			window.location.href=baseUrl+'/project/req/upload-attachment/id/'+req.requirementID;
+		}
+	});
+	$('#deleteFileButton').mikoButton({
+		width:90,
+		click:function(){
+			alert('OK');
+		}
+	});
+	$('#downloadFileButton').mikoButton({
+		width:90,
+		click:function(){
+			var fl=form1.getData().c01;
+			if(fl==null){
+				msg('请勾选需要下载的文件');
+				return;
+			}
+			window.location.href=baseUrl+'/ftp/attach/download?fl='+fl;
+		}
+	});
+	form1=$.mikoui.get('form1');
+	form1.setData({
+		f00:req.projectCode,
+		s01:req.lockedStatus == '1' ? '是' : '否',
+		s02:req.statusFlag,
+		f11:req.requirementID,
+		f01:req.requirementName,
+		f02:req.description,
+		f03:req.acceptanceCriteria,
+		f04:req.dependenceID,
+		dependenceID:req.dependenceID,
+		d00:req.dependenceFlag == '1' ? '是' : '否',
+		f05:req.priority,
+		d01:req.createDate,
+		d02:req.lastModifiedTime,
+		d03:req.creatorName,
+		f06:req.distributorID,
+		userName1:req.distributorName,
+		f07:req.reviewerID,
+		userName2:req.reviewerName,
+		
+	});
+});
+function msg(content,width){
+	$('#formTip').mikoTip({content:content,width:width});
+	setTimeout(function(){
+		$('#formTip').mikoHideTip();
+	},3000);
+}
+function tip(title,content){
+	//提示信息
+	var tip=$.mikoDialog.tip({  title: title,content:content });
+	setTimeout(function(){
+		if(tip)	tip.hide();
+	},3000);
+}
+
+</script>
+<style type="text/css">
+body { margin:0; padding:10px; }
+.btnGrp { margin-top:0px; height:25px;}
+#formTip { float:left; margin-top:120px; }
+</style>
+</head>
+<body>
+<div class="btnGrp">
+<button id="backButton">查看项目</button>
+<button id="saveButton">保存需求</button>
+<button id="verifyButton">提交审核</button>
+</div>
+<div class="btnGrp">
+<button id="uploadFileButton">上传文件</button>
+<button id="deleteFileButton">删除文件</button>
+<button id="downloadFileButton">下载文件</button>
+</div>
+<div id="formTip">
+</div>
+<div id="form1"></div> 
+</body>
+</html>

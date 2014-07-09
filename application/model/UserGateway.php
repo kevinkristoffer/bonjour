@@ -1,6 +1,27 @@
 <?php
 
 class Bonjour_Model_UserGateway extends Bonjour_Core_Model_GateWay {
+	
+	/**
+	 * 新建用户
+	 * @param unknown $user
+	 * @return number
+	 */
+	public function addUser($user){
+		$affected_rows=$this->db->insert($this->prefix.'user',$user);
+		return $affected_rows;
+	}
+	
+	/**
+	 * 修改用户
+	 * @param unknown $set
+	 * @param unknown $where
+	 * @return number
+	 */
+	public function modifyUser($set,$where){
+		$affected_rows=$this->db->update($this->prefix.'user',$set,$where);
+		return $affected_rows;
+	}
 
 	/**
 	 * 计算搜索到的有效用户数
@@ -37,6 +58,14 @@ class Bonjour_Model_UserGateway extends Bonjour_Core_Model_GateWay {
 			$results=$this->db->query($query)->fetchAll();
 		}
 		return $results;
+	}
+	
+	
+	public function countUserList(){
+		
+	}
+	public function queryUserList(){
+		
 	}
 }
 

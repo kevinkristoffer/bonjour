@@ -66,8 +66,10 @@ class Bonjour_Model_ReqGateway extends Bonjour_Core_Model_GateWay{
 	}
 	public function queryReqList($projectCode,$offset,$limit,$condition='',$params=array(),$orderby=''){
 		$query="select requirementID,requirementName,creatorName,distributorName,".
-				" reviewerName,priority,createDate,substring(flag,1,1) currentStatus from ".$this->prefix."requirement_main".
-				" where projectCode=? ".$condition." ".$orderby." limit $offset,$limit";
+				" reviewerName,priority,createDate,lockedStatus,flag1,statusCNNAME currentStatus".
+				" from ".$this->prefix."requirement_main a,bonjour_status b".
+				" where a.flag1=b.statusValue and b.entityName='REQUIREMENT'".
+				" and projectCode=? ".$condition." ".$orderby." limit $offset,$limit";
 		$params=array_merge(array($projectCode),$params);
 		$results=$this->db->query($query,$params)->fetchAll();
 		return $results;
@@ -80,11 +82,11 @@ class Bonjour_Model_ReqGateway extends Bonjour_Core_Model_GateWay{
 	public function queryProjectByRootNode($rootNode){
 		$query="select projectCode,projectName,parentNode,sum(reqCount) reqCount from".
 				" (select projectCode,projectName,parentNode,0 reqCount from ".$this->prefix."project_main".
-				" where substring(flag,1,1)!='3' and rootNode=?".
+				" where flag1!=".Bonjour_Core_GlobalConstant::PROJECT_CANCELED." and rootNode=?".
 				" union".
 				" select a.projectCode,a.projectName,parentNode,count(b.requirementID)".
 				" from ".$this->prefix."project_main a,".$this->prefix."requirement_main b".
-				" where a.projectCode=b.projectCode and substring(a.flag,1,1)!='3' and rootNode=?".
+				" where a.projectCode=b.projectCode and a.flag1!=".Bonjour_Core_GlobalConstant::PROJECT_CANCELED." and rootNode=?".
 				" group by 1,2,3) hh".
 				" group by 1,2,3";
 		$results=$this->db->query($query,array($rootNode,$rootNode))->fetchAll();
@@ -98,8 +100,9 @@ class Bonjour_Model_ReqGateway extends Bonjour_Core_Model_GateWay{
 	public function queryReqDetail($requirementID){
 		$query="select requirementID,requirementName,projectCode,description,acceptanceCriteria,dependenceID,".
 				" createDate,lastModifiedTime,creatorName,distributorID,distributorName,reviewerID,reviewerName,".
-				" closedBy,priority,lockedStatus,substring(flag,1,1) statusFlag,substring(flag,2,1) dependenceFlag,moduleName".
-				" from ".$this->prefix."requirement_main where requirementID=?";
+				" closedBy,priority,lockedStatus,flag1,flag2,moduleName,statusCNName currentStatus".
+				" from ".$this->prefix."requirement_main a,".$this->prefix."status b".
+				" where a.flag1=b.statusValue and b.entityName='REQUIREMENT' and requirementID=?";
 		$result=$this->db->query($query,$requirementID)->fetch();
 		return $result;
 	}

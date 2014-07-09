@@ -26,7 +26,7 @@ class Project_ReqController extends Bonjour_Controller_Base {
 				$fields = array (
 						'projectCode' 
 				);
-				$where1 = "projectCode=? and lockedStatus=0 and substring(flag,1,1)='1'";
+				$where1 = "projectCode=? and lockedStatus=0 and flag1=".Bonjour_Core_GlobalConstant::PROJECT_STARTED;
 				$project = $factory->__gateway ( 'Project' )->advancedQueryProjectDetail ( $fields, $where1, $projectCode );
 				if ($project == null)
 					throw new Exception ();
@@ -99,7 +99,7 @@ class Project_ReqController extends Bonjour_Controller_Base {
 				$fields = array (
 						'projectCode' 
 				);
-				$where1 = "projectCode=? and lockedStatus=0 and substring(flag,1,1)='1'";
+				$where1 = "projectCode=? and lockedStatus=0 and flag1=".Bonjour_Core_GlobalConstant::PROJECT_STARTED;
 				$project = $factory->__gateway ( 'Project' )->advancedQueryProjectDetail ( $fields, $where1, $projectCode );
 				if ($project == null)
 					throw new Exception ();
@@ -195,7 +195,7 @@ class Project_ReqController extends Bonjour_Controller_Base {
 				$fields = array (
 						'requirementID' 
 				);
-				$condition = "requirementID=? and lockedStatus=0 and substring(flag,1,1) in ('0','2')";
+				$condition = "requirementID=? and lockedStatus=0 and flag1 in (".Bonjour_Core_GlobalConstant::REQUIREMENT_INITIALIZED.",".Bonjour_Core_GlobalConstant::REQUIREMENT_VERYFY_RETURNED.")";
 				$result = $factory->__gateway ( 'Req' )->advancedQueryReqDetail ( $fields, $condition, $requirementID );
 				if ($result == null)
 					throw new Exception ();
@@ -367,7 +367,7 @@ class Project_ReqController extends Bonjour_Controller_Base {
 				}
 				$statusValue = $this->_request->getParam ( 'p4' );
 				if (isset ( $statusValue ) && preg_match ( '/^[0-8]{1}$/', $statusValue )) {
-					$condition = $condition . ' and substring(flag,1,1)=?';
+					$condition = $condition . ' and flag1=?';
 					$params = array_merge ( $params, array (
 							$statusValue 
 					) );
@@ -463,7 +463,7 @@ class Project_ReqController extends Bonjour_Controller_Base {
 				$fields = array (
 						'requirementID' 
 				);
-				$condition = "requirementID=? and lockedStatus=0 and substring(flag,1,1) in ('0','2')";
+				$condition = "requirementID=? and lockedStatus=0 and flag1 in (".Bonjour_Core_GlobalConstant::REQUIREMENT_INITIALIZED.",".Bonjour_Core_GlobalConstant::REQUIREMENT_VERYFY_RETURNED.")";
 				$result = $factory->__gateway ( 'Req' )->advancedQueryReqDetail ( $fields, $condition, $requirementID );
 				if ($result == null)
 					throw new Exception ();
@@ -508,7 +508,7 @@ class Project_ReqController extends Bonjour_Controller_Base {
 				$fields = array (
 						'moduleName' 
 				);
-				$condition = "requirementID=? and lockedStatus=0 and substring(flag,1,1) in ('0','2')";
+				$condition = "requirementID=? and lockedStatus=0 and flag1 in (".Bonjour_Core_GlobalConstant::REQUIREMENT_INITIALIZED.",".Bonjour_Core_GlobalConstant::REQUIREMENT_VERYFY_RETURNED.")";
 				$result = $factory->__gateway ( 'Req' )->advancedQueryReqDetail ( $fields, $condition, $requirementID );
 				if ($result == null)
 					throw new Exception ();
@@ -597,10 +597,9 @@ class Project_ReqController extends Bonjour_Controller_Base {
 				// 检查状态，同时获取评审人ID
 				$fields = array (
 						'reviewerID',
-						'reviewerName',
-						'flag' 
+						'reviewerName'
 				);
-				$condition = "requirementID=? and lockedStatus=0 and substring(flag,1,1)='0'";
+				$condition = "requirementID=? and lockedStatus=0 and flag1=".Bonjour_Core_GlobalConstant::REQUIREMENT_INITIALIZED;
 				$req = $factory->__gateway ( 'Req' )->advancedQueryReqDetail ( $fields, $condition, $requirementID );
 				if ($req == null)
 					throw new Exception ();
@@ -630,10 +629,8 @@ class Project_ReqController extends Bonjour_Controller_Base {
 					if ($affected_rows != 1)
 						throw new Exception ();
 						// 更新需求状态
-					$req_flag = $req->flag;
-					$req_flag = '1' . substr ( $req_flag, 1, 7 );
 					$set = array (
-							'flag' => $req_flag 
+							'flag1' => 1
 					);
 					$where ['requirementID=?'] = $requirementID;
 					$affected_rows = $factory->__gateway ( 'Req' )->modifyReq ( $set, $where );

@@ -1,3 +1,8 @@
-[2014-07-08]
+[2014-07-09]
 1. 添加“需求查询”子块
 2. bonjour_requirement_main中添加moduleName字段
+3. 添加status表
+4. 修改project_main表，添加Flag1字段(int)，建立索引，更新，SQL如下
+update bonjour_project_main set flag1=substring(flag,1,1)+0
+requirement_main添加Flag1,Flag2字段，建立索引，更新，SQL如下
+update bonjour_requirement_main set flag1=substring(flag,1,1)+0

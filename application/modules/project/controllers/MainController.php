@@ -193,11 +193,8 @@ class Project_MainController extends Bonjour_Controller_Base {
 				$factory->registGateway ( 'Project' );
 				
 				// 检验项目状态
-				$fields = array (
-						'lockedStatus',
-						'flag' 
-				);
-				$where1 = "projectCode=? and lockedStatus=0 and substring(flag,1,1) in ('0','1')";
+				$fields = array ('projectCode');
+				$where1 = "projectCode=? and lockedStatus=0 and flag1 in (".Bonjour_Core_GlobalConstant::PROJECT_INITIALIZED.",".Bonjour_Core_GlobalConstant::PROJECT_STARTED.")";
 				$project = $factory->__gateway ( 'Project' )->advancedQueryProjectDetail ( $fields, $where1, $projectCode );
 				if ($project == null)
 					throw new Exception ();
@@ -318,7 +315,7 @@ class Project_MainController extends Bonjour_Controller_Base {
 				$factory->setDbAdapter ( $db );
 				$factory->registGateway ( 'Project' )->registGateway ( 'Attach' );
 				
-				$condition = "and substring(flag,1,1)!='3'";
+				$condition = "and flag1!=".Bonjour_Core_GlobalConstant::PROJECT_CANCELED;
 				$result = $factory->__gateway ( 'Project' )->queryProjectDetail ( $projectCode, $condition );
 				if ($result == null)
 					throw new Exception ();
@@ -415,20 +412,20 @@ class Project_MainController extends Bonjour_Controller_Base {
 				$fields = array (
 						'projectCode' 
 				);
-				$where1 = "projectCode=? and lockedStatus=0 and substring(flag,1,1)='0'";
+				$where1 = "projectCode=? and lockedStatus=0 and flag1=".Bonjour_Core_GlobalConstant::PROJECT_INITIALIZED;
 				$project = $factory->__gateway ( 'Project' )->advancedQueryProjectDetail ( $fields, $where1, $projectCode );
 				if ($project == null)
 					throw new Exception ();
 					
 					// 查询未撤销的子项目个数，项目撤销以后无法在正常全景图中查询了
-				$cnt = $factory->__gateway ( 'Project' )->countChildNodeByStatus ( $projectCode, 3, '!=' );
+				$cnt = $factory->__gateway ( 'Project' )->countChildNodeByStatus ( $projectCode, 'PROJECT_CANCELED', '!=' );
 				if ($cnt > 0) {
 					echo '请检查全部子项目是否已撤销';
 					return;
 				}
 				
 				$set = array (
-						'flag' => '30000000' 
+						'flag1' => 3
 				);
 				$where2 ['projectCode=?'] = $projectCode;
 				$affected_rows = $factory->__gateway ( 'Project' )->modifyProject ( $set, $where2 );
@@ -469,20 +466,20 @@ class Project_MainController extends Bonjour_Controller_Base {
 				$fields = array (
 						'projectCode' 
 				);
-				$where1 = "projectCode=? and lockedStatus=0 and substring(flag,1,1)='1'";
+				$where1 = "projectCode=? and lockedStatus=0 and flag1=".Bonjour_Core_GlobalConstant::PROJECT_STARTED;
 				$project = $factory->__gateway ( 'Project' )->advancedQueryProjectDetail ( $fields, $where1, $projectCode );
 				if ($project == null)
 					throw new Exception ();
 					
 					// 查询未关闭或锁定的子项目个数
-				$cnt = $factory->__gateway ( 'Project' )->countChildNodeByStatus ( $projectCode, 2, '<', 'or lockedStatus=1' );
+				$cnt = $factory->__gateway ( 'Project' )->countChildNodeByStatus ( $projectCode, 'PROJECT_CLOSED', '<', 'or lockedStatus=1' );
 				if ($cnt > 0) {
 					echo '请确保全部子项目未锁定且已撤销';
 					return;
 				}
 				
 				$set = array (
-						'flag' => '20000000' 
+						'flag1' => 2
 				);
 				$where2 ['projectCode=?'] = $projectCode;
 				$affected_rows = $factory->__gateway ( 'Project' )->modifyProject ( $set, $where2 );
@@ -522,7 +519,7 @@ class Project_MainController extends Bonjour_Controller_Base {
 				$fields = array (
 						'projectCode' 
 				);
-				$where1 = "projectCode=? and lockedStatus=0 and substring(flag,1,1)='0'";
+				$where1 = "projectCode=? and lockedStatus=0 and flag1=".Bonjour_Core_GlobalConstant::PROJECT_INITIALIZED;
 				$project = $factory->__gateway ( 'Project' )->advancedQueryProjectDetail ( $fields, $where1, $projectCode );
 				if ($project == null)
 					throw new Exception ();
@@ -538,7 +535,7 @@ class Project_MainController extends Bonjour_Controller_Base {
 				
 				$set = array (
 						'realStartDate' => intval ( date ( 'Ymd' ) ),
-						'flag' => '10000000' 
+						'flag1' => 1
 				);
 				$where2 ['projectCode=?'] = $projectCode;
 				$affected_rows = $factory->__gateway ( 'Project' )->modifyProject ( $set, $where2 );
@@ -583,7 +580,7 @@ class Project_MainController extends Bonjour_Controller_Base {
 				$factory->registGateway ( 'Project' );
 				
 				// 分页查询根目录
-				$condition = "and substring(flag,1,1)!='3'";
+				$condition = "and flag1!=".Bonjour_Core_GlobalConstant::PROJECT_CANCELED;
 				$rows = $factory->__gateway ( 'Project' )->queryRootProject ( ($page - 1) * $pagesize, $pagesize, $condition );
 				$total = $factory->__gateway ( 'Project' )->countRootProject ( $condition );
 				$callback = array (
@@ -623,7 +620,7 @@ class Project_MainController extends Bonjour_Controller_Base {
 				$fields = array (
 						'projectCode' 
 				);
-				$where1 = "projectCode=? and lockedStatus=0 and substring(flag,1,1) in ('0','1')";
+				$where1 = "projectCode=? and lockedStatus=0 and flag1 in (".Bonjour_Core_GlobalConstant::PROJECT_INITIALIZED.",".Bonjour_Core_GlobalConstant::PROJECT_STARTED.")";
 				$project = $factory->__gateway ( 'Project' )->advancedQueryProjectDetail ( $fields, $where1, $projectCode );
 				if ($project == null)
 					throw new Exception ();
@@ -669,7 +666,7 @@ class Project_MainController extends Bonjour_Controller_Base {
 				$fields = array (
 						'moduleName' 
 				);
-				$condition = "projectCode=? and lockedStatus=0 and substring(flag,1,1) in('0','1')";
+				$condition = "projectCode=? and lockedStatus=0 and flag1 in(".Bonjour_Core_GlobalConstant::PROJECT_INITIALIZED.",".Bonjour_Core_GlobalConstant::PROJECT_STARTED.")";
 				$project = $factory->__gateway ( 'Project' )->advancedQueryProjectDetail ( $fields, $condition, $projectCode );
 				if ($project == null)
 					throw new Exception ();

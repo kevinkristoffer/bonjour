@@ -51,18 +51,18 @@ class Bonjour_Model_ProjectGateway extends Bonjour_Core_Model_GateWay {
 	 * @return array
 	 */
 	public function countRootProjectSnapshot(){
-		$query="select count(*) cnt from " . $this->prefix . "project_main".
-				" where nodeType='R' and substring(flag,1,1)!='3'";
+		$query="select count(*) cnt from ".$this->prefix."project_main".
+				" where nodeType='R' and flag1!=".Bonjour_Core_GlobalConstant::PROJECT_CANCELED;
 		$result=$this->db->query($query)->fetch();
 		return $result->cnt;
 	}
 	public function queryRootProjectSnapshot($offset,$limit) {
 		$query=" select a.projectCode,a.projectName,creatorName,createDate,count(b.projectCode) pCnt from (".
-				" select projectCode,projectName,creatorName,createDate from " . $this->prefix . "project_main".
-				" where nodeType='R' and substring(flag,1,1)!='3'".
+				" select projectCode,projectName,creatorName,createDate from ".$this->prefix."project_main".
+				" where nodeType='R' and flag1!=".Bonjour_Core_GlobalConstant::PROJECT_CANCELED.
 				" ) a left join ( ".
 				" select projectCode,parentNode from " . $this->prefix . "project_main".
-				" where nodeType='P' and substring(flag,1,1)!='3'".
+				" where nodeType='P' and flag1!=".Bonjour_Core_GlobalConstant::PROJECT_CANCELED.
 				" ) b on (a.projectCode=b.parentNode)".
 				" group by 1,2,3,4 limit $offset,$limit";
 		$results=$this->db->query($query)->fetchAll();
@@ -79,10 +79,9 @@ class Bonjour_Model_ProjectGateway extends Bonjour_Core_Model_GateWay {
 		return $result->cnt;
 	}
 	public function queryRootProject($offset,$limit,$condition='') {
-		$query =" select projectCode,projectName,createDate,creatorName,responsibleName,".
-				" case when substring(flag,1,1)='0' then '初始值' when substring(flag,1,1)='1' then '正常开启'".
-				" when substring(flag,1,1)='2' then '正常关闭' end currentStatus,lockedStatus,flag".
-				" from " . $this->prefix . "project_main where nodeType='R' ".$condition.
+		$query ="select a.projectCode,a.projectName,a.createDate,a.creatorName,a.responsibleName,a.flag1,b.statusCNName currentStatus".
+				" from ".$this->prefix."project_main a,".$this->prefix."status b".
+				" where a.flag1=b.statusValue and b.entityName='PROJECT' and a.nodeType='R' ".$condition.
 				" order by createDate desc limit $offset,$limit";
 		$results = $this->db->query ( $query )->fetchAll ();
 		return $results;
@@ -95,7 +94,7 @@ class Bonjour_Model_ProjectGateway extends Bonjour_Core_Model_GateWay {
 	public function generateProjectCode($nodeType){
 		$ym = date ( 'Ym' );
 		$maxCode = 1;
-		$query = "select max(substr(projectCode,8,5)) maxCode from " . $this->prefix . "project_main where substr(projectCode,1,7)=?";
+		$query = "select max(substr(projectCode,8,5)) maxCode from ".$this->prefix."project_main where substr(projectCode,1,7)=?";
 		$result = $this->db->query ( $query, $nodeType . $ym )->fetch ();
 		if ($result->maxCode != null) {
 			$maxCode = intval ( $result->maxCode ) + 1;
@@ -110,7 +109,7 @@ class Bonjour_Model_ProjectGateway extends Bonjour_Core_Model_GateWay {
 	 * @return unknown
 	 */
 	public function queryProjectNode($projectCode){
-		$query="select projectCode,projectName,parentNode from " . $this->prefix . "project_main where projectCode=?";
+		$query="select projectCode,projectName,parentNode from ".$this->prefix."project_main where projectCode=?";
 		$result=$this->db->query($query,$projectCode)->fetch();
 		return $result;
 	}
@@ -120,10 +119,9 @@ class Bonjour_Model_ProjectGateway extends Bonjour_Core_Model_GateWay {
 	 * @return unknown
 	 */
 	public function queryProjectByRootNode($rootNode,$include_root=false){
-		$query="select projectCode,projectName,parentNode,rootNode,creatorName,responsibleName,createDate,".
-				"case when substring(flag,1,1)='0' then '初始值' when substring(flag,1,1)='1' then '正常开启'".
-				" when substring(flag,1,1)='2' then '正常关闭' end currentStatus,lockedStatus,flag".
-				" from " . $this->prefix . "project_main where substring(flag,1,1)!='3' and rootNode=?";
+		$query="select projectCode,projectName,parentNode,rootNode,creatorName,responsibleName,createDate,
+				lockedStatus,flag1,statusCNName currentStatus from ".$this->prefix."project_main a,".$this->prefix."status b
+				where a.flag1=b.statusValue and b.entityName='PROJECT' and b.statusValue!=3 and a.rootNode=?";
 		if(!$include_root)
 			$query=$query." and nodeType!='R'";
 		$results=$this->db->query($query,$rootNode)->fetchAll();
@@ -171,9 +169,8 @@ class Bonjour_Model_ProjectGateway extends Bonjour_Core_Model_GateWay {
 	public function queryProjectDetail($projectCode,$condition='') {
 		$query = "select projectCode,projectName,nodeCodeRoute,nodeNameRoute,createDate,estimateStartDate,".
 				"estimateDuration,realStartDate,creatorName,responsibleID,responsibleName,description,lockedStatus,".
-				"case when substring(flag,1,1)='0' then '初始值' when substring(flag,1,1)='1' then '正常开启'".
-				"when substring(flag,1,1)='2' then '正常关闭' end currentStatus,flag,moduleName from " . $this->prefix . "project_main".
-				" where projectCode=? $condition";
+				"flag1,moduleName,b.statusCNName currentStatus from ".$this->prefix."project_main a,".$this->prefix."status b".
+				" where a.flag1=b.statusValue and b.entityName='PROJECT' and projectCode=? $condition";
 		$result = $this->db->query ( $query, $projectCode )->fetch ();
 		return $result;
 	}
@@ -194,14 +191,14 @@ class Bonjour_Model_ProjectGateway extends Bonjour_Core_Model_GateWay {
 	/**
 	 * 查询某个状态下的子节点个数，用在关闭、撤销操作前检验
 	 * @param unknown $parentNode
-	 * @param unknown $status
+	 * @param unknown $statusName
 	 * @param unknown $operator
-	 * @param string $condition	特殊条件
+	 * @param string $condition
 	 */
-	public function countChildNodeByStatus($parentNode,$status,$operator,$condition=''){
-		$query="select count(*) cnt from bonjour_project_main where parentNode=? ".
-			   " and substring(flag,1,1)".$operator."? ".$condition;
-		$result=$this->db->query($query,array($parentNode,strval($status)))->fetch();
+	public function countChildNodeByStatus($parentNode,$statusName,$operator,$condition=''){
+		$query="select count(*) cnt from ".$this->prefix."project_main where parentNode=? ".
+			   " and flag1".$operator."(select statusValue from ".$this->prefix."status where statusENName=?) ".$condition;
+		$result=$this->db->query($query,array($parentNode,$statusName))->fetch();
 		return $result->cnt;
 	}
 	/**
@@ -209,9 +206,9 @@ class Bonjour_Model_ProjectGateway extends Bonjour_Core_Model_GateWay {
 	 * @param unknown $projectCode
 	 */
 	public function queryParentNodeStatus($projectCode){
-		$query="select substring(a.flag,1,1) currentStatus from bonjour_project_main a".
+		$query="select flag1 currentStatus from ".$this->prefix."project_main a".
 				" where a.projectCode=(".
-				" select parentNode from bonjour_project_main b".
+				" select parentNode from ".$this->prefix."project_main b".
 				" where b.projectCode=?)";
 		$result=$this->db->query($query,$projectCode)->fetch();
 		return $result->currentStatus;

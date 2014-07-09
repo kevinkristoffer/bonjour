@@ -25,7 +25,7 @@ $(function(){
 		toolbar:{
 			items:[{
 				text:'新建',icon:'add',click:function(item){
-					openDialog('<?php echo $this->baseUrl();?>/project/main/add-project?nodeType=R&parentNode=000000000000','新建项目',400,620);
+					openDialog(baseUrl+'/project/main/add-project?nodeType=R&parentNode=000000000000','新建项目',400,620);
 				}
 			},{
 				text:'其他',icon:'save'
@@ -49,7 +49,7 @@ $(function(){
 		},{
 			display:'操作',columns:[{
 				display:'明细',width:70,render:function(rowdata,rowindex,value){
-					var url='<?php echo $this->baseUrl();?>/project/main/query-project-detail/code/'+rowdata.projectCode;
+					var url=baseUrl+'/project/main/query-project-detail/code/'+rowdata.projectCode;
 					return "<a href=\""+url+"\">查看</a>";
 				}
 			},{

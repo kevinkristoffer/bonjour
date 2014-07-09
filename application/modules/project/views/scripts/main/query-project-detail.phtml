@@ -73,7 +73,7 @@ $(function(){
 		}]
 	});
 	//未锁定且非关闭状态
-	if(proj.lockedStatus==0 && parseInt(proj.flag.substr(0,1))<2){
+	if(proj.lockedStatus==0 && proj.flag1<2){
 		$('#saveButton').mikoButton({
 			width:90,
 			click:function(){
@@ -126,7 +126,7 @@ $(function(){
 		}
 	});
 	//未锁定且正常关闭状态
-	if(proj.lockedStatus==0 && proj.flag.substr(0,1)=='2'){
+	if(proj.lockedStatus==0 && proj.flag1==2){
 		$('#restartButton').mikoButton({
 			width:90,
 			click:function(){
@@ -154,7 +154,7 @@ $(function(){
 		'ajaxStop':function(){ $(this).attr('disabled',false); }
 	});
 	//未锁定且初始值状态
-	if(proj.lockedStatus==0 && proj.flag.substr(0,1)=='0'){
+	if(proj.lockedStatus==0 && proj.flag1==0){
 		$('#startButton').mikoButton({
 			width:90,
 			click:function(){
@@ -189,7 +189,7 @@ $(function(){
 		});
 	}
 	//未锁定且正常开启状态
-	if(proj.lockedStatus==0 && proj.flag.substr(0,1)=='1'){
+	if(proj.lockedStatus==0 && proj.flag1==1){
 		$('#newReqButton').mikoButton({
 			width:90,
 			click:function(){
@@ -253,25 +253,25 @@ body { margin:0; padding:10px; }
 </head>
 <body>
 <div class="btnGrp">
-<?php if($this->project->lockedStatus==0 && intval(substr($this->project->flag,0,1))<2):?>
+<?php if($this->project->lockedStatus==0 && $this->project->flag1<2):?>
 <button id="saveButton">保存项目</button>
 <?php endif;?>
-<?php if($this->project->lockedStatus==0 && substr($this->project->flag,0,1)=='2'):?>
+<?php if($this->project->lockedStatus==0 && $this->project->flag1=='2'):?>
 <button id="restartButton">重启项目</button><!-- 重启是关闭的逆操作，需要父项目重启后才能启动当前项目 -->
 <?php endif;?>
 <button id="lockButton"><?php echo $this->project->lockedStatus==0 ? '锁定项目' : '解锁项目'; ?></button>
-<?php if($this->project->lockedStatus==0 && substr($this->project->flag,0,1)=='0'):?>
+<?php if($this->project->lockedStatus==0 && $this->project->flag1=='0'):?>
 <button id="startButton">启动项目</button><!-- 启动项目后才能新建需求 -->
 <button id="cancelButton">撤销项目</button><!-- 项目取消后需到项目回收站才能恢复 -->
 <?php endif;?>
-<?php if($this->project->lockedStatus==0 && substr($this->project->flag,0,1)=='1'):?>
+<?php if($this->project->lockedStatus==0 && $this->project->flag1=='1'):?>
 <button id="newReqButton">新建需求</button>
 <button id="closeButton">关闭项目</button><!-- 只有子项目全部关闭后才能关闭当前项目 -->
 <?php endif;?>
 <button id="refreshButton">刷新页面</button>
 </div>
 <div class="btnGrp">
-<?php if($this->project->lockedStatus==0 && intval(substr($this->project->flag,0,1))<2):?>
+<?php if($this->project->lockedStatus==0 && $this->project->flag1<2):?>
 <button id="uploadFileButton">上传文件</button>
 <button id="deleteFileButton">删除文件</button>
 <?php endif;?>

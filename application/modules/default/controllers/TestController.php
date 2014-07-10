@@ -87,6 +87,45 @@ class TestController extends Bonjour_Controller_Base{
 		array_push($num,5);
 		var_dump($num);
 	}
+	/**
+	 * 测试翻译条件过滤JSON
+	 */
+	public function test7Action(){
+		$this->_helper->viewRenderer->setNoRender ( true );
+		header ( 'content-type:text/html;charset=utf-8' );
+		$str='{"rules":[{"field":"CustomerID","op":"startwith","value":"12","type":"string"},{"field":"CustomerID","op":"equal","value":"23","type":"string"}],"groups":[{"rules":[{"field":"CompanyName","op":"equal","value":"AAA","type":"string"},{"field":"Amount","op":"equal","value":5.36,"type":"number"},{"field":"CustomerID","op":"equal","value":"45","type":"string"}],"op":"or"}],"op":"and"}';
+		$obj=Zend_Json::decode($str);
+		//echo var_dump($obj['groups']);
+		//echo count($obj['rules']);
+		echo self::translateFilter('', $obj);
+		//echo var_dump($obj['groups']);
+	}
+	
+	static function translateFilter($input,$obj){
+		$i=0;
+		$j=0;
+		if(array_key_exists('rules', $obj) && array_key_exists('op', $obj)){
+			
+			
+			
+			if(array_key_exists('groups', $obj)){
+				for($j=0;$j<count($obj['groups']);$j++){
+					$input=$input.$obj['op'].' ( '.self::translateFilter($input, $obj['groups'][$j]).' ) ';
+				}
+			}
+			
+			for($i;$i<count($obj['rules']);$i++){
+				
+				echo $j;
+				if($i!=0){
+					$input=$input.' '.$obj['op'].' ';
+				}
+				$input=$input.' '.$obj['rules'][$i]['field'].
+				' '.$obj['rules'][$i]['op'].' '.$obj['rules'][$i]['value'];
+			}
+		}
+		return $input;
+	}
 	
 	/**
 	 *

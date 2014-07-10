@@ -9,6 +9,12 @@ class System_UserController extends Bonjour_Controller_Base {
 	public function init() {
 	}
 	/**
+	 * 查询全部用户
+	 */
+	public function queryAllUserAction(){
+		
+	}
+	/**
 	 * 分页查询全部有效用户
 	 */
 	public function queryValidUserAction() {

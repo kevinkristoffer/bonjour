@@ -44,6 +44,14 @@ class Project_MyController extends Bonjour_Controller_Base{
 		
 	}
 	
+	/**
+	 * 我的BUG
+	 */
+	public function bugAction(){
+		
+	}
+	
+	
 }
 
 ?>

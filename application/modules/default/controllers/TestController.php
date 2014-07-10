@@ -93,38 +93,33 @@ class TestController extends Bonjour_Controller_Base{
 	public function test7Action(){
 		$this->_helper->viewRenderer->setNoRender ( true );
 		header ( 'content-type:text/html;charset=utf-8' );
-		$str='{"rules":[{"field":"CustomerID","op":"startwith","value":"12","type":"string"},{"field":"CustomerID","op":"equal","value":"23","type":"string"}],"groups":[{"rules":[{"field":"CompanyName","op":"equal","value":"AAA","type":"string"},{"field":"Amount","op":"equal","value":5.36,"type":"number"},{"field":"CustomerID","op":"equal","value":"45","type":"string"}],"op":"or"}],"op":"and"}';
+		$str='{"rules":[{"field":"CustomerID","op":"notequal","value":"AA","type":"string"},{"field":"CustomerID","op":"equal","value":"BB","type":"string"}],"groups":[{"rules":[{"field":"CustomerID","op":"equal","value":"CC","type":"string"},{"field":"CustomerID","op":"equal","value":"EE","type":"string"}],"groups":[{"rules":[{"field":"CompanyName","op":"greater","value":"54","type":"string"},{"field":"CustomerID","op":"less","value":"12","type":"string"},{"field":"Amount","op":"equal","value":545,"type":"number"}],"op":"and"}],"op":"or"}],"op":"and"}';
 		$obj=Zend_Json::decode($str);
 		//echo var_dump($obj['groups']);
 		//echo count($obj['rules']);
-		echo self::translateFilter('', $obj);
+		echo self::translateFilter($obj);
 		//echo var_dump($obj['groups']);
 	}
 	
-	static function translateFilter($input,$obj){
-		$i=0;
-		$j=0;
+	static function translateFilter($obj){
+		$output='';
+		
 		if(array_key_exists('rules', $obj) && array_key_exists('op', $obj)){
-			
-			
-			
+			$temp_array=array();
+			for($i=0;$i<count($obj['rules']);$i++){
+				$output=$obj['rules'][$i]['field'].' '.$obj['rules'][$i]['op'].' '.$obj['rules'][$i]['value'];
+				array_push($temp_array, $output);
+			}
 			if(array_key_exists('groups', $obj)){
 				for($j=0;$j<count($obj['groups']);$j++){
-					$input=$input.$obj['op'].' ( '.self::translateFilter($input, $obj['groups'][$j]).' ) ';
+					$output=' ( '.self::translateFilter($obj['groups'][$j]).' ) ';
+					array_push($temp_array, $output);
 				}
 			}
-			
-			for($i;$i<count($obj['rules']);$i++){
-				
-				echo $j;
-				if($i!=0){
-					$input=$input.' '.$obj['op'].' ';
-				}
-				$input=$input.' '.$obj['rules'][$i]['field'].
-				' '.$obj['rules'][$i]['op'].' '.$obj['rules'][$i]['value'];
-			}
+			$output=implode(' '.$obj['op'].' ', $temp_array);
 		}
-		return $input;
+		
+		return $output;
 	}
 	
 	/**

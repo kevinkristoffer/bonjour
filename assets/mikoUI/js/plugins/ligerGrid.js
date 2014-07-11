@@ -1047,6 +1047,7 @@
             {
                 if (cols[i].frozen)
                 {
+                	console.log('('+i+')');
                     return true;
                 }
             }

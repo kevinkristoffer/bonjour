@@ -5,7 +5,7 @@
  * @author Administrator
  *
  */
-class PrivilegeGateway extends Bonjour_Core_Model_GateWay{
+class Bonjour_Model_PrivilegeGateway extends Bonjour_Core_Model_GateWay{
 	
 	
 }

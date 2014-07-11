@@ -7917,6 +7917,12 @@
                 if (view2width > 0) g.gridview2.css({ width: view2width });
             }
         },
+        setGroupColumn: function (name,display)
+        {
+        	var g = this, p = this.options;
+        	p.groupColumnName = name;
+        	p.groupColumnDisplay = display;
+        },
         _setWidth: function (value)
         {
             var g = this, p = this.options;
@@ -10216,8 +10222,9 @@
             }
             $(".l-bar-btnload:first span", g.toolbar).removeClass("l-disabled");
             g._updateGridData();
-            if (g.enabledFrozen())
-                g._fillGridBody(g.rows, true);
+            if (g.enabledFrozen()){
+            	g._fillGridBody(g.rows, true);
+            }
             g._fillGridBody(g.rows, false);
             g.trigger('SysGridHeightChanged');
             if (p.totalRender)

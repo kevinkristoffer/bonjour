@@ -108,7 +108,7 @@ $(function(){
 	$('#reqListGrid').mikoGrid({
 		url:baseUrl+'/project/req/query-req-list',
 		delayLoad:true,
-		rownumbers:true,
+		//rownumbers:true,
 		enabledSort:false,
 		columns:[{
 			display:'编号',name:'requirementID',width:50
@@ -144,7 +144,7 @@ $(function(){
 			}
 			$.mikoDialog.open({
 				top:30,
-				height:320,
+				height:350,
 				width:500,
 				title:'高级查询',
 				target: $("#target1"),
@@ -176,6 +176,14 @@ $(function(){
 							g.setParm('p3',enddate);
 							g.setParm('p4',statusValue);
 							g.setParm('p6',descFlag);
+							//设置分组
+							var groupColumnName=miko.get('groupColumn').getValue();
+							if(groupColumnName!='null' && groupColumnName!=''){
+								var groupColumnDisplay=miko.get('groupColumn').getText();
+								g.setGroupColumn(groupColumnName,groupColumnDisplay);
+							}else{
+								g.setGroupColumn(null,null);
+							}
 							g.reload();
 						}
 					},cls:'l-dialog-btn-highlight' 
@@ -225,9 +233,15 @@ $(function(){
     $('#reqStatus').mikoComboBox({ 
         width:120,
         valueFieldID:'reqStatusValue',
-        data:[{ text:'初始值',id:'0'},{ text:'提交审核',id:'1'},{ text:'退回未提交',id:'2'},
+        data:[{ text:'初始值',id:'0'},{ text:'提交审核',id:'1'},{ text:'审核退回',id:'2'},
               { text:'通过审核',id:'3'},{ text:'已立项',id:'4'},{ text:'提交验收',id:'5'},
               { text:'验收退回',id:'6'},{ text:'通过验收',id:'7'},{ text:'已关闭',id:'8'}]
+    });
+    $('#groupColumn').mikoComboBox({
+        width:120,
+        valueFieldID:'groupColumnValue',
+        data:[{text:'创建人',id:'creatorName'},{text:'指派人',id:'distributorName'},{text:'评审人',id:'reviewerName'},
+              {text:'优先级',id:'priority'},{text:'创建日期',id:'createDate'},{text:'当前状态',id:'currentStatus'}]
     });
 });
 function openDialog(url,title,height,width){
@@ -348,6 +362,11 @@ label { font-weight:bold; }
             <tr>
                 <td align="right" class="l-table-edit-td"><label>状态字</label></td>
                 <td align="left" class="l-table-edit-td"><input type="text" id="reqStatus"/></td>
+                <td align="left"></td>
+            </tr>
+            <tr>
+                <td align="right" class="l-table-edit-td"><label>分组字段</label></td>
+                <td align="left" class="l-table-edit-td"><input type="text" id="groupColumn"/></td>
                 <td align="left"></td>
             </tr>
         </table>

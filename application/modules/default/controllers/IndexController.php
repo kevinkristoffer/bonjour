@@ -17,21 +17,21 @@ class IndexController extends Bonjour_Controller_Base {
 	 * Default action
 	 */
 	public function indexAction() {
-		/*$this->initSession ();
+		$this->initSession ();
 		$authNamespace = new Zend_Session_Namespace ( 'Bonjour_Auth' );
 		$guest = array (
-				'useid' => 0,
-				'username' => '游客' 
+				'useID' => 0,
+				'userName' => '游客',
+				'roleID' => 0,
+				'roleName' => ''
 		);
 		$currentUser = $authNamespace->currentUser ? $authNamespace->currentUser : '游客';
-		$this->view->assign ( 'currentUser', $currentUser );*/
+		$this->view->assign ( 'currentUser', $currentUser );
 		try {
 			$factory=Bonjour_Core_Model_Factory::getInstance();
 			$db=Bonjour_Core_Db_Connection::getConnection('slave');
-			if($db == null){
-				$this->_redirect('error/db-disconnect');
-				return;
-			}
+			if($db == null)	throw new Exception();
+
 			$factory->setDbAdapter($db);
 			$factory->registGateway('Menu');
 			

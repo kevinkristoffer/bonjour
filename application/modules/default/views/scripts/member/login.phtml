@@ -26,13 +26,14 @@ $(function(){
 				username:username,
 				userpass:userpass,
 			},function(data){
-			var callback=$.parseJSON(data);
-			msg.html(callback.message);
-			if(callback.success==1){
+			if(data=='0000'){
+				alert('登录成功，5秒钟后跳转......');
 				setTimeout(function(){
-					window.location.href=baseUrl+'/index';
+					window.location.href=baseUrl+'/';
 				},5000);
-			}	
+			}else{
+				alert('登录失败');
+			}
 		});
 	});
 });

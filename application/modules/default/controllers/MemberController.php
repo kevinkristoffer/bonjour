@@ -70,9 +70,12 @@ class MemberController extends Bonjour_Controller_Base {
 		 * 登录页面
 		 */
 		if ($this->_request->isGet ()) {
-		/**
-		 * 直接跳转到注册页面 *
-		 */
+			/*$this->initSession ();
+			$authNamespace = new Zend_Session_Namespace ( 'Bonjour_Auth' );
+			if(isset($authNamespace)){
+				$this->_redirect('');
+				return;
+			}*/
 		}
 		/**
 		 * 提交表单
@@ -80,8 +83,6 @@ class MemberController extends Bonjour_Controller_Base {
 		if ($this->_request->isPost ()) {
 			$this->_helper->viewRenderer->setNoRender ( true );
 			header ( 'content-type:text/html;charset=utf-8' );
-			
-			$message = '系统出错';
 			try {
 				// check ajax request
 				if (! isset ( $_SERVER ['HTTP_X_REQUESTED_WITH'] ) || strtolower ( $_SERVER ['HTTP_X_REQUESTED_WITH'] ) != 'xmlhttprequest') {
@@ -90,34 +91,34 @@ class MemberController extends Bonjour_Controller_Base {
 				
 				$username = $this->_request->getPost ( 'username' );
 				$userpass = $this->_request->getPost ( 'userpass' );
+				
+				if(!isset($username) || !isset($userpass)) throw new Exception();
+				
 				$userpass = md5 ( $userpass );
-				$email = $this->_request->getPost ( 'email' );
 				
-				$this->initDbFactory ();
-				$this->dbFactory->registGateway ( 'User' );
-				
-				$currentUser = $this->dbFactory->__gateway ( 'User' )->queryUser ( $username, $userpass );
-				
-				if (! $currentUser) {
-					$message = '帐号不存在或密码错误';
+				// 连接数据库
+				$factory = Bonjour_Core_Model_Factory::getInstance ();
+				$db = Bonjour_Core_Db_Connection::getConnection ( 'slave' );
+				if ($db == null) {
 					throw new Exception ();
 				}
+				$factory->setDbAdapter ( $db );
+				$factory->registGateway ( 'User' );
+				
+				//根据账户和密码查询有效用户
+				$user = $factory->__gateway ( 'User' )->validUser($username,$userpass);
+				
+				if(!isset($user)) throw new Exception();
 				
 				$this->initSession ();
 				$authNamespace = new Zend_Session_Namespace ( 'Bonjour_Auth' );
-				$authNamespace->currentUser = $currentUser;
+				$authNamespace->currentUser = $user;
 				
-				$callback = array (
-						'success' => 1,
-						'message' => '登录成功，5秒后跳转' 
-				);
-			} catch ( Exception $ex ) {
-				$callback = array (
-						'success' => 0,
-						'message' => $message 
-				);
+				echo Bonjour_Core_GlobalConstant::BONJOUR_SUCCESS;
+			} catch ( Exception $e ) {
+				echo $e->getMessage();
+				echo Bonjour_Core_GlobalConstant::BONJOUR_ERROR;
 			}
-			echo Zend_Json::encode ( $callback );
 		}
 	}
 }

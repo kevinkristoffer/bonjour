@@ -181,9 +181,9 @@ class Bonjour_Model_ProjectGateway extends Bonjour_Core_Model_GateWay {
 	 * @param unknown $params
 	 * @return unknown
 	 */
-	public function advancedQueryProjectDetail($fields,$where,$params){
+	public function advancedQueryProjectDetail($fields,$condition,$params){
 		$glued_fields=implode(',', $fields);	//字段片段
-		$query="select $glued_fields from " . $this->prefix . "project_main where $where";
+		$query="select $glued_fields from " . $this->prefix . "project_main where $condition";
 		$result = $this->db->query ( $query, $params )->fetch ();
 		return $result;
 	}

@@ -67,6 +67,31 @@ class Bonjour_Model_UserGateway extends Bonjour_Core_Model_GateWay {
 	public function queryUserList(){
 		
 	}
+	/**
+	 * 登录用户验证
+	 * @param unknown $userName
+	 * @param unknown $userPass
+	 * @return boolean
+	 */
+	public function validUser($userName,$userPass){
+		$query="select count(*) cnt from bonjour_user a,bonjour_role b".
+			   " where a.roleID=b.roleID and a.userName=? and a.userPass=? and a.validStatus=1";
+		$result=$this->db->query($query,array($userName,$userPass))->fetch();
+		return $result->cnt == 1 ? true : false;
+	}
+	/**
+	 * 用户高级查询
+	 * @param unknown $fields
+	 * @param unknown $condition
+	 * @param unknown $params
+	 * @return unknown
+	 */
+	public function advancedQueryUser($fields,$condition,$params){
+		$glued_fields=implode(',', $fields);	//字段片段
+		$query="select $glued_fields from " . $this->prefix . "user where $condition";
+		$result = $this->db->query ( $query, $params )->fetch ();
+		return $result;
+	}
 }
 
 ?>

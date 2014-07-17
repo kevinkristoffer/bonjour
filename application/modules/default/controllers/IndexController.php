@@ -11,22 +11,16 @@ class IndexController extends Bonjour_Controller_Base {
 	 * @see Bonjour_Controller_Base::init()
 	 */
 	public function init() {
-		
+		parent::init();
 	}
 	/**
 	 * Default action
 	 */
 	public function indexAction() {
-		$this->initSession ();
 		$authNamespace = new Zend_Session_Namespace ( 'Bonjour_Auth' );
-		$guest = array (
-				'useID' => 0,
-				'userName' => '游客',
-				'roleID' => 0,
-				'roleName' => ''
-		);
-		$currentUser = $authNamespace->currentUser ? $authNamespace->currentUser : '游客';
+		$currentUser=$authNamespace->currentUser;
 		$this->view->assign ( 'currentUser', $currentUser );
+		
 		try {
 			$factory=Bonjour_Core_Model_Factory::getInstance();
 			$db=Bonjour_Core_Db_Connection::getConnection('slave');

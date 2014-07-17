@@ -23,6 +23,7 @@ a img { border: 0;}
 #top_toolbar { float: left; margin-left:90px; display:inline; margin-top:10px; height:60px; width:322px; background: url('images/top_toolbar.gif') no-repeat;}
 #top_toolbar ul { float: left; margin-left:10px; margin-top:2px; height:25px; width:302px; overflow:hidden; }
 #top_toolbar ul li { float: left;  width:41px; line-height: 25px; height: 25px; }
+#top_toolbar ul .label { float: left;  width:85px; line-height: 25px; height: 25px; }
 #top_toolbar ul .seperator { border-right: 1px dotted #ccc;}
 #top_toolbar ul li .skinItem { display: block; width:25px; height:25px; line-height: 25px; margin-left: 8px; }
 .tree_nav { margin-top:5px; }
@@ -39,10 +40,9 @@ a img { border: 0;}
   	<ul>
   	<li><a class="skinItem" title="Orange"><img src="<?php echo $this->baseUrl();?>/assets/images/skin_orange.jpg" title="温暖橘色"/></a></li>
   	<li class="seperator"><a class="skinItem" title="Ocean"><img src="<?php echo $this->baseUrl();?>/assets/images/skin_ocean.jpg" title="清新海洋"/></a></li>
+  	<li class="label">你好，<?php echo $this->currentUser->userName; ?></li>
   	</ul>
   	<ul>
-  	<li></li>
-  	<li></li>
   	</ul>
   </div>
   </div>

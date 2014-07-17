@@ -54,15 +54,20 @@ $(function(){
 	
 });
 function f_addtab(tabid,text,url){
-	tab.addTabItem({
-        tabid: tabid,
-        text: text,
-        url: url,
-        height:650,
-        callback: function ()
-        {
-            //addShowCodeBtn(tabid); 
-            //addFrameSkinLink(tabid); 
-        }
-    });
+	$.post(baseUrl+'/member/check-login',function(data){
+		if(data != '0000'){
+			window.location.href=baseUrl+'/member/login';
+		}
+		tab.addTabItem({
+	        tabid: tabid,
+	        text: text,
+	        url: url,
+	        height:650,
+	        callback: function ()
+	        {
+	            //addShowCodeBtn(tabid); 
+	            //addFrameSkinLink(tabid); 
+	        }
+	    });
+	});
 }

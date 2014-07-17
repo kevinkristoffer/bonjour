@@ -27,10 +27,8 @@ $(function(){
 				userpass:userpass,
 			},function(data){
 			if(data=='0000'){
-				alert('登录成功，5秒钟后跳转......');
-				setTimeout(function(){
-					window.location.href=baseUrl+'/';
-				},5000);
+				alert('登录成功，点击跳转页面......');
+				window.location.href=baseUrl+'/';
 			}else{
 				alert('登录失败');
 			}

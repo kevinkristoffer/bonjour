@@ -15,13 +15,17 @@ class Bonjour_Controller_Base extends Zend_Controller_Action{
 // 		$this->_request->setControllerName(strtolower($this->_request->getControllerName()));
 // 		$this->_request->setActionName(strtolower($this->_request->getActionName()));
 
-		//测试环境下模拟session
-// 		$this->initSession ();
-// 		$authNamespace = new Zend_Session_Namespace ( 'Bonjour_Auth' );
-// 		$user1 = array ('userID' => 1,'userName' => '胡建鸿','roleID'=>1,'roleName'=>'超级管理员');
-// 		if(!isset($authNamespace->currentUser)){
-// 			$authNamespace->currentUser=$user1;
-// 		}
+		//检查是否登录
+		$this->initSession ();
+		$authNamespace = new Zend_Session_Namespace ( 'Bonjour_Auth' );
+		if(!isset($authNamespace->currentUser)){
+			if($this->_request->isGet()){
+				$this->redirect('member/login');
+			}else{
+				echo Bonjour_Core_GlobalConstant::BONJOUR_ERROR;
+			}
+			exit();
+		}
 	}
 	
 	//Database adater session

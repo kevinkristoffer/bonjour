@@ -61,11 +61,28 @@ class Bonjour_Model_UserGateway extends Bonjour_Core_Model_GateWay {
 	}
 	
 	
-	public function countUserList(){
-		
+	
+	/**
+	 * 分页查询用户列表
+	 * @param unknown $offset
+	 * @param unknown $limit
+	 */
+	public function countUserList($condition='',$params=array()){
+		//添加1=1可以有and前缀
+		if($condition!=''){
+			$condition='where 1=1 '.$condition;
+		}
+		$query="select count(*) cnt from ".$this->prefix."user a $condition";
+		$result=$this->db->query($query,$params)->fetch();
+		return $result->cnt;
 	}
-	public function queryUserList(){
-		
+	public function queryUserList($condition='',$params=array(),$offset,$limit){
+		$query="select a.userID,a.accountName,a.userName,b.roleID,b.roleName,a.email,a.mobile,".
+				" a.phoneNumber,a.creatorName,a.createDate,a.loginTimes,a.lastLogin,a.validStatus".
+				" from ".$this->prefix."user a,".$this->prefix."role b".
+				" where a.roleID=b.roleID $condition order by 1 limit $offset,$limit";
+		$results=$this->db->query($query,$params)->fetchAll();
+		return $results;
 	}
 	/**
 	 * 登录用户验证
@@ -73,11 +90,11 @@ class Bonjour_Model_UserGateway extends Bonjour_Core_Model_GateWay {
 	 * @param unknown $userPass
 	 * @return boolean
 	 */
-	public function validUser($userName,$userPass){
-		$query="select count(*) cnt from bonjour_user a,bonjour_role b".
-			   " where a.roleID=b.roleID and a.userName=? and a.userPass=? and a.validStatus=1";
-		$result=$this->db->query($query,array($userName,$userPass))->fetch();
-		return $result->cnt == 1 ? true : false;
+	public function validUser($accountName,$userPass){
+		$query="select a.userID,a.userName,b.roleID,b.roleName from ".$this->prefix."user a,".$this->prefix."role b".
+			   " where a.roleID=b.roleID and a.accountName=? and a.userPass=? and a.validStatus=1";
+		$result=$this->db->query($query,array($accountName,$userPass))->fetch();
+		return $result;
 	}
 	/**
 	 * 用户高级查询
@@ -91,6 +108,15 @@ class Bonjour_Model_UserGateway extends Bonjour_Core_Model_GateWay {
 		$query="select $glued_fields from " . $this->prefix . "user where $condition";
 		$result = $this->db->query ( $query, $params )->fetch ();
 		return $result;
+	}
+	/**
+	 * 查询未过期的有效用户组
+	 * @return unknown
+	 */
+	public function queryValidRole(){
+		$query="select roleID,roleName from bonjour_role where expiryDate<now()";
+		$results=$this->db->query($query)->fetchAll();
+		return $results;
 	}
 }
 

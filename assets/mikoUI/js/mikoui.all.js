@@ -2173,7 +2173,7 @@
         hideOnLoseFocus: true,
         hideGridOnLoseFocus : false,
         url: null,              //数据源URL(需返回JSON)
-        emptyText: '（空）',       //空行
+        emptyText: null,       //空行
         addRowButton: '新增',           //新增按钮
         addRowButtonClick: null,        //新增事件
         triggerIcon : null,         //
@@ -8265,6 +8265,26 @@
                 g.reRender({ rowdata: rowdata });
             }
         },
+        getEditRow: function (rowid)	//获取编辑后的数据
+        {
+            var rowdata = g.getRow(rowid);
+            var newdata = {};
+            if (!g.editors[rowdata['__id']]) return;
+            for (var columnid in g.editors[rowdata['__id']])
+            {
+                var o = g.editors[rowdata['__id']][columnid];
+                var column = o.editParm.column;
+                if (column.name)
+                {
+                    newdata[column.name] = o.editor.getValue(o.input, o.editParm);
+                }
+                if (column.textField && o.editor.getText)
+                {
+                    newdata[column.textField] = o.editor.getText(o.input, o.editParm);
+                }
+            }
+            return newdata;
+        },
         addEditRow: function (rowdata, containerBulider)
         {
             this.submitEdit();
@@ -8308,6 +8328,7 @@
         endEdit: function (rowParm)
         {
             var g = this, p = this.options;
+           
             if (g.editor.editing)
             {
                 var o = g.editor;

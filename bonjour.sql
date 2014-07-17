@@ -10,6 +10,11 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
+-- 导出 bonjour 的数据库结构
+CREATE DATABASE IF NOT EXISTS `bonjour` /*!40100 DEFAULT CHARACTER SET utf8 */;
+USE `bonjour`;
+
+
 -- 导出  表 bonjour.bonjour_attachment 结构
 CREATE TABLE IF NOT EXISTS `bonjour_attachment` (
   `AttachmentID` char(15) NOT NULL,
@@ -81,8 +86,8 @@ CREATE TABLE IF NOT EXISTS `bonjour_forum` (
 /*!40000 ALTER TABLE `bonjour_forum` DISABLE KEYS */;
 INSERT INTO `bonjour_forum` (`forumID`, `menuID`, `parentID`, `forumName`, `url`, `forumOrder`, `lockedStatus`, `validstatus`) VALUES
 	(1, 1, 0, '版块管理', NULL, 0, 1, 1),
-	(2, 1, 1, '主菜单管理', 'forum/menu.do', 0, 1, 1),
-	(3, 1, 0, '用户管理', NULL, 0, 1, 0),
+	(2, 1, 1, '主菜单管理', 'forum/menu', 0, 1, 1),
+	(3, 1, 0, '用户管理', 'system/user', 0, 1, 1),
 	(4, 2, 0, '项目管理', NULL, 0, 1, 1),
 	(5, 2, 0, '需求管理', NULL, 0, 1, 1),
 	(7, 2, 0, '任务管理', NULL, 0, 1, 1),
@@ -442,7 +447,7 @@ CREATE TABLE IF NOT EXISTS `bonjour_role` (
   `CreatorName` varchar(50) DEFAULT NULL,
   `ExpiryDate` int(8) DEFAULT '99999999',
   `DefaultStatus` tinyint(1) DEFAULT '0',
-  `Remark` text,
+  `Remark` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`RoleID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
 
@@ -470,12 +475,11 @@ CREATE TABLE IF NOT EXISTS `bonjour_session` (
   PRIMARY KEY (`id`)
 ) ENGINE=MEMORY DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
 
--- 正在导出表  bonjour.bonjour_session 的数据：3 rows
+-- 正在导出表  bonjour.bonjour_session 的数据：1 rows
 /*!40000 ALTER TABLE `bonjour_session` DISABLE KEYS */;
 INSERT INTO `bonjour_session` (`id`, `modified`, `lifetime`, `data`) VALUES
-	('gsfin89hmstsn0lnvdl83ehme0', 1405065551, 600, 'Bonjour_Auth|a:1:{s:11:"currentUser";a:4:{s:6:"userID";i:1;s:8:"userName";s:9:"胡建鸿";s:6:"roleID";i:1;s:8:"roleName";s:15:"超级管理员";}}'),
-	('k7tnlf6nrf3tlfjgenv9o91td4', 1404806135, 600, 'Bonjour_Auth|a:1:{s:11:"currentUser";a:4:{s:6:"userID";i:1;s:8:"userName";s:9:"胡建鸿";s:6:"roleID";i:1;s:8:"roleName";s:15:"超级管理员";}}'),
-	('9mv5cp9ut4loeb9nagcdmq5c14', 1404811987, 600, 'Bonjour_Auth|a:1:{s:11:"currentUser";a:4:{s:6:"userID";i:1;s:8:"userName";s:9:"胡建鸿";s:6:"roleID";i:1;s:8:"roleName";s:15:"超级管理员";}}');
+	('gsfin89hmstsn0lnvdl83ehme0', 1405575726, 1800, 'Bonjour_Auth|a:1:{s:11:"currentUser";O:8:"stdClass":4:{s:6:"userID";s:1:"1";s:8:"userName";s:9:"胡建鸿";s:6:"roleID";s:1:"1";s:8:"roleName";s:15:"超级管理员";}}'),
+	('7rfrlpasju37cqpaie01ci26h3', 1405587736, 1800, 'Bonjour_Auth|a:1:{s:11:"currentUser";O:8:"stdClass":4:{s:6:"userID";s:1:"1";s:8:"userName";s:9:"胡建鸿";s:6:"roleID";s:1:"1";s:8:"roleName";s:15:"超级管理员";}}');
 /*!40000 ALTER TABLE `bonjour_session` ENABLE KEYS */;
 
 
@@ -602,6 +606,7 @@ CREATE TABLE IF NOT EXISTS `bonjour_team_member` (
 -- 导出  表 bonjour.bonjour_user 结构
 CREATE TABLE IF NOT EXISTS `bonjour_user` (
   `UserID` int(11) NOT NULL AUTO_INCREMENT,
+  `AccountName` varchar(50) NOT NULL,
   `UserName` varchar(50) NOT NULL,
   `UserPass` char(32) DEFAULT NULL,
   `RoleID` int(11) unsigned NOT NULL DEFAULT '0',
@@ -609,45 +614,48 @@ CREATE TABLE IF NOT EXISTS `bonjour_user` (
   `Mobile` varchar(20) DEFAULT NULL,
   `PhoneNumber` varchar(20) DEFAULT NULL,
   `CreateDate` int(8) NOT NULL,
+  `CreatorID` int(8) NOT NULL,
+  `CreatorName` varchar(50) DEFAULT NULL,
   `LoginTimes` int(11) DEFAULT '0',
-  `LastLogin` int(8) DEFAULT '0',
+  `LastLogin` datetime DEFAULT NULL,
   `ValidStatus` int(11) DEFAULT '1',
   PRIMARY KEY (`UserID`),
+  UNIQUE KEY `AccountName` (`AccountName`),
   KEY `RoleID` (`RoleID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8;
 
 -- 正在导出表  bonjour.bonjour_user 的数据：~29 rows (大约)
 /*!40000 ALTER TABLE `bonjour_user` DISABLE KEYS */;
-INSERT INTO `bonjour_user` (`UserID`, `UserName`, `UserPass`, `RoleID`, `Email`, `Mobile`, `PhoneNumber`, `CreateDate`, `LoginTimes`, `LastLogin`, `ValidStatus`) VALUES
-	(1, '胡建鸿', '489f71f382393834491ba8ac79208a56', 1, 'sammy19871116@gmail.com', NULL, NULL, 20140531, 0, 0, 1),
-	(2, '测试帐号1', '489f71f382393834491ba8ac79208a56', 2, NULL, NULL, NULL, 20140531, 0, 0, 1),
-	(3, '测试帐号2', '489f71f382393834491ba8ac79208a56', 3, NULL, NULL, NULL, 20140531, 0, 0, 1),
-	(4, '测试帐号3', '489f71f382393834491ba8ac79208a56', 9, NULL, NULL, NULL, 20140531, 0, 0, 1),
-	(5, '测试帐号4', '489f71f382393834491ba8ac79208a56', 5, NULL, NULL, NULL, 20140531, 0, 0, 1),
-	(6, '测试帐号5', '489f71f382393834491ba8ac79208a56', 9, NULL, NULL, NULL, 20140531, 0, 0, 1),
-	(7, '测试帐号6', '489f71f382393834491ba8ac79208a56', 9, NULL, NULL, NULL, 20140531, 0, 0, 1),
-	(8, '测试帐号7', '489f71f382393834491ba8ac79208a56', 6, NULL, NULL, NULL, 20140531, 0, 0, 1),
-	(9, '测试帐号8', '489f71f382393834491ba8ac79208a56', 8, NULL, NULL, NULL, 20140531, 0, 0, 1),
-	(10, '测试帐号9', '489f71f382393834491ba8ac79208a56', 9, NULL, NULL, NULL, 20140531, 0, 0, 1),
-	(11, '测试帐号10', '489f71f382393834491ba8ac79208a56', 9, NULL, NULL, NULL, 20140531, 0, 0, 1),
-	(12, '测试帐号11', '489f71f382393834491ba8ac79208a56', 5, NULL, NULL, NULL, 20140531, 0, 0, 1),
-	(13, '测试帐号12', '489f71f382393834491ba8ac79208a56', 7, NULL, NULL, NULL, 20140531, 0, 0, 1),
-	(14, '测试帐号13', '489f71f382393834491ba8ac79208a56', 9, NULL, NULL, NULL, 20140531, 0, 0, 1),
-	(15, '测试帐号14', '489f71f382393834491ba8ac79208a56', 9, NULL, NULL, NULL, 20140531, 0, 0, 1),
-	(16, '测试帐号15', '489f71f382393834491ba8ac79208a56', 4, NULL, NULL, NULL, 20140531, 0, 0, 1),
-	(17, '测试帐号16', '489f71f382393834491ba8ac79208a56', 9, NULL, NULL, NULL, 20140531, 0, 0, 0),
-	(18, '测试帐号17', '489f71f382393834491ba8ac79208a56', 6, NULL, NULL, NULL, 20140531, 0, 0, 1),
-	(19, '测试帐号18', '489f71f382393834491ba8ac79208a56', 9, NULL, NULL, NULL, 20140531, 0, 0, 1),
-	(20, '测试帐号19', '489f71f382393834491ba8ac79208a56', 9, NULL, NULL, NULL, 20140531, 0, 0, 1),
-	(21, '测试帐号20', '489f71f382393834491ba8ac79208a56', 3, NULL, NULL, NULL, 20140531, 0, 0, 1),
-	(22, '测试帐号21', '489f71f382393834491ba8ac79208a56', 3, NULL, NULL, NULL, 20140531, 0, 0, 1),
-	(23, '测试帐号22', '489f71f382393834491ba8ac79208a56', 2, NULL, NULL, NULL, 20140531, 0, 0, 1),
-	(24, '测试帐号23', '489f71f382393834491ba8ac79208a56', 9, NULL, NULL, NULL, 20140531, 0, 0, 1),
-	(25, '测试帐号24', '489f71f382393834491ba8ac79208a56', 9, NULL, NULL, NULL, 20140531, 0, 0, 0),
-	(26, '测试帐号25', '489f71f382393834491ba8ac79208a56', 9, NULL, NULL, NULL, 20140531, 0, 0, 0),
-	(27, '测试帐号26', '489f71f382393834491ba8ac79208a56', 9, NULL, NULL, NULL, 20140531, 0, 0, 0),
-	(28, '测试帐号27', '489f71f382393834491ba8ac79208a56', 9, NULL, NULL, NULL, 20140531, 0, 0, 0),
-	(29, '测试帐号28', '489f71f382393834491ba8ac79208a56', 9, NULL, NULL, NULL, 20140531, 0, 0, 0);
+INSERT INTO `bonjour_user` (`UserID`, `AccountName`, `UserName`, `UserPass`, `RoleID`, `Email`, `Mobile`, `PhoneNumber`, `CreateDate`, `CreatorID`, `CreatorName`, `LoginTimes`, `LastLogin`, `ValidStatus`) VALUES
+	(1, 'hujianhong', '胡建鸿', '1d42abef5a4a5748edf45448bc8d64c5', 1, 'sammy19871116@gmail.com', NULL, NULL, 20140531, 1, '胡建鸿', 8, '2014-07-17 15:58:04', 1),
+	(2, 'test1', '测试帐号1', '1d42abef5a4a5748edf45448bc8d64c5', 2, '', '', '', 20140531, 1, '胡建鸿', 0, '0000-00-00 00:00:00', 1),
+	(3, 'test2', '测试帐号2', '1d42abef5a4a5748edf45448bc8d64c5', 3, '', '15058430233', '057456867933', 20140531, 1, '胡建鸿', 1, '2014-07-17 09:57:34', 1),
+	(4, 'test3', '测试帐号3', '1d42abef5a4a5748edf45448bc8d64c5', 9, NULL, NULL, NULL, 20140531, 1, '胡建鸿', 0, '0000-00-00 00:00:00', 1),
+	(5, 'test4', '测试帐号4', '1d42abef5a4a5748edf45448bc8d64c5', 5, NULL, NULL, NULL, 20140531, 1, '胡建鸿', 0, '0000-00-00 00:00:00', 1),
+	(6, 'test5', '测试帐号5', '1d42abef5a4a5748edf45448bc8d64c5', 9, '', '', '', 20140531, 1, '胡建鸿', 0, '0000-00-00 00:00:00', 1),
+	(7, 'test6', '测试帐号6', '1d42abef5a4a5748edf45448bc8d64c5', 9, NULL, NULL, NULL, 20140531, 1, '胡建鸿', 0, '0000-00-00 00:00:00', 1),
+	(8, 'test7', '测试帐号7', '1d42abef5a4a5748edf45448bc8d64c5', 6, NULL, NULL, NULL, 20140531, 1, '胡建鸿', 0, '0000-00-00 00:00:00', 1),
+	(9, 'test8', '测试帐号8', '1d42abef5a4a5748edf45448bc8d64c5', 8, NULL, NULL, NULL, 20140531, 1, '胡建鸿', 0, '0000-00-00 00:00:00', 1),
+	(10, 'test9', '测试帐号9', '1d42abef5a4a5748edf45448bc8d64c5', 9, NULL, NULL, NULL, 20140531, 1, '胡建鸿', 0, '0000-00-00 00:00:00', 1),
+	(11, 'test10', '测试帐号10', '1d42abef5a4a5748edf45448bc8d64c5', 9, NULL, NULL, NULL, 20140531, 1, '胡建鸿', 0, '0000-00-00 00:00:00', 1),
+	(12, 'test11', '测试帐号11', '1d42abef5a4a5748edf45448bc8d64c5', 5, NULL, NULL, NULL, 20140531, 1, '胡建鸿', 0, '0000-00-00 00:00:00', 1),
+	(13, 'test12', '测试帐号12', '1d42abef5a4a5748edf45448bc8d64c5', 7, NULL, NULL, NULL, 20140531, 1, '胡建鸿', 0, '0000-00-00 00:00:00', 1),
+	(14, 'test13', '测试帐号13', '1d42abef5a4a5748edf45448bc8d64c5', 9, NULL, NULL, NULL, 20140531, 1, '胡建鸿', 0, '0000-00-00 00:00:00', 1),
+	(15, 'test14', '测试帐号14', '1d42abef5a4a5748edf45448bc8d64c5', 9, NULL, NULL, NULL, 20140531, 1, '胡建鸿', 0, '0000-00-00 00:00:00', 1),
+	(16, 'test15', '测试帐号15', '1d42abef5a4a5748edf45448bc8d64c5', 4, NULL, NULL, NULL, 20140531, 1, '胡建鸿', 0, '0000-00-00 00:00:00', 1),
+	(17, 'test16', '测试帐号16', '1d42abef5a4a5748edf45448bc8d64c5', 9, NULL, NULL, NULL, 20140531, 1, '胡建鸿', 0, '0000-00-00 00:00:00', 0),
+	(18, 'test17', '测试帐号17', '1d42abef5a4a5748edf45448bc8d64c5', 6, NULL, NULL, NULL, 20140531, 1, '胡建鸿', 0, '0000-00-00 00:00:00', 1),
+	(19, 'test18', '测试帐号18', '1d42abef5a4a5748edf45448bc8d64c5', 9, NULL, NULL, NULL, 20140531, 1, '胡建鸿', 0, '0000-00-00 00:00:00', 1),
+	(20, 'test19', '测试帐号19', '1d42abef5a4a5748edf45448bc8d64c5', 9, NULL, NULL, NULL, 20140531, 1, '胡建鸿', 0, '0000-00-00 00:00:00', 1),
+	(21, 'test20', '测试帐号20', '1d42abef5a4a5748edf45448bc8d64c5', 3, NULL, NULL, NULL, 20140531, 1, '胡建鸿', 0, '0000-00-00 00:00:00', 1),
+	(22, 'test21', '测试帐号21', '1d42abef5a4a5748edf45448bc8d64c5', 3, NULL, NULL, NULL, 20140531, 1, '胡建鸿', 0, '0000-00-00 00:00:00', 1),
+	(23, 'test22', '测试帐号22', '1d42abef5a4a5748edf45448bc8d64c5', 2, NULL, NULL, NULL, 20140531, 1, '胡建鸿', 0, '0000-00-00 00:00:00', 1),
+	(24, 'test23', '测试帐号23', '1d42abef5a4a5748edf45448bc8d64c5', 9, NULL, NULL, NULL, 20140531, 1, '胡建鸿', 0, '0000-00-00 00:00:00', 1),
+	(25, 'test24', '测试帐号24', '1d42abef5a4a5748edf45448bc8d64c5', 9, NULL, NULL, NULL, 20140531, 1, '胡建鸿', 0, '0000-00-00 00:00:00', 0),
+	(26, 'test25', '测试帐号25', '1d42abef5a4a5748edf45448bc8d64c5', 9, NULL, NULL, NULL, 20140531, 1, '胡建鸿', 0, '0000-00-00 00:00:00', 0),
+	(27, 'test26', '测试帐号26', '1d42abef5a4a5748edf45448bc8d64c5', 9, NULL, NULL, NULL, 20140531, 1, '胡建鸿', 0, '0000-00-00 00:00:00', 0),
+	(28, 'test27', '测试帐号27', '1d42abef5a4a5748edf45448bc8d64c5', 9, NULL, NULL, NULL, 20140531, 1, '胡建鸿', 0, '0000-00-00 00:00:00', 0),
+	(29, 'test28', '测试帐号28', '1d42abef5a4a5748edf45448bc8d64c5', 9, NULL, NULL, NULL, 20140531, 1, '胡建鸿', 0, '0000-00-00 00:00:00', 0);
 /*!40000 ALTER TABLE `bonjour_user` ENABLE KEYS */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;

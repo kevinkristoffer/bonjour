@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+<head>
+<?php echo $this->headTitle('用户管理'); ?>
+<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+<meta http-equiv="description" content="用户管理">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<script type="text/javascript">
+var baseUrl='<?php echo $this->baseUrl();?>';
+</script>
+<link rel="stylesheet" type="text/css" href="<?php echo $this->baseUrl();?>/assets/mikoUI/skins/mikoui-icons.css" />
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/jquery/jquery-1.7.2.js"></script>
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/plugins/cookie/jquery.cookie.js"></script>
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/js/client.js"></script>
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/mikoUI/js/mikoui.all.js"></script>
+<script type="text/javascript">
+var roles=$.parseJSON('<?php echo $this->roles?>');
+var userStatus=[{value:'0',text:'无效'},{value:'1',text:'有效'}];
+</script>
+<script type="text/javascript">
+var g=null;
+$(function(){
+	$('#userListGrid').mikoGrid({
+		url:baseUrl+'/system/user/query-user-list',
+		enabledEdit: true, 
+		clickToEdit:false,
+		columns:[{
+			display:'编号',name:'userID',width:40
+		},{
+			display:'登录帐号',name:'accountName',width:70
+		},{
+			display:'用户名',name:'userName',width:80,editor:{type:'text'}
+		},{
+			display:'用户组',name:'roleID',width:80,
+			render:function(item){
+				for(var i=0; i<roles.length; i++){
+					if(roles[i]['roleID'] == item.roleID)
+						return roles[i]['roleName'];
+				}
+				return item.roleName;
+			},
+			editor:{type:'select',data:roles,valueField:'roleID',textField:'roleName'}
+		},{
+			display:'邮箱',name:'email',width:80,editor:{type:'text'}
+		},{
+			display:'移动电话',name:'mobile',width:80,editor:{type:'text'}
+		},{
+			display:'座机',name:'phoneNumber',width:80,editor:{type:'text'}
+		},{
+			display:'创建人',name:'creatorName',width:60
+		},{
+			display:'创建日期',name:'createDate',width:80
+		},{
+			display:'登录次数',name:'loginTimes',width:60
+		},{
+			display:'最近登录',name:'lastLogin',width:80
+		},{
+			display:'状态',name:'validStatus',width:50,
+			render:function(item){ return item.validStatus==1 ? '有效' : '无效'},
+			editor:{type:'select',data:userStatus,valueField:'value'}
+		},{
+			display:'操作',width:100,render:function(rowdata, rowindex, value){
+				var h = "";
+                if (!rowdata._editing)
+                {
+                    h += "<a href='javascript:beginEdit(" + rowindex + ")'>修改</a> ";
+                }
+                else
+                {
+                    h += "<a href='javascript:endEdit(" + rowindex + ")'>提交</a> ";
+                    h += "<a href='javascript:cancelEdit(" + rowindex + ")'>取消</a> "; 
+                }
+                return h;
+			}
+		}],
+		toolbar:{items:[{text:'高级搜索',icon:'search2',click:function(){
+			$.mikoDialog.open({
+				top:30,
+				height:250,
+				width:500,
+				title:'高级搜索',
+				target: $("#target1"),
+				buttons:[{
+					text: '确定', onclick: function (item, dialog) {
+						var userID=miko.get('userID').getValue();
+						var userName=miko.get('userName').getValue();
+						var roleID=miko.get('roleID').getValue();
+						var creatorID=miko.get('creatorID').getValue();
+						var createDate1=miko.get('createDate1').getValue();
+						var createDate2=miko.get('createDate2').getValue();
+						var validStatus=miko.get('validStatus').getValue();
+						if(userID!=null && userID!='' && !/^(\d+)$/.test(userID)){
+							$.mikoDialog.warn('用户编号为正整数');
+							return;
+						}
+						if((createDate1==null && createDate2!=null) || (createDate1!=null && createDate2==null)){
+							$.mikoDialog.warn('请同时选择或不选起讫日期');
+							return;
+						}
+						if(g){
+							var startdate='',enddate='';
+							if(createDate1!=null && createDate1!=''){
+								var date1=new Date(createDate1);
+								startdate=date1.getFullYear()*10000+(date1.getMonth()+1)*100+date1.getDate();
+							}
+							if(createDate2!=null && createDate2!=''){
+								var date2=new Date(createDate2);
+								enddate=date2.getFullYear()*10000+(date2.getMonth()+1)*100+date2.getDate();
+							}
+							g.setParm('p1',userID);
+							g.setParm('p2',userName);
+							g.setParm('p3',roleID);
+							g.setParm('p4',creatorID);
+							g.setParm('p5',startdate);
+							g.setParm('p6',enddate);
+							g.setParm('p7',validStatus);
+							g.reload();
+						}
+					},cls:'l-dialog-btn-highlight' 
+				},{
+					text:'重置',onclick:function(item, dialog){
+						miko.get('userID').setValue('');
+						miko.get('userName').setValue('');
+						miko.get('roleID').setValue('');
+						miko.get('creatorID').setValue('');
+						miko.get('createDate1').clear();
+						miko.get('createDate2').clear();
+						miko.get('validStatus').setValue('');
+					}
+				}]
+			});
+		}},{line:true},{text:'新建用户',icon:'add',click:function(){
+			alert('新建用户');
+		}},{line:true},{text:'用户组管理',icon:'role',click:function(){
+			alert('用户组管理');
+		}}]}
+	});
+	$('#userID').mikoTextBox({ width:120 });
+	$('#userName').mikoTextBox({ width:120 });
+	$('#roleID').mikoComboBox({
+		width:120,
+		data:roles,
+		valueField:'roleID',
+		textField:'roleName',
+		valueFieldID:'roleIDValue'
+	});
+	$('#creatorID').mikoComboBox({
+		width:120,
+		isMultiSelect:false,
+		isShowCheckBox:false,
+		selectBoxWidth:320,
+		selectBoxHeight:230,
+		textField:'userName',
+		valueField:'userID',
+		slide:true,
+		grid:{
+			url:baseUrl+'/system/user/query-valid-user',
+			pageSize:5,
+			pageSizeOptions:[5,10,20],
+			columns:[{
+				display:'用户编号',name:'userID',width:60
+			},{
+				display:'姓名',name:'userName',width:110
+			},{
+				display:'用户角色',name:'roleName',width:100
+			}]
+		},
+		condition:{fields:[{ name:'keyword',label:'关键字',width:90}]}
+	});
+	$('#createDate1').mikoDateEditor({ width:120 });
+	$('#createDate2').mikoDateEditor({ width:120 });
+	$('#validStatus').mikoComboBox({
+		width:120,
+		data:userStatus,
+		valueField:'value',
+		valueFieldID:'validStatusValue'
+	});
+	g=$('#userListGrid').mikoGetGridManager();
+});
+
+function beginEdit(rowid) { 
+    g.beginEdit(rowid);
+}
+function cancelEdit(rowid) { 
+    g.cancelEdit(rowid);
+}
+function endEdit(rowid)
+{
+	var oldrow=g.getRow(rowid);
+	var rowdata=g.getEditRow(rowid);
+	if(rowdata.userName==''){
+		$.mikoDialog.warn('用户名不能为空');
+		return;
+	}
+    $.post(baseUrl+'/system/user/modify-user',{
+        p0:oldrow.userID,p1:rowdata.userName,p2:rowdata.roleID,p3:rowdata.email || '',
+        p4:rowdata.mobile || '',p5:rowdata.phoneNumber || '',p6:rowdata.validStatus
+    },function(data){
+        if(data=='0000'){
+        	g.endEdit(rowid);
+        	tip('信息提示','保存成功');
+        }else{
+        	tip('信息提示','保存失败');
+        }
+    });
+}
+function tip(title,content){
+	//提示信息
+	var tip=$.mikoDialog.tip({  title: title,content:content });
+	setTimeout(function(){
+		if(tip)	tip.hide();
+	},3000);
+}
+</script>
+<style type="text/css">
+body {
+	margin: 0;
+	padding: 0;
+}
+a {
+	color: #111;
+}
+a:hover {
+	color: #999;
+}
+.l-table-edit { }
+.l-table-edit-td { padding:4px; }
+.l-button-submit, .l-button-reset { width:80px; float:left; margin-left:10px; padding-bottom:2px; }
+.l-verify-tip { left:230px; top:120px; }
+</style>
+</head>
+<body>
+<div id="userListGrid" style="margin:5px;"></div>
+<form id="dialogForm" name="dialogForm">
+  <div id="target1" style="margin:3px;display:none;">
+    <div>
+		<table cellpadding="0" cellspacing="0" class="l-table-edit" >
+            <tr>
+                <td align="right" class="l-table-edit-td"><label>编号</label></td>
+                <td align="left" class="l-table-edit-td"><input type="text" id="userID"/></td>
+                <td align="left"></td>
+            </tr>
+            <tr>
+                <td align="right" class="l-table-edit-td"><label>用户名关键字</label></td>
+                <td align="left" class="l-table-edit-td"><input type="text" id="userName"/></td>
+                <td align="left"></td>
+            </tr>
+            <tr>
+                <td align="right" class="l-table-edit-td"><label>用户组</label></td>
+                <td align="left" class="l-table-edit-td"><input type="text" id="roleID"/></td>
+                <td align="left"></td>
+            </tr>
+            <tr>
+                <td align="right" class="l-table-edit-td"><label>创建人</label></td>
+                <td align="left" class="l-table-edit-td"><input type="text" id="creatorID"/></td>
+                <td align="left"></td>
+            </tr>
+            <tr>
+            	<td align="right" class="l-table-edit-td"><label>创建日期区间</label></td>
+                <td align="left" class="l-table-edit-td"><input type="text" id="createDate1"/></td>
+                <td align="left" class="l-table-edit-td"><input type="text" id="createDate2"/></td>
+            </tr>
+            <tr>
+                <td align="right" class="l-table-edit-td"><label>状态</label></td>
+                <td align="left" class="l-table-edit-td"><input type="text" id="validStatus"/></td>
+                <td align="left"></td>
+            </tr>
+        </table>
+	</div>
+  </div>
+  </form>	
+</body>
+</html>

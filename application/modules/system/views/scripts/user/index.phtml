@@ -114,6 +114,7 @@ $(function(){
 							g.setParm('p5',startdate);
 							g.setParm('p6',enddate);
 							g.setParm('p7',validStatus);
+							g.changePage('first');
 							g.reload();
 						}
 					},cls:'l-dialog-btn-highlight' 
@@ -130,14 +131,60 @@ $(function(){
 				}]
 			});
 		}},{line:true},{text:'新建用户',icon:'add',click:function(){
-			alert('新建用户');
+			$.mikoDialog.open({
+				top:30,
+				height:250,
+				width:350,
+				title:'新建用户',
+				target: $("#target2"),
+				buttons:[{
+					text: '确定', onclick: function (item, dialog) {
+						var f1=miko.get('f1').getValue();
+						var f2=miko.get('f2').getValue();
+						var f3=miko.get('f3').getValue();
+						var f4=miko.get('f4').getValue();
+						var f5=miko.get('f5').getValue();
+						var f6=miko.get('f6').getValue();
+						if(/^\s*$/.test(f1) || /^\s*$/.test(f2)){
+							$.mikoDialog.warn('帐号和用户名不能为空');
+							return;
+						}
+						if(!/^(\d+)$/.test(f3)){
+							$.mikoDialog.warn('请选择用户组');
+							return;
+						}
+						$.post(baseUrl+'/system/user/add-user',
+						{f1:f1,f2:f2,f3:f3,f4:f4,f5:f5,f6:f6},
+						function(data){
+							if(data=='0000'){
+								miko.get('f1').setValue('');
+								miko.get('f2').setValue('');
+								miko.get('f3').setValue('');
+								miko.get('f4').setValue('');
+								miko.get('f5').setValue('');
+								miko.get('f6').setValue('');
+								dialog.hide();
+								tip('信息提示','保存成功');
+							}
+						});
+					},cls:'l-dialog-btn-highlight' 
+				},{
+					text:'重置',onclick:function(item, dialog){
+						miko.get('f1').setValue('');
+						miko.get('f2').setValue('');
+						miko.get('f3').setValue('');
+						miko.get('f4').setValue('');
+						miko.get('f5').setValue('');
+						miko.get('f6').setValue('');
+					}
+				}]
+			});
 		}},{line:true},{text:'用户组管理',icon:'role',click:function(){
 			alert('用户组管理');
 		}}]}
 	});
-	$('#userID').mikoTextBox({ width:120 });
-	$('#userName').mikoTextBox({ width:120 });
-	$('#roleID').mikoComboBox({
+	$('#userID,#userName,#f1,#f2,#f4,#f5,#f6').mikoTextBox({ width:120 });
+	$('#roleID,#f3').mikoComboBox({
 		width:120,
 		data:roles,
 		valueField:'roleID',
@@ -167,8 +214,7 @@ $(function(){
 		},
 		condition:{fields:[{ name:'keyword',label:'关键字',width:90}]}
 	});
-	$('#createDate1').mikoDateEditor({ width:120 });
-	$('#createDate2').mikoDateEditor({ width:120 });
+	$('#createDate1,#createDate2').mikoDateEditor({ width:120 });
 	$('#validStatus').mikoComboBox({
 		width:120,
 		data:userStatus,
@@ -269,5 +315,41 @@ a:hover {
 	</div>
   </div>
   </form>	
+  <div id="target2" style="margin:3px;display:none;">
+    <div>
+		<table cellpadding="0" cellspacing="0" class="l-table-edit" >
+			<tr>
+                <td align="right" class="l-table-edit-td"><label>登录帐号</label></td>
+                <td align="left" class="l-table-edit-td"><input type="text" id="f1"/></td>
+                <td align="left"></td>
+            </tr>
+            <tr>
+                <td align="right" class="l-table-edit-td"><label>用户名</label></td>
+                <td align="left" class="l-table-edit-td"><input type="text" id="f2"/></td>
+                <td align="left"></td>
+            </tr>
+            <tr>
+                <td align="right" class="l-table-edit-td"><label>用户组</label></td>
+                <td align="left" class="l-table-edit-td"><input type="text" id="f3"/></td>
+                <td align="left"></td>
+            </tr>
+            <tr>
+                <td align="right" class="l-table-edit-td"><label>邮箱</label></td>
+                <td align="left" class="l-table-edit-td"><input type="text" id="f4"/></td>
+                <td align="left"></td>
+            </tr>
+            <tr>
+                <td align="right" class="l-table-edit-td"><label>移动电话</label></td>
+                <td align="left" class="l-table-edit-td"><input type="text" id="f5"/></td>
+                <td align="left"></td>
+            </tr>
+            <tr>
+                <td align="right" class="l-table-edit-td"><label>固定电话</label></td>
+                <td align="left" class="l-table-edit-td"><input type="text" id="f6"/></td>
+                <td align="left"></td>
+            </tr>
+        </table>
+	</div>
+  </div>
 </body>
 </html>

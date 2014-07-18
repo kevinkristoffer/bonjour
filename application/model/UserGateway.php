@@ -113,8 +113,8 @@ class Bonjour_Model_UserGateway extends Bonjour_Core_Model_GateWay {
 	 * 查询未过期的有效用户组
 	 * @return unknown
 	 */
-	public function queryValidRole(){
-		$query="select roleID,roleName from bonjour_role where expiryDate<now()";
+	public function queryRoleList(){
+		$query="select roleID,roleName from bonjour_role";
 		$results=$this->db->query($query)->fetchAll();
 		return $results;
 	}

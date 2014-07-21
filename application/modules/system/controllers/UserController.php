@@ -22,7 +22,7 @@ class System_UserController extends Bonjour_Controller_Base {
 			$factory->setDbAdapter ( $db );
 			$factory->registGateway ( 'User' );
 			
-			$roles = $factory->__gateway ( 'User' )->queryRoleList ();
+			$roles = $factory->__gateway ( 'User' )->queryRoleSnapList ();
 			$this->view->assign ( 'roles', Zend_Json::encode ( $roles ) );
 		} catch ( Exception $e ) {
 			echo Bonjour_Core_GlobalConstant::BONJOUR_ERROR;
@@ -143,7 +143,6 @@ class System_UserController extends Bonjour_Controller_Base {
 				
 				$page = $this->_request->getParam ( 'page' );
 				$pagesize = $this->_request->getParam ( 'pagesize' );
-				$condition = $this->_request->getParam ( 'condition' ); // 搜索表单参数
 				if (! isset ( $page ) || ! isset ( $pagesize ) || ! preg_match ( '/^(\d+)$/', $page ) || ! preg_match ( '/^(\d+)$/', $pagesize )) {
 					throw new Exception ();
 				}
@@ -273,7 +272,41 @@ class System_UserController extends Bonjour_Controller_Base {
 	/**
 	 * 查询全部角色
 	 */
-	public function queryAllRoleAction() {
+	public function queryRoleListAction() {
+		if ($this->_request->isPost ()) {
+			$this->_helper->viewRenderer->setNoRender ( true );
+			header ( 'content-type:text/html;charset=utf-8' );
+			try{
+				if (! isset ( $_SERVER ['HTTP_X_REQUESTED_WITH'] ) || strtolower ( $_SERVER ['HTTP_X_REQUESTED_WITH'] ) != 'xmlhttprequest') {
+					throw new Exception ();
+				}
+				
+				$page = $this->_request->getParam ( 'page' );
+				$pagesize = $this->_request->getParam ( 'pagesize' );
+				if (! isset ( $page ) || ! isset ( $pagesize ) || ! preg_match ( '/^(\d+)$/', $page ) || ! preg_match ( '/^(\d+)$/', $pagesize )) {
+					throw new Exception ();
+				}
+				
+				$factory = Bonjour_Core_Model_Factory::getInstance ();
+				$db = Bonjour_Core_Db_Connection::getConnection ( 'slave' );
+				if ($db == null) {
+					throw new Exception ();
+				}
+				$factory->setDbAdapter ( $db );
+				$factory->registGateway ( 'User' );
+				// 查询
+				$total = $factory->__gateway ( 'User' )-> countRoleList();
+				$rows = $factory->__gateway ( 'User' )->queryRoleList($pagesize * ($page - 1), $pagesize);
+				$callback = array (
+						'Rows' => $rows,
+						'Total' => $total
+				);
+				
+				echo Zend_Json::encode ( $callback );
+			}catch ( Exception $e ) {
+				echo Bonjour_Core_GlobalConstant::BONJOUR_ERROR;
+			}
+		}
 	}
 	/**
 	 * 修改角色

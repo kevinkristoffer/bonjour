@@ -105,16 +105,30 @@ class Bonjour_Model_UserGateway extends Bonjour_Core_Model_GateWay {
 	 */
 	public function advancedQueryUser($fields,$condition,$params){
 		$glued_fields=implode(',', $fields);	//字段片段
-		$query="select $glued_fields from " . $this->prefix . "user where $condition";
+		$query="select $glued_fields from ".$this->prefix."user where $condition";
 		$result = $this->db->query ( $query, $params )->fetch ();
 		return $result;
 	}
 	/**
-	 * 查询未过期的有效用户组
+	 * 查询角色快照
 	 * @return unknown
 	 */
-	public function queryRoleList(){
+	public function queryRoleSnapList(){
 		$query="select roleID,roleName from bonjour_role";
+		$results=$this->db->query($query)->fetchAll();
+		return $results;
+	}
+	/**
+	 * 分页查询全部角色
+	 */
+	public function countRoleList(){
+		$query="select count(*) cnt from ".$this->prefix."role";
+		$result=$this->db->query($query)->fetch();
+		return $result->cnt;
+	}
+	public function queryRoleList($offset,$limit){
+		$query="select roleID,roleName,creatorID,creatorName,createDate,validStatus,remark".
+				" from ".$this->prefix."role order by 1 limit $offset,$limit";
 		$results=$this->db->query($query)->fetchAll();
 		return $results;
 	}

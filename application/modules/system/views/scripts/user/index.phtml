@@ -18,7 +18,7 @@ var roles=$.parseJSON('<?php echo $this->roles?>');
 var userStatus=[{value:'0',text:'无效'},{value:'1',text:'有效'}];
 </script>
 <script type="text/javascript">
-var g=null;
+var g=null,g2=null;
 $(function(){
 	$('#userListGrid').mikoGrid({
 		url:baseUrl+'/system/user/query-user-list',
@@ -164,7 +164,9 @@ $(function(){
 								miko.get('f5').setValue('');
 								miko.get('f6').setValue('');
 								dialog.hide();
-								tip('信息提示','保存成功');
+								//tip('信息提示','保存成功');
+							}else{
+								$.mikoDialog.warn('保存失败');
 							}
 						});
 					},cls:'l-dialog-btn-highlight' 
@@ -180,8 +182,39 @@ $(function(){
 				}]
 			});
 		}},{line:true},{text:'用户组管理',icon:'role',click:function(){
-			alert('用户组管理');
+			$.mikoDialog.open({
+				top:30,
+				height:250,
+				width:500,
+				title:'用户组管理',
+				target: $("#target3"),
+				buttons:[{
+					text: '关闭', onclick: function (item, dialog) {
+						dialog.hide();
+					},cls:'l-dialog-btn-highlight' 
+				}]
+			});
 		}}]}
+	});
+	$('#roleListGrid').mikoGrid({
+		url:baseUrl+'/system/user/query-role-list',
+		enabledEdit: true, 
+		clickToEdit:false,
+		columns:[{
+			display:'编号',name:'roleID',width:50
+		},{
+			display:'名称',name:'roleName',width:90
+		},{
+			display:'创建人',name:'creatorName',width:60
+		},{
+			display:'创建日期',name:'createDate',width:80
+		},{
+			display:'状态',name:'validStatus',width:60,render:function(item){
+				return item..validStatus==1 ? '有效' : '无效';
+			}
+		},{
+			display:'备注信息',name:'remark',width:60
+		}]
 	});
 	$('#userID,#userName,#f1,#f2,#f4,#f5,#f6').mikoTextBox({ width:120 });
 	$('#roleID,#f3').mikoComboBox({
@@ -350,6 +383,9 @@ a:hover {
             </tr>
         </table>
 	</div>
+  </div>
+  <div id="target3" style="margin:3px;display:none;">
+    <div id="roleListGrid"></div>
   </div>
 </body>
 </html>

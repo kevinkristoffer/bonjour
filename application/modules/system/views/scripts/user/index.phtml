@@ -16,6 +16,7 @@ var baseUrl='<?php echo $this->baseUrl();?>';
 <script type="text/javascript">
 var roles=$.parseJSON('<?php echo $this->roles?>');
 var userStatus=[{value:'0',text:'无效'},{value:'1',text:'有效'}];
+var roleStatus=[{value:'0',text:'无效'},{value:'1',text:'有效'}];
 </script>
 <script type="text/javascript">
 var g=null,g2=null;
@@ -24,6 +25,9 @@ $(function(){
 		url:baseUrl+'/system/user/query-user-list',
 		enabledEdit: true, 
 		clickToEdit:false,
+		pageSize:15,
+		pageSizeOptions:[15,25],
+		enabledSort:false,
 		columns:[{
 			display:'编号',name:'userID',width:40
 		},{
@@ -31,7 +35,7 @@ $(function(){
 		},{
 			display:'用户名',name:'userName',width:80,editor:{type:'text'}
 		},{
-			display:'用户组',name:'roleID',width:80,
+			display:'用户组',name:'roleID',width:100,
 			render:function(item){
 				for(var i=0; i<roles.length; i++){
 					if(roles[i]['roleID'] == item.roleID)
@@ -63,12 +67,12 @@ $(function(){
 				var h = "";
                 if (!rowdata._editing)
                 {
-                    h += "<a href='javascript:beginEdit(" + rowindex + ")'>修改</a> ";
+                    h += "<a href='javascript:beginUserGridEdit(" + rowindex + ")'>修改</a> ";
                 }
                 else
                 {
-                    h += "<a href='javascript:endEdit(" + rowindex + ")'>提交</a> ";
-                    h += "<a href='javascript:cancelEdit(" + rowindex + ")'>取消</a> "; 
+                    h += "<a href='javascript:endUserGridEdit(" + rowindex + ")'>提交</a> ";
+                    h += "<a href='javascript:cancelUserGridEdit(" + rowindex + ")'>取消</a> "; 
                 }
                 return h;
 			}
@@ -184,8 +188,8 @@ $(function(){
 		}},{line:true},{text:'用户组管理',icon:'role',click:function(){
 			$.mikoDialog.open({
 				top:30,
-				height:250,
-				width:500,
+				height:300,
+				width:580,
 				title:'用户组管理',
 				target: $("#target3"),
 				buttons:[{
@@ -200,21 +204,40 @@ $(function(){
 		url:baseUrl+'/system/user/query-role-list',
 		enabledEdit: true, 
 		clickToEdit:false,
+		pageSize:5,
+		pageSizeOptions:[5,10,20],
 		columns:[{
-			display:'编号',name:'roleID',width:50
+			display:'编号',name:'roleID',width:40
 		},{
-			display:'名称',name:'roleName',width:90
+			display:'名称',name:'roleName',width:90,editor:{ type:'text' }
 		},{
 			display:'创建人',name:'creatorName',width:60
 		},{
 			display:'创建日期',name:'createDate',width:80
 		},{
 			display:'状态',name:'validStatus',width:60,render:function(item){
-				return item..validStatus==1 ? '有效' : '无效';
-			}
+				return item.validStatus==1 ? '有效' : '无效';
+			},editor:{type:'select',data:roleStatus,valueField:'value'}
 		},{
-			display:'备注信息',name:'remark',width:60
-		}]
+			display:'备注信息',name:'remark',width:100,editor:{ type:'text' }
+		},{
+			display:'操作',width:80,render:function(rowdata, rowindex, value){
+				var h = "";
+                if (!rowdata._editing)
+                {
+                    h += "<a href='javascript:beginRoleGridEdit(" + rowindex + ")'>修改</a> ";
+                }
+                else
+                {
+                    h += "<a href='javascript:endRoleGridEdit(" + rowindex + ")'>提交</a> ";
+                    h += "<a href='javascript:cancelRoleGridEdit(" + rowindex + ")'>取消</a> "; 
+                }
+                return h;
+			}
+		}],
+		toolbar:{items:[{text:'新建用户组',icon:'add',click:function(){
+			g2.addEditRow();
+		}}]}
 	});
 	$('#userID,#userName,#f1,#f2,#f4,#f5,#f6').mikoTextBox({ width:120 });
 	$('#roleID,#f3').mikoComboBox({
@@ -255,20 +278,29 @@ $(function(){
 		valueFieldID:'validStatusValue'
 	});
 	g=$('#userListGrid').mikoGetGridManager();
+	g2=$('#roleListGrid').mikoGetGridManager();
 });
 
-function beginEdit(rowid) { 
+function beginUserGridEdit(rowid) { 
     g.beginEdit(rowid);
 }
-function cancelEdit(rowid) { 
+function cancelUserGridEdit(rowid) { 
     g.cancelEdit(rowid);
 }
-function endEdit(rowid)
+function endUserGridEdit(rowid)
 {
 	var oldrow=g.getRow(rowid);
 	var rowdata=g.getEditRow(rowid);
 	if(rowdata.userName==''){
 		$.mikoDialog.warn('用户名不能为空');
+		return;
+	}
+	if(rowdata.roleID==''){
+		$.mikoDialog.warn('用户组不能为空');
+		return;
+	}
+	if(rowdata.validStatus==''){
+		$.mikoDialog.warn('状态不能为空');
 		return;
 	}
     $.post(baseUrl+'/system/user/modify-user',{
@@ -277,6 +309,36 @@ function endEdit(rowid)
     },function(data){
         if(data=='0000'){
         	g.endEdit(rowid);
+        	tip('信息提示','保存成功');
+        }else{
+        	tip('信息提示','保存失败');
+        }
+    });
+}
+function beginRoleGridEdit(rowid) { 
+    g2.beginEdit(rowid);
+}
+function cancelRoleGridEdit(rowid) { 
+    g2.cancelEdit(rowid);
+}
+function endRoleGridEdit(rowid)
+{
+	var oldrow=g2.getRow(rowid);
+	var rowdata=g2.getEditRow(rowid);
+	if(rowdata.roleName==''){
+		$.mikoDialog.warn('用户名不能为空');
+		return;
+	}
+	if(rowdata.validStatus==''){
+		$.mikoDialog.warn('状态不能为空');
+		return;
+	}
+    $.post(baseUrl+'/system/user/modify-role',{
+        p0:oldrow.roleID || 0,p1:rowdata.roleName,p2:rowdata.validStatus,p3:rowdata.remark || ''
+    },function(data){
+        if(data=='0000'){
+        	g2.endEdit(rowid);
+        	if(!oldrow.roleID) g2.reload();
         	tip('信息提示','保存成功');
         }else{
         	tip('信息提示','保存失败');

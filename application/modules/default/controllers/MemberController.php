@@ -79,7 +79,13 @@ class MemberController extends Bonjour_Controller_Base {
 		 * 登录页面
 		 */
 		if ($this->_request->isGet ()) {
-			
+			//防止重复登录
+			$this->initSession ();
+			$authNamespace = new Zend_Session_Namespace ( 'Bonjour_Auth' );
+			if(isset($authNamespace->currentUser)){
+				$this->redirect('');
+				exit();
+			}
 		}
 		/**
 		 * 提交表单
@@ -91,6 +97,14 @@ class MemberController extends Bonjour_Controller_Base {
 				// check ajax request
 				if (! isset ( $_SERVER ['HTTP_X_REQUESTED_WITH'] ) || strtolower ( $_SERVER ['HTTP_X_REQUESTED_WITH'] ) != 'xmlhttprequest') {
 					throw new Exception ();
+				}
+				
+				//防止重复登录
+				$this->initSession ();
+				$authNamespace = new Zend_Session_Namespace ( 'Bonjour_Auth' );
+				if(isset($authNamespace->currentUser)){
+					echo Bonjour_Core_GlobalConstant::BONJOUR_SUCCESS;
+					exit();
 				}
 				
 				$username = $this->_request->getPost ( 'username' );
@@ -120,8 +134,6 @@ class MemberController extends Bonjour_Controller_Base {
 				$affected_rows=$factory->__gateway ( 'User' )->modifyUser($set,$where);
 				
 				//设置会话
-				$this->initSession ();
-				$authNamespace = new Zend_Session_Namespace ( 'Bonjour_Auth' );
 				$authNamespace->currentUser = $user;
 				
 				echo Bonjour_Core_GlobalConstant::BONJOUR_SUCCESS;

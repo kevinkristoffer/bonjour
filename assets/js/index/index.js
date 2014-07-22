@@ -31,6 +31,8 @@ $(function(){
 			}
 		});
 	});
+	
+	
 	$('#framecenter').mikoTab({});
 	tab=miko.get('framecenter');
 	

@@ -15,8 +15,8 @@ var baseUrl='<?php echo $this->baseUrl();?>';
 <script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/mikoUI/js/mikoui.all.js"></script>
 <script type="text/javascript">
 $(function(){
-	$('#teamGrid').mikoGrid({
-		url:,
+	$('#teamListGrid').mikoGrid({
+		//url:,
 		delayLoad:true,
 		rownumbers:true,
 		columns:[{
@@ -25,14 +25,12 @@ $(function(){
 		},{
 		},{
 		},{
-		}],
-		toolbar: { items: [{ text: '高级查询',icon: 'search2',click:function(){
-		}}]}
+		}]
 	});
 };
 </script>
 </head>
 <body>
-<div id="teamGrid"></div>
+<div id="teamListGrid"></div>
 </body>
 </html>

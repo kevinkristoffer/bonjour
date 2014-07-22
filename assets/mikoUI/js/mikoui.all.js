@@ -8267,6 +8267,7 @@
         },
         getEditRow: function (rowid)	//获取编辑后的数据
         {
+        	var g = this;
             var rowdata = g.getRow(rowid);
             var newdata = {};
             if (!g.editors[rowdata['__id']]) return;

@@ -30,11 +30,11 @@ class Bonjour_Model_UserGateway extends Bonjour_Core_Model_GateWay {
 	 */
 	public function countValidUser($keyword=null){
 		$result=null;
+		$query="select count(*) cnt from ".$this->prefix."user where validStatus=1";
 		if(isset($keyword) && $keyword!=''){
-			$query="select count(*) cnt from ".$this->prefix."user where validStatus=1 and userName regexp ?";
+			$query=$query." and userName regexp ?";
 			$result=$this->db->query($query,$keyword)->fetch();
 		}else{
-			$query="select count(*) cnt from ".$this->prefix."user where validStatus=1";
 			$result=$this->db->query($query)->fetch();
 		}
 		return $result->cnt;
@@ -48,13 +48,13 @@ class Bonjour_Model_UserGateway extends Bonjour_Core_Model_GateWay {
 	 */
 	public function queryValidUser($offset,$limit,$keyword=null){
 		$results=null;
+		$query=" select userID,userName,b.roleName from ".$this->prefix."user a,".$this->prefix."role b".
+				" where a.RoleID=b.roleID and a.validStatus=1";
 		if(isset($keyword) && $keyword!=''){
-			$query=" select userID,userName,b.roleName from ".$this->prefix."user a,".$this->prefix."role b".
-					" where a.RoleID=b.roleID and a.validStatus=1 and userName regexp ? limit $offset,$limit";
+			$query=$query." and userName regexp ? limit $offset,$limit";
 			$results=$this->db->query($query,$keyword)->fetchAll();
 		}else{
-			$query=" select userID,userName,b.roleName from ".$this->prefix."user a,".$this->prefix."role b".
-					" where a.RoleID=b.roleID and a.validStatus=1 limit $offset,$limit";
+			$query=$query." limit $offset,$limit";
 			$results=$this->db->query($query)->fetchAll();
 		}
 		return $results;
@@ -109,12 +109,32 @@ class Bonjour_Model_UserGateway extends Bonjour_Core_Model_GateWay {
 		$result = $this->db->query ( $query, $params )->fetch ();
 		return $result;
 	}
+	////////////////////////////////////////////////////////////////////////////////
+	/**
+	 * 新建角色
+	 * @param unknown $role
+	 * @return unknown
+	 */
+	public function addRole($role){
+		$affected_rows=$this->db->insert($this->prefix.'role',$role);
+		return $affected_rows;
+	}
+	/**
+	 * 修改角色
+	 * @param unknown $set
+	 * @param unknown $where
+	 * @return unknown
+	 */
+	public function modifyRole($set,$where){
+		$affected_rows=$this->db->update($this->prefix.'role',$set,$where);
+		return $affected_rows;
+	}
 	/**
 	 * 查询角色快照
 	 * @return unknown
 	 */
 	public function queryRoleSnapList(){
-		$query="select roleID,roleName from bonjour_role";
+		$query="select roleID,roleName from ".$this->prefix."role";
 		$results=$this->db->query($query)->fetchAll();
 		return $results;
 	}

@@ -193,7 +193,7 @@ class System_UserController extends Bonjour_Controller_Base {
 					}
 				}
 				if (isset ( $validStatus ) && $validStatus != '' && preg_match ( '/^[0-1]{1}$/', $validStatus )) {
-					$condition = $condition . " and validStatus=?";
+					$condition = $condition . " and a.validStatus=?";
 					$params = array_merge ( $params, array (
 							$validStatus 
 					) );
@@ -217,7 +217,7 @@ class System_UserController extends Bonjour_Controller_Base {
 				
 				echo Zend_Json::encode ( $callback );
 			} catch ( Exception $e ) {
-				echo $e->getMessage ();
+				//echo $e->getMessage ();
 				echo Bonjour_Core_GlobalConstant::BONJOUR_ERROR;
 			}
 		}
@@ -309,9 +309,70 @@ class System_UserController extends Bonjour_Controller_Base {
 		}
 	}
 	/**
-	 * 修改角色
+	 * 新建/修改角色
 	 */
 	public function modifyRoleAction() {
+		if ($this->_request->isPost ()) {
+			$this->_helper->viewRenderer->setNoRender ( true );
+			header ( 'content-type:text/html;charset=utf-8' );
+			try {
+				if (! isset ( $_SERVER ['HTTP_X_REQUESTED_WITH'] ) || strtolower ( $_SERVER ['HTTP_X_REQUESTED_WITH'] ) != 'xmlhttprequest') {
+					throw new Exception ();
+				}
+				/*
+				 * p0:roleID p1:roleName p2:validStatus p3:remark
+				 */
+				
+				$params = $this->_request->getParams ();
+				if (! array_key_exists ( 'p0', $params ) || !preg_match('/^(\d+)$/',$params['p0']))
+					throw new Exception ();
+				if (! array_key_exists ( 'p1', $params ) || $params ['p1'] == '')
+					throw new Exception ();
+				if (! array_key_exists ( 'p2', $params ) || ! preg_match ( '/^(\d+)$/', $params ['p2'] ))
+					throw new Exception ();
+				if (! array_key_exists ( 'p3', $params ))
+					throw new Exception ();
+				
+				$factory = Bonjour_Core_Model_Factory::getInstance ();
+				$db = Bonjour_Core_Db_Connection::getConnection ( 'slave' );
+				if ($db == null) {
+					throw new Exception ();
+				}
+				$factory->setDbAdapter ( $db );
+				$factory->registGateway ( 'User' );
+				
+				// 角色编号为空则新建角色否则修改角色
+				if ($params ['p0'] == 0) {
+					$authNamespace = new Zend_Session_Namespace ( 'Bonjour_Auth' );
+					$creatorID = $authNamespace->currentUser->userID;
+					$creatorName = $authNamespace->currentUser->userName;
+					$role = array (
+							'roleName' => $params ['p1'],
+							'createDate' => date ( 'Ymd' ),
+							'creatorID' => $creatorID,
+							'creatorName' => $creatorName,
+							'validStatus' => $params ['p2'],
+							'remark' => $params ['p3'] 
+					);
+					$affected_rows = $factory->__gateway ( 'User' )->addRole ( $role );
+					if ($affected_rows != 1)
+						throw new Exception ();
+				} else {
+					$set = array (
+							'roleName' => $params ['p1'],
+							'validStatus' => $params ['p2'],
+							'remark' => $params ['p3'] 
+					);
+					$where ['roleID=?'] = $params ['p0'];
+					$factory->__gateway ( 'User' )->modifyRole ( $set, $where );
+				}
+				
+				echo Bonjour_Core_GlobalConstant::BONJOUR_SUCCESS;
+			} catch ( Exception $e ) {
+				//echo $e->getMessage ();
+				echo Bonjour_Core_GlobalConstant::BONJOUR_ERROR;
+			}
+		}
 	}
 }
 

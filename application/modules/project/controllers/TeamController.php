@@ -1,6 +1,6 @@
 <?php
 
-class TeamController {
+class TeamController extends Bonjour_Controller_Base{
 	
 	/**
 	 * Constructor
@@ -15,15 +15,23 @@ class TeamController {
 		
 	}
 	
-	public function queryTeamListAction(){
-		
-	}
-	
 	public function addTeamAction(){
 		
 	}
 	
-	public function addTeamMemberAction(){
+	public function modifyTeamAction(){
+		
+	}
+	
+	public function queryTeamListAction(){
+		
+	}
+	
+	public function addMemberAction(){
+		
+	}
+	
+	public function removeMemberAction(){
 		
 	}
 }

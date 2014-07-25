@@ -14,20 +14,87 @@ var baseUrl='<?php echo $this->baseUrl();?>';
 <script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/js/client.js"></script>
 <script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/mikoUI/js/mikoui.all.js"></script>
 <script type="text/javascript">
+var g=null;
+var teamStatus=[{value:'0',text:'无效'},{value:'1',text:'有效'}];
 $(function(){
 	$('#teamListGrid').mikoGrid({
-		//url:,
-		delayLoad:true,
-		rownumbers:true,
+		url:baseUrl+'/project/team/query-team-list',
 		columns:[{
-			display:''
+			display:'编号',name:'teamID',width:50
 		},{
+			display:'团队名称',name:'teamName',width:250,editor:{type:'text'}
 		},{
+			display:'描述',name:'description',width:300,editor:{type:'text'}
 		},{
+			display:'负责人',name:'responsibleName',width:80,
+			editor:{type:'select',data:null,valueField:'responsibleID',textField:'responsibleName'}
 		},{
-		}]
+			display:'创建人',name:'creatorName',width:80
+		},{
+			display:'创建日期',name:'createTime',width:60
+		},{
+			display:'状态',name:'validStatus',width:50,
+			render:function(item){ return item.validStatus==1 ? '有效' : '无效'},
+			editor:{type:'select',data:teamStatus,valueField:'value'}
+		},{
+			display:'操作',width:100,render:function(rowdata, rowindex, value){
+				var h = "";
+				console.log(rowdata);
+                if (!rowdata._editing && rowdata.teamID)
+                {
+                    h += "<a href='javascript:beginTeamGridEdit(" + rowindex + ")'>修改</a> ";
+                }
+                else
+                {
+                    h += "<a href='javascript:endTeamGridEdit(" + rowindex + ")'>提交</a> ";
+                    h += "<a href='javascript:cancelTeamGridEdit(" + rowindex + ")'>取消</a> "; 
+                }
+                return h;
+			}
+		}],
+		toolbar:{items:[{text:'新建团队',icon:'add',click:function(){
+			g.addEditRow();
+		}}]}
 	});
-};
+	g=$('#teamListGrid').mikoGetGridManager();
+});
+function beginTeamGridEdit(rowid) { 
+    g.beginEdit(rowid);
+}
+function cancelTeamGridEdit(rowid) { 
+    g.cancelEdit(rowid);
+}
+function endTeamGridEdit(rowid)
+{
+	var oldrow=g.getRow(rowid);
+	var rowdata=g.getEditRow(rowid);
+	if(rowdata.TeamName==''){
+		$.mikoDialog.warn('用户名不能为空');
+		return;
+	}
+	if(rowdata.validStatus==''){
+		$.mikoDialog.warn('状态不能为空');
+		return;
+	}
+    $.post(baseUrl+'/system/user/modify-Team',{
+        p0:oldrow.TeamID || 0,p1:rowdata.TeamName,p2:rowdata.validStatus,p3:rowdata.remark || ''
+    },function(data){
+        if(data=='0000'){
+        	g.endEdit(rowid);
+        	if(!oldrow.TeamID) g.reload();
+        	tip('信息提示','保存成功');
+        }else{
+        	tip('信息提示','保存失败');
+        }
+    });
+}
+function tip(title,content){
+	//提示信息
+	var tip=$.mikoDialog.tip({  title: title,content:content });
+	setTimeout(function(){
+		if(tip)	tip.hide();
+	},3000);
+}
 </script>
 </head>
 <body>

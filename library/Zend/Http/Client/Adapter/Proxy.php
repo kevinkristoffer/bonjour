@@ -67,6 +67,7 @@ class Zend_Http_Client_Adapter_Proxy extends Zend_Http_Client_Adapter_Socket
         'proxy_pass'    => '',
         'proxy_auth'    => Zend_Http_Client::AUTH_BASIC,
         'persistent'    => false,
+    	'timeout'		=> 15
     );
 
     /**

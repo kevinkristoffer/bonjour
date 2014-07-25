@@ -64,7 +64,7 @@ class Bonjour_Model_TeamGateway extends Bonjour_Core_Model_GateWay{
 		return $result->cnt;
 	}
 	public function queryTeamList($offset,$limit){
-		$query="select teamID,teamName,nickName,responsibleName,creatorName,createTime,validStatus from ".$this->prefix."team";
+		$query="select teamID,teamName,responsibleName,creatorName,createTime,validStatus from ".$this->prefix."team";
 		$results=$this->db->query($query)->fetchAll();
 		return $results;
 	}

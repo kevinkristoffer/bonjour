@@ -121,6 +121,51 @@ class TestController extends Bonjour_Controller_Base{
 		
 		return $output;
 	}
+	/**
+	 * 测试s3服务
+	 */
+	public function testS3Action(){
+		$this->_helper->viewRenderer->setNoRender ( true );
+		header ( 'content-type:text/html;charset=utf-8' );
+		
+		try{
+			$s3=new Zend_Service_Amazon_S3('AKIAJPHC5NJDPEQWDJVQ','ia8zEFQNlZJO7WV6Sb46GiRu8TyF9U/5C3xOZAmD');
+			
+			//echo file_get_contents('D:/myfiles/Chahua16.jpg');
+// 			$s3->putFile('D:/myfiles/Chahua16.jpg', 'bacterium87-bucket/test1.jpg',
+// 			array(Zend_Service_Amazon_S3::S3_ACL_HEADER=>Zend_Service_Amazon_S3::S3_ACL_PUBLIC_READ));
+
+			$s3->putObject('bacterium87-bucket/test1.jpg',file_get_contents('D:/myfiles/Chahua16.jpg'),
+			array(Zend_Service_Amazon_S3::S3_ACL_HEADER=>Zend_Service_Amazon_S3::S3_ACL_PUBLIC_READ));
+			
+// 			$objs=$s3->getObjectsByBucket('bacterium87-bucket');
+			
+// 			var_dump($objs);
+		}catch(Exception $e){
+			echo $e->getMessage();
+		}
+	}
+	/**
+	 * 测试代理服务器
+	 */
+	public function testProxyClientAction(){
+		$this->_helper->viewRenderer->setNoRender ( true );
+		header ( 'content-type:text/html;charset=utf-8' );
+		try{
+			require_once 'Zend/Http/Client/Adapter/Proxy.php';
+			$config = array (
+					'proxy_host' => '127.0.0.1',
+					'proxy_port' => 1081,
+					'proxy_user' => '',
+					'proxy_pass' => '' 
+			);
+			$client=new Zend_Http_Client("http://www.youtube.com",$config);
+			$response=$client->request(Zend_Http_Client::GET);
+			echo $response->getMessage();
+		}catch(Exception $e){
+			echo $e->getMessage();
+		}
+	}
 	
 	/**
 	 *

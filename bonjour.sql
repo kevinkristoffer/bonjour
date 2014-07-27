@@ -486,9 +486,12 @@ CREATE TABLE IF NOT EXISTS `bonjour_session` (
   PRIMARY KEY (`id`)
 ) ENGINE=MEMORY DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
 
--- 正在导出表  bonjour.bonjour_session 的数据：0 rows
+-- 正在导出表  bonjour.bonjour_session 的数据：1 rows
 DELETE FROM `bonjour_session`;
 /*!40000 ALTER TABLE `bonjour_session` DISABLE KEYS */;
+INSERT INTO `bonjour_session` (`id`, `modified`, `lifetime`, `data`) VALUES
+	('s38p8148utg4j613gt8g2ttkg3', 1406457247, 3600, 'Bonjour_Auth|a:1:{s:11:"currentUser";O:8:"stdClass":4:{s:6:"userID";s:1:"1";s:8:"userName";s:9:"胡建鸿";s:6:"roleID";s:1:"1";s:8:"roleName";s:15:"超级管理员";}}'),
+	('vs767q9spur5kslnu5n7k62984', 1406457041, 3600, '');
 /*!40000 ALTER TABLE `bonjour_session` ENABLE KEYS */;
 
 
@@ -585,20 +588,22 @@ DELETE FROM `bonjour_task_schedule`;
 CREATE TABLE IF NOT EXISTS `bonjour_team` (
   `TeamID` int(11) NOT NULL AUTO_INCREMENT,
   `TeamName` varchar(50) NOT NULL,
-  `NickName` varchar(50) DEFAULT NULL,
   `Description` varchar(250) DEFAULT NULL,
   `ResponsibleID` int(11) DEFAULT NULL,
-  `ResponsibleName` int(11) DEFAULT NULL,
+  `ResponsibleName` varchar(50) DEFAULT NULL,
   `CreatorID` int(11) NOT NULL,
   `CreatorName` varchar(50) DEFAULT NULL,
   `CreateTime` datetime NOT NULL,
   `ValidStatus` tinyint(4) DEFAULT '1',
   PRIMARY KEY (`TeamID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
--- 正在导出表  bonjour.bonjour_team 的数据：~0 rows (大约)
+-- 正在导出表  bonjour.bonjour_team 的数据：~2 rows (大约)
 DELETE FROM `bonjour_team`;
 /*!40000 ALTER TABLE `bonjour_team` DISABLE KEYS */;
+INSERT INTO `bonjour_team` (`TeamID`, `TeamName`, `Description`, `ResponsibleID`, `ResponsibleName`, `CreatorID`, `CreatorName`, `CreateTime`, `ValidStatus`) VALUES
+	(1, 'test1', 'test1', 22, '测试帐号21', 1, '胡建鸿', '2014-07-26 21:55:33', 0),
+	(2, '美美团购网项目团队', '团购门户设计开发维护团队', 1, '胡建鸿', 1, '胡建鸿', '2014-07-26 21:55:46', 1);
 /*!40000 ALTER TABLE `bonjour_team` ENABLE KEYS */;
 
 
@@ -608,12 +613,33 @@ CREATE TABLE IF NOT EXISTS `bonjour_team_member` (
   `UserID` int(11) NOT NULL,
   `UserName` varchar(50) DEFAULT NULL,
   `RoleDesc` varchar(50) DEFAULT NULL,
-  `CreateTime` datetime NOT NULL
+  `CreateTime` datetime NOT NULL,
+  PRIMARY KEY (`TeamID`,`UserID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 正在导出表  bonjour.bonjour_team_member 的数据：~0 rows (大约)
 DELETE FROM `bonjour_team_member`;
 /*!40000 ALTER TABLE `bonjour_team_member` DISABLE KEYS */;
+INSERT INTO `bonjour_team_member` (`TeamID`, `UserID`, `UserName`, `RoleDesc`, `CreateTime`) VALUES
+	(1, 1, '胡建鸿', '项目总监', '2014-07-26 23:32:07'),
+	(1, 3, '测试帐号2', '需求设计', '2014-07-26 23:41:21'),
+	(1, 6, '测试帐号5', '开发人员', '2014-07-26 23:44:21'),
+	(1, 24, '测试帐号23', '开发人员', '2014-07-26 23:33:04'),
+	(1, 30, '王小丫', '开发人员', '2014-07-26 23:42:43'),
+	(1, 31, '王宝强', '开发人员', '2014-07-26 23:45:58'),
+	(2, 1, '胡建鸿', '项目负责人', '2014-07-27 11:13:16'),
+	(2, 4, '测试帐号3', '待定', '2014-07-27 11:15:54'),
+	(2, 6, '测试帐号5', '需求分析师', '2014-07-27 11:14:24'),
+	(2, 8, '测试帐号7', '待定', '2014-07-27 11:16:01'),
+	(2, 9, '测试帐号8', '文档管理', '2014-07-27 14:55:55'),
+	(2, 10, '测试帐号9', '需求分析师', '2014-07-27 11:14:14'),
+	(2, 12, '测试帐号11', '开发人员1', '2014-07-27 11:15:09'),
+	(2, 13, '测试帐号12', '项目评估分析员', '2014-07-27 11:14:58'),
+	(2, 14, '测试帐号13', '测试员1', '2014-07-27 11:15:32'),
+	(2, 21, '测试帐号20', '待定', '2014-07-27 11:16:12'),
+	(2, 23, '测试帐号22', '开发人员2', '2014-07-27 11:15:19'),
+	(2, 30, '王小丫', '销售分析师', '2014-07-27 11:16:34'),
+	(2, 31, '王宝强', '集成测试员1', '2014-07-27 11:15:46');
 /*!40000 ALTER TABLE `bonjour_team_member` ENABLE KEYS */;
 
 
@@ -642,7 +668,7 @@ CREATE TABLE IF NOT EXISTS `bonjour_user` (
 DELETE FROM `bonjour_user`;
 /*!40000 ALTER TABLE `bonjour_user` DISABLE KEYS */;
 INSERT INTO `bonjour_user` (`UserID`, `AccountName`, `UserName`, `UserPass`, `RoleID`, `Email`, `Mobile`, `PhoneNumber`, `CreateDate`, `CreatorID`, `CreatorName`, `LoginTimes`, `LastLogin`, `ValidStatus`) VALUES
-	(1, 'hujianhong', '胡建鸿', '1d42abef5a4a5748edf45448bc8d64c5', 1, 'sammy19871116@gmail.com', NULL, NULL, 20140531, 1, '胡建鸿', 11, '2014-07-20 08:53:44', 1),
+	(1, 'hujianhong', '胡建鸿', '1d42abef5a4a5748edf45448bc8d64c5', 1, 'sammy19871116@gmail.com', NULL, NULL, 20140531, 1, '胡建鸿', 20, '2014-07-27 18:31:52', 1),
 	(2, 'test1', '测试帐号1', '1d42abef5a4a5748edf45448bc8d64c5', 3, '', '', '', 20140531, 1, '胡建鸿', 0, '0000-00-00 00:00:00', 1),
 	(3, 'test2', '测试帐号2', '1d42abef5a4a5748edf45448bc8d64c5', 3, '', '15058430233', '057456867933', 20140531, 1, '胡建鸿', 1, '2014-07-17 09:57:34', 1),
 	(4, 'test3', '测试帐号3', '1d42abef5a4a5748edf45448bc8d64c5', 9, NULL, NULL, NULL, 20140531, 1, '胡建鸿', 0, '0000-00-00 00:00:00', 1),

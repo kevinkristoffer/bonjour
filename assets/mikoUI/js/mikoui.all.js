@@ -8188,7 +8188,7 @@
             if (editorBuilder.setValue)
                 editorBuilder.setValue.call(this, editor, editParm.value, editParm);
             if (editorBuilder.setText && editParm.column.textField)
-                editorBuilder.setText.call(this, editor, editParm.text, editParm);
+            	editorBuilder.setText.call(this, editor, editParm.text, editParm);
             if (editorBuilder.resize)
                 editorBuilder.resize.call(this, editor, width, height, editParm);
             return editor;
@@ -8223,6 +8223,8 @@
                 var editParm = {
                     record: rowdata,
                     value: g._getValueByName(rowdata, column.name),
+                    //修正text无法显示的bug
+                    text: g._getValueByName(rowdata, column.textField),
                     column: column,
                     rowindex: rowdata['__index'],
                     grid: g

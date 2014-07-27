@@ -43,7 +43,7 @@ class Bonjour_Model_TeamGateway extends Bonjour_Core_Model_GateWay{
 	}
 	public function queryTeamSnapList($offset,$limit,$keyword=null){
 		$results=null;
-		$query="select teamID,teamName,nickName,responsibleName from ".$this->prefix."team where validStatus=1";
+		$query="select teamID,teamName,responsibleName from ".$this->prefix."team where validStatus=1";
 		if(isset($keyword) && $keyword!=''){
 			$query=$query." and teamName regexp ? limit $offset,$limit";
 			$results=$this->db->query($query,$keyword)->fetchAll();
@@ -64,7 +64,7 @@ class Bonjour_Model_TeamGateway extends Bonjour_Core_Model_GateWay{
 		return $result->cnt;
 	}
 	public function queryTeamList($offset,$limit){
-		$query="select teamID,teamName,responsibleName,creatorName,createTime,validStatus from ".$this->prefix."team";
+		$query="select teamID,teamName,description,responsibleID,responsibleName,creatorName,createTime,validStatus from ".$this->prefix."team";
 		$results=$this->db->query($query)->fetchAll();
 		return $results;
 	}
@@ -83,8 +83,8 @@ class Bonjour_Model_TeamGateway extends Bonjour_Core_Model_GateWay{
 	 * @return unknown
 	 */
 	public function queryTeamMember($teamID){
-		$query="select userID,userName,roleDesc,createTime from ".$this->prefix."team_member where teamID=?";
-		$results=$this->db->query($query)->fetchAll();
+		$query="select userID,userName,roleDesc,createTime from ".$this->prefix."team_member where teamID=? order by createTime asc";
+		$results=$this->db->query($query,$teamID)->fetchAll();
 		return $results;
 	}
 	/**
@@ -93,9 +93,14 @@ class Bonjour_Model_TeamGateway extends Bonjour_Core_Model_GateWay{
 	 * @param unknown $userID
 	 * @return unknown
 	 */
-	public function removeTeamMember($teamID,$userID){
+	public function removeTeamMember($teamID,$uids){
 		$where['teamID=?']=$teamID;
-		$where['userID=?']=$userID;
+		$tmp=array();
+		for($i=0;$i<count($uids);$i++){
+			array_push($tmp,'?');
+		}
+		$tmp2=implode(',', $tmp);
+		$where['userID in ('.$tmp2.')']=$uids;
 		$affected_rows=$this->db->delete($this->prefix.'team_member',$where);
 		return $affected_rows;
 	}
@@ -126,10 +131,10 @@ class Bonjour_Model_TeamGateway extends Bonjour_Core_Model_GateWay{
 				" where a.RoleID=b.roleID and a.validStatus=1".
 				" and userID not in (select userID from ".$this->prefix."team_member where teamID=?)";
 		if(isset($keyword) && $keyword!=''){
-			$query=$query." and userName regexp ? limit $offset,$limit";
+			$query=$query." and userName regexp ? order by 1 limit $offset,$limit";
 			$results=$this->db->query($query,array($teamID,$keyword))->fetchAll();
 		}else{
-			$query=$query." limit $offset,$limit";
+			$query=$query." order by 1 limit $offset,$limit";
 			$results=$this->db->query($query,$teamID)->fetchAll();
 		}
 		return $results;

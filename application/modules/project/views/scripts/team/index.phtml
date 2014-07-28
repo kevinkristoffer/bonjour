@@ -206,25 +206,30 @@ function f_showMember(row, detailPanel,callback)
             }
         },{line:true},{
             text:'移除选定成员',icon:'delete',click:function(){
-                var rows=g2.getSelectedRows();
+            	var rows=g2.getSelectedRows();
                 var uids=[];
+                var unames=[];
                 for(var i=0;i<rows.length;i++){
-                    if(rows[i].userID && /^(\d+)$/.test(rows[i].userID))
-                        uids.push(parseInt(rows[i].userID));
+                    if(rows[i].userID && /^(\d+)$/.test(rows[i].userID)){
+                    	uids.push(parseInt(rows[i].userID));
+                    	unames.push(rows[i].userName);
+                    } 
                 }
-                if(uids.length==0){
-                	$.mikoDialog.warn('请选择成员');
-                	return;
-                }
-                $.post(baseUrl+'/project/team/remove-member',
-                {tid:row.teamID,uids:uids.join(',')},
-                function(data){
-                	if(data=='0000'){
-                    	g2.reload();
-                    	tip('信息提示','删除成功');
-                    }else{
-                    	tip('信息提示','删除失败');
+            	$.mikoDialog.confirm('确定移除'+unames.join(',')+'吗？',function(yes){
+                    if(uids.length==0){
+                    	$.mikoDialog.warn('请选择成员');
+                    	return;
                     }
+                    $.post(baseUrl+'/project/team/remove-member',
+                    {tid:row.teamID,uids:uids.join(',')},
+                    function(data){
+                    	if(data=='0000'){
+                        	g2.reload();
+                        	tip('信息提示','删除成功');
+                        }else{
+                        	tip('信息提示','删除失败');
+                        }
+                    });
                 });
             }
         }]}

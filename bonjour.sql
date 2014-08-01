@@ -17,22 +17,22 @@ USE `bonjour`;
 
 -- 导出  表 bonjour.bonjour_attachment 结构
 CREATE TABLE IF NOT EXISTS `bonjour_attachment` (
-  `AttachmentID` char(15) NOT NULL,
-  `ModuleName` varchar(50) NOT NULL,
-  `ModuleCode` varchar(50) DEFAULT NULL,
-  `ModuleID` int(11) DEFAULT NULL,
-  `RealPath` varchar(200) NOT NULL,
-  `FileName` varchar(100) NOT NULL,
-  `FileSize` varchar(50) NOT NULL,
-  `DownloadTimes` int(11) DEFAULT '0',
-  `CreateTime` char(19) NOT NULL,
-  PRIMARY KEY (`AttachmentID`),
-  KEY `ModuleName` (`ModuleName`)
+  `attachmentID` char(15) NOT NULL,
+  `moduleName` varchar(50) NOT NULL,
+  `moduleCode` varchar(50) DEFAULT NULL,
+  `moduleID` int(11) DEFAULT NULL,
+  `realPath` varchar(200) NOT NULL,
+  `fileName` varchar(100) NOT NULL,
+  `fileSize` varchar(50) NOT NULL,
+  `downloadTimes` int(11) DEFAULT '0',
+  `createTime` char(19) NOT NULL,
+  PRIMARY KEY (`attachmentID`),
+  KEY `ModuleName` (`moduleName`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 正在导出表  bonjour.bonjour_attachment 的数据：~17 rows (大约)
 /*!40000 ALTER TABLE `bonjour_attachment` DISABLE KEYS */;
-INSERT INTO `bonjour_attachment` (`AttachmentID`, `ModuleName`, `ModuleCode`, `ModuleID`, `RealPath`, `FileName`, `FileSize`, `DownloadTimes`, `CreateTime`) VALUES
+INSERT INTO `bonjour_attachment` (`attachmentID`, `moduleName`, `moduleCode`, `moduleID`, `realPath`, `fileName`, `fileSize`, `downloadTimes`, `createTime`) VALUES
 	('140443892709512', 'ProjectMain', 'P20140600023', NULL, 'D:\\myfiles\\ProjectMain\\P20140600023\\8626f59fb09f2f4ed423bbab0c4fe3ea.jpg', '947513521017832.jpg', '31KB', 4, '2014-07-04 09:55:27'),
 	('140443892722140', 'ProjectMain', 'P20140600023', NULL, 'D:\\myfiles\\ProjectMain\\P20140600023\\bf4481ff6eef2e3c2ca0d9a4298953d9.jpg', '3320946_073017074373_2.jpg', '113KB', 4, '2014-07-04 09:55:27'),
 	('140443892751516', 'ProjectMain', 'P20140600023', NULL, 'D:\\myfiles\\ProjectMain\\P20140600023\\32104780c154d94352d2517a6800c994.jpg', '094S21b36.jpg', '12KB', 1, '2014-07-04 09:55:27'),
@@ -77,14 +77,14 @@ CREATE TABLE IF NOT EXISTS `bonjour_forum` (
   `url` varchar(50) DEFAULT NULL,
   `forumOrder` int(3) DEFAULT '0',
   `lockedStatus` int(11) DEFAULT '1',
-  `validstatus` int(11) DEFAULT '1',
+  `validStatus` int(11) DEFAULT '1',
   KEY `forum_id` (`forumID`),
   KEY `menu_id` (`menuID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf16 ROW_FORMAT=COMPACT;
 
 -- 正在导出表  bonjour.bonjour_forum 的数据：~23 rows (大约)
 /*!40000 ALTER TABLE `bonjour_forum` DISABLE KEYS */;
-INSERT INTO `bonjour_forum` (`forumID`, `menuID`, `parentID`, `forumName`, `url`, `forumOrder`, `lockedStatus`, `validstatus`) VALUES
+INSERT INTO `bonjour_forum` (`forumID`, `menuID`, `parentID`, `forumName`, `url`, `forumOrder`, `lockedStatus`, `validStatus`) VALUES
 	(1, 1, 0, '版块管理', NULL, 0, 1, 1),
 	(2, 1, 1, '主菜单管理', 'forum/menu', 0, 1, 1),
 	(3, 1, 0, '用户管理', 'system/user', 0, 1, 1),
@@ -103,7 +103,7 @@ INSERT INTO `bonjour_forum` (`forumID`, `menuID`, `parentID`, `forumName`, `url`
 	(17, 2, 5, '需求查询', 'project/req/query-all', 1, 1, 1),
 	(18, 2, 0, '团队管理', 'project/team', 2, 1, 1),
 	(19, 1, 0, '权限管理', NULL, 3, 1, 1),
-	(20, 1, 19, '模块权限', NULL, 4, 1, 1),
+	(20, 1, 19, '版块权限', NULL, 4, 1, 1),
 	(21, 1, 19, '操作权限', NULL, 5, 1, 1),
 	(22, 2, 7, '车型保费/赔付占比图', NULL, 6, 1, 0),
 	(23, 2, 7, '高级查询', NULL, 7, 1, 0),
@@ -129,30 +129,11 @@ INSERT INTO `bonjour_menu` (`menuID`, `menuName`, `menuOrder`, `lockedStatus`, `
 /*!40000 ALTER TABLE `bonjour_menu` ENABLE KEYS */;
 
 
--- 导出  表 bonjour.bonjour_privilege 结构
-CREATE TABLE IF NOT EXISTS `bonjour_privilege` (
-  `MasterName` varchar(4) DEFAULT '*',
-  `MasterKey` varchar(10) DEFAULT NULL,
-  `MasterValue` int(11) DEFAULT '0',
-  `AccessName` varchar(20) NOT NULL,
-  `AccessKey` varchar(20) NOT NULL,
-  `AccessIDValue` int(11) DEFAULT '0',
-  `AccessCodeValue` varchar(20) DEFAULT '*',
-  `Operation` varchar(20) DEFAULT '*',
-  `OperationName` varchar(20) DEFAULT NULL,
-  KEY `Operation` (`Operation`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- 正在导出表  bonjour.bonjour_privilege 的数据：~0 rows (大约)
-/*!40000 ALTER TABLE `bonjour_privilege` DISABLE KEYS */;
-/*!40000 ALTER TABLE `bonjour_privilege` ENABLE KEYS */;
-
-
 -- 导出  表 bonjour.bonjour_privilege_access 结构
 CREATE TABLE IF NOT EXISTS `bonjour_privilege_access` (
-  `ForumID` int(11) DEFAULT NULL,
-  `AccessName` varchar(20) DEFAULT NULL,
-  `DisplayName` varchar(20) DEFAULT NULL
+  `forumID` int(11) DEFAULT NULL,
+  `accessName` varchar(20) DEFAULT NULL,
+  `displayName` varchar(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 正在导出表  bonjour.bonjour_privilege_access 的数据：~0 rows (大约)
@@ -162,54 +143,72 @@ CREATE TABLE IF NOT EXISTS `bonjour_privilege_access` (
 
 -- 导出  表 bonjour.bonjour_privilege_access_operation 结构
 CREATE TABLE IF NOT EXISTS `bonjour_privilege_access_operation` (
-  `AccessName` varchar(20) NOT NULL,
-  `Operation` varchar(20) NOT NULL,
-  `OperationName` varchar(20) NOT NULL,
-  KEY `Operation` (`Operation`)
+  `accessName` varchar(20) NOT NULL,
+  `operation` varchar(20) NOT NULL,
+  `operationName` varchar(20) NOT NULL,
+  KEY `Operation` (`operation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 正在导出表  bonjour.bonjour_privilege_access_operation 的数据：~1 rows (大约)
 /*!40000 ALTER TABLE `bonjour_privilege_access_operation` DISABLE KEYS */;
-INSERT INTO `bonjour_privilege_access_operation` (`AccessName`, `Operation`, `OperationName`) VALUES
+INSERT INTO `bonjour_privilege_access_operation` (`accessName`, `operation`, `operationName`) VALUES
 	('Forum', 'ACCESS', '访问');
 /*!40000 ALTER TABLE `bonjour_privilege_access_operation` ENABLE KEYS */;
 
 
+-- 导出  表 bonjour.bonjour_privilege_main 结构
+CREATE TABLE IF NOT EXISTS `bonjour_privilege_main` (
+  `masterType` varchar(4) NOT NULL,
+  `masterKey` varchar(10) NOT NULL,
+  `masterValue` int(11) NOT NULL,
+  `accessName` varchar(20) NOT NULL,
+  `accessKey` varchar(20) NOT NULL,
+  `accessIDValue` int(11) NOT NULL,
+  `accessCodeValue` varchar(20) NOT NULL,
+  `operation` varchar(20) NOT NULL,
+  `operationName` varchar(20) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- 正在导出表  bonjour.bonjour_privilege_main 的数据：~0 rows (大约)
+/*!40000 ALTER TABLE `bonjour_privilege_main` DISABLE KEYS */;
+/*!40000 ALTER TABLE `bonjour_privilege_main` ENABLE KEYS */;
+
+
 -- 导出  表 bonjour.bonjour_project_main 结构
 CREATE TABLE IF NOT EXISTS `bonjour_project_main` (
-  `ProjectCode` char(12) NOT NULL,
-  `NodeType` char(1) NOT NULL,
-  `ProjectName` varchar(100) NOT NULL,
-  `RootNode` char(12) DEFAULT NULL,
-  `ParentNode` char(12) NOT NULL,
-  `NodeCodeRoute` varchar(100) DEFAULT NULL,
-  `NodeNameRoute` varchar(500) DEFAULT NULL,
-  `CreateDate` int(8) NOT NULL,
-  `EstimateStartDate` int(8) DEFAULT NULL,
-  `EstimateDuration` int(11) DEFAULT NULL,
-  `RealStartDate` int(8) DEFAULT NULL,
-  `TeamID` int(8) NOT NULL,
-  `TeamName` int(8) DEFAULT NULL,
-  `CreatorID` int(11) NOT NULL,
-  `CreatorName` varchar(50) DEFAULT NULL,
-  `ResponsibleID` int(11) NOT NULL,
-  `ResponsibleName` varchar(50) DEFAULT NULL,
-  `Description` text,
-  `ReleaseCode` int(11) DEFAULT NULL,
-  `LockedStatus` tinyint(4) DEFAULT '0',
-  `Flag1` int(11) DEFAULT '0',
-  `ModuleName` varchar(50) DEFAULT NULL,
-  PRIMARY KEY (`ProjectCode`),
-  KEY `NodeType` (`NodeType`),
-  KEY `ParentNode` (`ParentNode`),
-  KEY `CreatorID` (`CreatorID`),
-  KEY `ResponsibleID` (`ResponsibleID`),
-  KEY `Flag1` (`Flag1`)
+  `projectCode` char(12) NOT NULL,
+  `nodeType` char(1) NOT NULL,
+  `projectName` varchar(100) NOT NULL,
+  `rootNode` char(12) DEFAULT NULL,
+  `parentNode` char(12) NOT NULL,
+  `nodeCodeRoute` varchar(100) DEFAULT NULL,
+  `nodeNameRoute` varchar(500) DEFAULT NULL,
+  `createDate` int(8) NOT NULL,
+  `estimateStartDate` int(8) DEFAULT NULL,
+  `estimateDuration` int(11) DEFAULT NULL,
+  `realStartDate` int(8) DEFAULT NULL,
+  `teamID` int(8) NOT NULL,
+  `teamName` int(8) DEFAULT NULL,
+  `creatorID` int(11) NOT NULL,
+  `creatorName` varchar(50) DEFAULT NULL,
+  `responsibleID` int(11) NOT NULL,
+  `responsibleName` varchar(50) DEFAULT NULL,
+  `description` text,
+  `releaseCode` int(11) DEFAULT NULL,
+  `lockedStatus` tinyint(4) DEFAULT '0',
+  `flag1` int(11) DEFAULT '0',
+  `moduleName` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`projectCode`),
+  KEY `NodeType` (`nodeType`),
+  KEY `ParentNode` (`parentNode`),
+  KEY `CreatorID` (`creatorID`),
+  KEY `ResponsibleID` (`responsibleID`),
+  KEY `Flag1` (`flag1`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='项目主表';
 
 -- 正在导出表  bonjour.bonjour_project_main 的数据：~64 rows (大约)
 /*!40000 ALTER TABLE `bonjour_project_main` DISABLE KEYS */;
-INSERT INTO `bonjour_project_main` (`ProjectCode`, `NodeType`, `ProjectName`, `RootNode`, `ParentNode`, `NodeCodeRoute`, `NodeNameRoute`, `CreateDate`, `EstimateStartDate`, `EstimateDuration`, `RealStartDate`, `TeamID`, `TeamName`, `CreatorID`, `CreatorName`, `ResponsibleID`, `ResponsibleName`, `Description`, `ReleaseCode`, `LockedStatus`, `Flag1`, `ModuleName`) VALUES
+INSERT INTO `bonjour_project_main` (`projectCode`, `nodeType`, `projectName`, `rootNode`, `parentNode`, `nodeCodeRoute`, `nodeNameRoute`, `createDate`, `estimateStartDate`, `estimateDuration`, `realStartDate`, `teamID`, `teamName`, `creatorID`, `creatorName`, `responsibleID`, `responsibleName`, `description`, `releaseCode`, `lockedStatus`, `flag1`, `moduleName`) VALUES
 	('P20140600001', 'P', '用户管理', 'R20140600006', 'R20140600006', 'P20140600001', '用户管理', 20140604, 20140609, 50, NULL, 0, NULL, 1, '胡建鸿', 2, '测试帐号1', '管理系统的全部用户和权限管理', NULL, 0, 0, 'ProjectMain'),
 	('P20140600002', 'P', '界面管理', 'R20140600006', 'R20140600006', 'P20140600002', '界面管理', 20140604, NULL, 100, NULL, 0, NULL, 1, '胡建鸿', 2, '测试帐号1', '', NULL, 0, 0, 'ProjectMain'),
 	('P20140600003', 'P', '系统参数设定', 'R20140600006', 'R20140600006', 'P20140600003', '系统参数设定', 20140604, NULL, 5, NULL, 0, NULL, 1, '胡建鸿', 23, '测试帐号22', '主要的参数管理', NULL, 0, 0, 'ProjectMain'),
@@ -317,42 +316,42 @@ CREATE TABLE IF NOT EXISTS `bonjour_project_main_history` (
 
 -- 导出  表 bonjour.bonjour_requirement_main 结构
 CREATE TABLE IF NOT EXISTS `bonjour_requirement_main` (
-  `RequirementID` int(11) NOT NULL AUTO_INCREMENT,
-  `ProjectCode` char(12) NOT NULL,
-  `RequirementName` varchar(150) NOT NULL,
-  `Description` text,
-  `AcceptanceCriteria` text,
-  `DependenceID` int(11) DEFAULT NULL,
-  `CreateDate` int(8) NOT NULL,
-  `LastModifiedTime` datetime NOT NULL,
-  `CreatorID` int(11) NOT NULL,
-  `CreatorName` varchar(50) DEFAULT NULL,
-  `DistributorID` int(11) DEFAULT NULL,
-  `DistributorName` varchar(50) DEFAULT NULL,
-  `ReviewerID` int(11) DEFAULT NULL,
-  `ReviewerName` varchar(50) DEFAULT NULL,
-  `ClosedBy` varchar(50) DEFAULT NULL,
-  `Priority` int(1) NOT NULL,
-  `LockedStatus` int(1) DEFAULT '0',
-  `Flag` char(8) DEFAULT '00000000',
-  `Flag1` int(11) DEFAULT '0',
-  `Flag2` int(11) DEFAULT '0',
-  `ModuleName` varchar(50) DEFAULT 'RequirementMain',
-  `Keyword` varchar(150) DEFAULT NULL,
-  PRIMARY KEY (`RequirementID`),
-  KEY `ProjectCode` (`ProjectCode`),
-  KEY `CreateDate` (`CreateDate`),
-  KEY `CreatorID` (`CreatorID`),
-  KEY `DistributorID` (`DistributorID`),
-  KEY `ReviewerID` (`ReviewerID`),
-  KEY `Priority` (`Priority`),
-  KEY `Flag` (`Flag`),
-  KEY `Flag1` (`Flag1`)
+  `requirementID` int(11) NOT NULL AUTO_INCREMENT,
+  `projectCode` char(12) NOT NULL,
+  `requirementName` varchar(150) NOT NULL,
+  `description` text,
+  `acceptanceCriteria` text,
+  `dependenceID` int(11) DEFAULT NULL,
+  `createDate` int(8) NOT NULL,
+  `lastModifiedTime` datetime NOT NULL,
+  `creatorID` int(11) NOT NULL,
+  `creatorName` varchar(50) DEFAULT NULL,
+  `distributorID` int(11) DEFAULT NULL,
+  `distributorName` varchar(50) DEFAULT NULL,
+  `reviewerID` int(11) DEFAULT NULL,
+  `reviewerName` varchar(50) DEFAULT NULL,
+  `closedBy` varchar(50) DEFAULT NULL,
+  `priority` int(1) NOT NULL,
+  `lockedStatus` int(1) DEFAULT '0',
+  `flag` char(8) DEFAULT '00000000',
+  `flag1` int(11) DEFAULT '0',
+  `flag2` int(11) DEFAULT '0',
+  `moduleName` varchar(50) DEFAULT 'RequirementMain',
+  `keyword` varchar(150) DEFAULT NULL,
+  PRIMARY KEY (`requirementID`),
+  KEY `ProjectCode` (`projectCode`),
+  KEY `CreateDate` (`createDate`),
+  KEY `CreatorID` (`creatorID`),
+  KEY `DistributorID` (`distributorID`),
+  KEY `ReviewerID` (`reviewerID`),
+  KEY `Priority` (`priority`),
+  KEY `Flag` (`flag`),
+  KEY `Flag1` (`flag1`)
 ) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8 COMMENT='需求主表';
 
 -- 正在导出表  bonjour.bonjour_requirement_main 的数据：~26 rows (大约)
 /*!40000 ALTER TABLE `bonjour_requirement_main` DISABLE KEYS */;
-INSERT INTO `bonjour_requirement_main` (`RequirementID`, `ProjectCode`, `RequirementName`, `Description`, `AcceptanceCriteria`, `DependenceID`, `CreateDate`, `LastModifiedTime`, `CreatorID`, `CreatorName`, `DistributorID`, `DistributorName`, `ReviewerID`, `ReviewerName`, `ClosedBy`, `Priority`, `LockedStatus`, `Flag`, `Flag1`, `Flag2`, `ModuleName`, `Keyword`) VALUES
+INSERT INTO `bonjour_requirement_main` (`requirementID`, `projectCode`, `requirementName`, `description`, `acceptanceCriteria`, `dependenceID`, `createDate`, `lastModifiedTime`, `creatorID`, `creatorName`, `distributorID`, `distributorName`, `reviewerID`, `reviewerName`, `closedBy`, `priority`, `lockedStatus`, `flag`, `flag1`, `flag2`, `moduleName`, `keyword`) VALUES
 	(1, 'S20140700006', '添加首页资讯功能', '添加首页资讯功能', '能按时弹出会话框', NULL, 20140707, '2014-07-07 09:23:01', 1, '胡建鸿', 1, '胡建鸿', 2, '测试帐号1', NULL, 2, 0, '00000000', 0, 0, 'RequirementMain', NULL),
 	(2, 'S20140700006', 'SNS分享功能', '', '', NULL, 20140707, '2014-07-07 09:23:29', 1, '胡建鸿', 1, '胡建鸿', 2, '测试帐号1', NULL, 1, 0, '00000000', 0, 0, 'RequirementMain', NULL),
 	(3, 'P20140700003', '测试需求123123123', '测试需求123123123', '测试需求123123123', NULL, 20140707, '2014-07-09 16:55:45', 1, '胡建鸿', 2, '测试帐号1', 1, '胡建鸿', NULL, 1, 0, '00000000', 1, 0, 'RequirementMain', NULL),
@@ -424,31 +423,31 @@ CREATE TABLE IF NOT EXISTS `bonjour_requirement_main_history` (
 
 -- 导出  表 bonjour.bonjour_requirement_review 结构
 CREATE TABLE IF NOT EXISTS `bonjour_requirement_review` (
-  `ApplicationID` int(11) NOT NULL AUTO_INCREMENT,
-  `RequirementID` int(11) NOT NULL,
-  `ApplicantID` int(11) NOT NULL,
-  `ApplicantName` varchar(50) DEFAULT NULL,
-  `ApplicantRemark` text,
-  `ReviewerID` int(11) NOT NULL,
-  `ReviewerName` varchar(50) DEFAULT NULL,
-  `ReviewType` char(1) NOT NULL,
-  `ReviewComment` text,
-  `CreateTime` datetime NOT NULL,
-  `LastModifiedTime` datetime DEFAULT NULL,
-  `FeedbackTime` datetime DEFAULT NULL,
-  `LockedStatus` int(1) NOT NULL DEFAULT '0',
-  `Flag` char(8) DEFAULT '00000000',
-  PRIMARY KEY (`ApplicationID`),
-  KEY `RequirementID` (`RequirementID`),
-  KEY `ApplicantID` (`ApplicantID`),
-  KEY `ReviewerID` (`ReviewerID`),
-  KEY `CreateTime` (`CreateTime`),
-  KEY `Flag` (`Flag`)
+  `applicationID` int(11) NOT NULL AUTO_INCREMENT,
+  `requirementID` int(11) NOT NULL,
+  `applicantID` int(11) NOT NULL,
+  `applicantName` varchar(50) DEFAULT NULL,
+  `applicantRemark` text,
+  `reviewerID` int(11) NOT NULL,
+  `reviewerName` varchar(50) DEFAULT NULL,
+  `reviewType` char(1) NOT NULL,
+  `reviewComment` text,
+  `createTime` datetime NOT NULL,
+  `lastModifiedTime` datetime DEFAULT NULL,
+  `feedbackTime` datetime DEFAULT NULL,
+  `lockedStatus` int(1) NOT NULL DEFAULT '0',
+  `flag` char(8) DEFAULT '00000000',
+  PRIMARY KEY (`applicationID`),
+  KEY `RequirementID` (`requirementID`),
+  KEY `ApplicantID` (`applicantID`),
+  KEY `ReviewerID` (`reviewerID`),
+  KEY `CreateTime` (`createTime`),
+  KEY `Flag` (`flag`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 COMMENT='需求评审表';
 
 -- 正在导出表  bonjour.bonjour_requirement_review 的数据：~2 rows (大约)
 /*!40000 ALTER TABLE `bonjour_requirement_review` DISABLE KEYS */;
-INSERT INTO `bonjour_requirement_review` (`ApplicationID`, `RequirementID`, `ApplicantID`, `ApplicantName`, `ApplicantRemark`, `ReviewerID`, `ReviewerName`, `ReviewType`, `ReviewComment`, `CreateTime`, `LastModifiedTime`, `FeedbackTime`, `LockedStatus`, `Flag`) VALUES
+INSERT INTO `bonjour_requirement_review` (`applicationID`, `requirementID`, `applicantID`, `applicantName`, `applicantRemark`, `reviewerID`, `reviewerName`, `reviewType`, `reviewComment`, `createTime`, `lastModifiedTime`, `feedbackTime`, `lockedStatus`, `flag`) VALUES
 	(5, 8, 1, '胡建鸿', NULL, 2, '测试帐号1', '1', NULL, '2014-07-08 17:28:58', '2014-07-08 17:28:58', NULL, 0, '00000000'),
 	(6, 3, 1, '胡建鸿', NULL, 1, '胡建鸿', '1', NULL, '2014-07-09 16:55:48', '2014-07-09 16:55:48', NULL, 0, '00000000');
 /*!40000 ALTER TABLE `bonjour_requirement_review` ENABLE KEYS */;
@@ -456,19 +455,19 @@ INSERT INTO `bonjour_requirement_review` (`ApplicationID`, `RequirementID`, `App
 
 -- 导出  表 bonjour.bonjour_role 结构
 CREATE TABLE IF NOT EXISTS `bonjour_role` (
-  `RoleID` int(11) NOT NULL AUTO_INCREMENT,
-  `RoleName` varchar(50) NOT NULL,
-  `CreateDate` int(8) NOT NULL,
-  `CreatorID` int(11) NOT NULL,
-  `CreatorName` varchar(50) DEFAULT NULL,
-  `ValidStatus` tinyint(1) DEFAULT '1',
-  `Remark` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`RoleID`)
+  `roleID` int(11) NOT NULL AUTO_INCREMENT,
+  `roleName` varchar(50) NOT NULL,
+  `createDate` int(8) NOT NULL,
+  `creatorID` int(11) NOT NULL,
+  `creatorName` varchar(50) DEFAULT NULL,
+  `validStatus` tinyint(1) DEFAULT '1',
+  `remark` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`roleID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
 
 -- 正在导出表  bonjour.bonjour_role 的数据：~9 rows (大约)
 /*!40000 ALTER TABLE `bonjour_role` DISABLE KEYS */;
-INSERT INTO `bonjour_role` (`RoleID`, `RoleName`, `CreateDate`, `CreatorID`, `CreatorName`, `ValidStatus`, `Remark`) VALUES
+INSERT INTO `bonjour_role` (`roleID`, `roleName`, `createDate`, `creatorID`, `creatorName`, `validStatus`, `remark`) VALUES
 	(1, '超级管理员', 20140531, 1, '胡建鸿', 1, NULL),
 	(2, '项目管理员', 20140531, 1, '胡建鸿', 1, NULL),
 	(3, '需求管理员', 20140531, 1, '胡建鸿', 1, NULL),
@@ -490,30 +489,27 @@ CREATE TABLE IF NOT EXISTS `bonjour_session` (
   PRIMARY KEY (`id`)
 ) ENGINE=MEMORY DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
 
--- 正在导出表  bonjour.bonjour_session 的数据：4 rows
+-- 正在导出表  bonjour.bonjour_session 的数据：1 rows
 /*!40000 ALTER TABLE `bonjour_session` DISABLE KEYS */;
 INSERT INTO `bonjour_session` (`id`, `modified`, `lifetime`, `data`) VALUES
-	('s38p8148utg4j613gt8g2ttkg3', 1406457247, 3600, 'Bonjour_Auth|a:1:{s:11:"currentUser";O:8:"stdClass":4:{s:6:"userID";s:1:"1";s:8:"userName";s:9:"胡建鸿";s:6:"roleID";s:1:"1";s:8:"roleName";s:15:"超级管理员";}}'),
-	('vs767q9spur5kslnu5n7k62984', 1406457041, 3600, ''),
-	('gaqn8binnurk358f4rjfkgccu2', 1406508351, 1800, 'Bonjour_Auth|a:1:{s:11:"currentUser";O:8:"stdClass":4:{s:6:"userID";s:1:"1";s:8:"userName";s:9:"胡建鸿";s:6:"roleID";s:1:"1";s:8:"roleName";s:15:"超级管理员";}}'),
-	('7rfrlpasju37cqpaie01ci26h3', 1406521146, 1800, 'Bonjour_Auth|a:1:{s:11:"currentUser";O:8:"stdClass":4:{s:6:"userID";s:1:"1";s:8:"userName";s:9:"胡建鸿";s:6:"roleID";s:1:"1";s:8:"roleName";s:15:"超级管理员";}}');
+	('7rfrlpasju37cqpaie01ci26h3', 1406872081, 1800, 'Bonjour_Auth|a:1:{s:11:"currentUser";O:8:"stdClass":4:{s:6:"userID";s:1:"1";s:8:"userName";s:9:"胡建鸿";s:6:"roleID";s:1:"1";s:8:"roleName";s:15:"超级管理员";}}');
 /*!40000 ALTER TABLE `bonjour_session` ENABLE KEYS */;
 
 
 -- 导出  表 bonjour.bonjour_status 结构
 CREATE TABLE IF NOT EXISTS `bonjour_status` (
-  `EntityName` varchar(20) NOT NULL,
-  `StatusCNName` varchar(30) NOT NULL,
-  `StatusENName` varchar(50) NOT NULL,
-  `StatusValue` int(11) NOT NULL,
-  `Remark` varchar(50) DEFAULT NULL,
-  PRIMARY KEY (`StatusENName`),
-  KEY `EntityName` (`EntityName`)
+  `entityName` varchar(20) NOT NULL,
+  `statusCNName` varchar(30) NOT NULL,
+  `statusENName` varchar(50) NOT NULL,
+  `statusValue` int(11) NOT NULL,
+  `remark` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`statusENName`),
+  KEY `EntityName` (`entityName`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 正在导出表  bonjour.bonjour_status 的数据：~13 rows (大约)
 /*!40000 ALTER TABLE `bonjour_status` DISABLE KEYS */;
-INSERT INTO `bonjour_status` (`EntityName`, `StatusCNName`, `StatusENName`, `StatusValue`, `Remark`) VALUES
+INSERT INTO `bonjour_status` (`entityName`, `statusCNName`, `statusENName`, `statusValue`, `remark`) VALUES
 	('PROJECT', '取消关闭', 'PROJECT_CANCELED', 3, NULL),
 	('PROJECT', '正常关闭', 'PROJECT_CLOSED', 2, NULL),
 	('PROJECT', '初始化', 'PROJECT_INITIALIZED', 0, NULL),
@@ -532,31 +528,31 @@ INSERT INTO `bonjour_status` (`EntityName`, `StatusCNName`, `StatusENName`, `Sta
 
 -- 导出  表 bonjour.bonjour_task_main 结构
 CREATE TABLE IF NOT EXISTS `bonjour_task_main` (
-  `TaskID` int(11) NOT NULL AUTO_INCREMENT,
-  `TaskName` varchar(150) DEFAULT NULL,
-  `RequirementID` int(11) NOT NULL,
-  `DependenceID` int(11) DEFAULT NULL,
-  `CreatorID` int(11) NOT NULL,
-  `CreatorName` varchar(50) DEFAULT NULL,
-  `CreateTime` datetime NOT NULL,
-  `HandlerID` int(11) NOT NULL,
-  `HandlerName` varchar(50) DEFAULT NULL,
-  `EstimateStartDate` int(8) DEFAULT NULL,
-  `EstimateEndDate` int(8) DEFAULT NULL,
-  `EstimateHour` int(11) DEFAULT NULL,
-  `RealStartDate` int(8) DEFAULT NULL,
-  `RealEndDate` int(8) DEFAULT NULL,
-  `LastModifiedTime` datetime DEFAULT NULL,
-  `Priority` int(1) NOT NULL,
-  `LockedStatus` int(1) DEFAULT '0',
-  `Flag` char(8) DEFAULT '00000000',
-  `Keyword` varchar(150) DEFAULT NULL,
-  PRIMARY KEY (`TaskID`),
-  KEY `RequirementID` (`RequirementID`),
-  KEY `CreatorID` (`CreatorID`),
-  KEY `HandlerID` (`HandlerID`),
-  KEY `Priority` (`Priority`),
-  KEY `Flag` (`Flag`)
+  `taskID` int(11) NOT NULL AUTO_INCREMENT,
+  `taskName` varchar(150) DEFAULT NULL,
+  `requirementID` int(11) NOT NULL,
+  `dependenceID` int(11) DEFAULT NULL,
+  `creatorID` int(11) NOT NULL,
+  `creatorName` varchar(50) DEFAULT NULL,
+  `createTime` datetime NOT NULL,
+  `handlerID` int(11) NOT NULL,
+  `handlerName` varchar(50) DEFAULT NULL,
+  `estimateStartDate` int(8) DEFAULT NULL,
+  `estimateEndDate` int(8) DEFAULT NULL,
+  `estimateHour` int(11) DEFAULT NULL,
+  `realStartDate` int(8) DEFAULT NULL,
+  `realEndDate` int(8) DEFAULT NULL,
+  `lastModifiedTime` datetime DEFAULT NULL,
+  `priority` int(1) NOT NULL,
+  `lockedStatus` int(1) DEFAULT '0',
+  `flag` char(8) DEFAULT '00000000',
+  `keyword` varchar(150) DEFAULT NULL,
+  PRIMARY KEY (`taskID`),
+  KEY `RequirementID` (`requirementID`),
+  KEY `CreatorID` (`creatorID`),
+  KEY `HandlerID` (`handlerID`),
+  KEY `Priority` (`priority`),
+  KEY `Flag` (`flag`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='任务主表';
 
 -- 正在导出表  bonjour.bonjour_task_main 的数据：~0 rows (大约)
@@ -566,19 +562,19 @@ CREATE TABLE IF NOT EXISTS `bonjour_task_main` (
 
 -- 导出  表 bonjour.bonjour_task_schedule 结构
 CREATE TABLE IF NOT EXISTS `bonjour_task_schedule` (
-  `TaskID` int(11) DEFAULT NULL,
-  `StartDate` int(11) DEFAULT NULL,
-  `EndDate` int(11) DEFAULT NULL,
-  `StartHour` int(11) DEFAULT NULL,
-  `EndHour` int(11) DEFAULT NULL,
-  `StartMinute` int(11) DEFAULT NULL,
-  `EndMinute` int(11) DEFAULT NULL,
-  `CreateTime` int(11) DEFAULT NULL,
-  `Remark` int(11) DEFAULT NULL,
-  `ItemType` int(11) DEFAULT NULL,
-  `CalExhausted` int(11) DEFAULT NULL,
-  `RealExhausted` int(11) DEFAULT NULL,
-  `CodeAmount` int(11) DEFAULT NULL
+  `taskID` int(11) DEFAULT NULL,
+  `startDate` int(11) DEFAULT NULL,
+  `endDate` int(11) DEFAULT NULL,
+  `startHour` int(11) DEFAULT NULL,
+  `endHour` int(11) DEFAULT NULL,
+  `startMinute` int(11) DEFAULT NULL,
+  `endMinute` int(11) DEFAULT NULL,
+  `createTime` int(11) DEFAULT NULL,
+  `remark` int(11) DEFAULT NULL,
+  `itemType` int(11) DEFAULT NULL,
+  `calExhausted` int(11) DEFAULT NULL,
+  `realExhausted` int(11) DEFAULT NULL,
+  `codeAmount` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='任务进度监控表';
 
 -- 正在导出表  bonjour.bonjour_task_schedule 的数据：~0 rows (大约)
@@ -588,21 +584,21 @@ CREATE TABLE IF NOT EXISTS `bonjour_task_schedule` (
 
 -- 导出  表 bonjour.bonjour_team 结构
 CREATE TABLE IF NOT EXISTS `bonjour_team` (
-  `TeamID` int(11) NOT NULL AUTO_INCREMENT,
-  `TeamName` varchar(50) NOT NULL,
+  `teamID` int(11) NOT NULL AUTO_INCREMENT,
+  `teamName` varchar(50) NOT NULL,
   `Description` varchar(250) DEFAULT NULL,
-  `ResponsibleID` int(11) DEFAULT NULL,
-  `ResponsibleName` varchar(50) DEFAULT NULL,
-  `CreatorID` int(11) NOT NULL,
-  `CreatorName` varchar(50) DEFAULT NULL,
-  `CreateTime` datetime NOT NULL,
-  `ValidStatus` tinyint(4) DEFAULT '1',
-  PRIMARY KEY (`TeamID`)
+  `responsibleID` int(11) DEFAULT NULL,
+  `responsibleName` varchar(50) DEFAULT NULL,
+  `creatorID` int(11) NOT NULL,
+  `creatorName` varchar(50) DEFAULT NULL,
+  `createTime` datetime NOT NULL,
+  `validStatus` tinyint(4) DEFAULT '1',
+  PRIMARY KEY (`teamID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
 -- 正在导出表  bonjour.bonjour_team 的数据：~2 rows (大约)
 /*!40000 ALTER TABLE `bonjour_team` DISABLE KEYS */;
-INSERT INTO `bonjour_team` (`TeamID`, `TeamName`, `Description`, `ResponsibleID`, `ResponsibleName`, `CreatorID`, `CreatorName`, `CreateTime`, `ValidStatus`) VALUES
+INSERT INTO `bonjour_team` (`teamID`, `teamName`, `Description`, `responsibleID`, `responsibleName`, `creatorID`, `creatorName`, `createTime`, `validStatus`) VALUES
 	(1, 'test1', 'test1', 2, '测试帐号1', 1, '胡建鸿', '2014-07-26 21:55:33', 0),
 	(2, '美美团购网项目团队', '团购门户设计开发维护团队', 1, '胡建鸿', 1, '胡建鸿', '2014-07-26 21:55:46', 1);
 /*!40000 ALTER TABLE `bonjour_team` ENABLE KEYS */;
@@ -610,17 +606,17 @@ INSERT INTO `bonjour_team` (`TeamID`, `TeamName`, `Description`, `ResponsibleID`
 
 -- 导出  表 bonjour.bonjour_team_member 结构
 CREATE TABLE IF NOT EXISTS `bonjour_team_member` (
-  `TeamID` int(11) NOT NULL,
-  `UserID` int(11) NOT NULL,
-  `UserName` varchar(50) DEFAULT NULL,
-  `RoleDesc` varchar(50) DEFAULT NULL,
-  `CreateTime` datetime NOT NULL,
-  PRIMARY KEY (`TeamID`,`UserID`)
+  `teamID` int(11) NOT NULL,
+  `userID` int(11) NOT NULL,
+  `userName` varchar(50) DEFAULT NULL,
+  `roleDesc` varchar(50) DEFAULT NULL,
+  `createTime` datetime NOT NULL,
+  PRIMARY KEY (`teamID`,`userID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 正在导出表  bonjour.bonjour_team_member 的数据：~17 rows (大约)
 /*!40000 ALTER TABLE `bonjour_team_member` DISABLE KEYS */;
-INSERT INTO `bonjour_team_member` (`TeamID`, `UserID`, `UserName`, `RoleDesc`, `CreateTime`) VALUES
+INSERT INTO `bonjour_team_member` (`teamID`, `userID`, `userName`, `roleDesc`, `createTime`) VALUES
 	(1, 1, '胡建鸿', '项目总监', '2014-07-26 23:32:07'),
 	(1, 3, '测试帐号2', '需求设计', '2014-07-26 23:41:21'),
 	(1, 6, '测试帐号5', '开发人员', '2014-07-26 23:44:21'),
@@ -643,29 +639,29 @@ INSERT INTO `bonjour_team_member` (`TeamID`, `UserID`, `UserName`, `RoleDesc`, `
 
 -- 导出  表 bonjour.bonjour_user 结构
 CREATE TABLE IF NOT EXISTS `bonjour_user` (
-  `UserID` int(11) NOT NULL AUTO_INCREMENT,
-  `AccountName` varchar(50) NOT NULL,
-  `UserName` varchar(50) NOT NULL,
-  `UserPass` char(32) DEFAULT NULL,
-  `RoleID` int(11) unsigned NOT NULL DEFAULT '0',
+  `userID` int(11) NOT NULL AUTO_INCREMENT,
+  `accountName` varchar(50) NOT NULL,
+  `userName` varchar(50) NOT NULL,
+  `userPass` char(32) DEFAULT NULL,
+  `roleID` int(11) unsigned NOT NULL DEFAULT '0',
   `Email` varchar(100) DEFAULT NULL,
-  `Mobile` varchar(20) DEFAULT NULL,
-  `PhoneNumber` varchar(20) DEFAULT NULL,
-  `CreateDate` int(8) NOT NULL,
-  `CreatorID` int(8) NOT NULL,
-  `CreatorName` varchar(50) DEFAULT NULL,
-  `LoginTimes` int(11) DEFAULT '0',
-  `LastLogin` datetime DEFAULT NULL,
-  `ValidStatus` int(11) DEFAULT '1',
-  PRIMARY KEY (`UserID`),
-  UNIQUE KEY `AccountName` (`AccountName`),
-  KEY `RoleID` (`RoleID`)
+  `mobile` varchar(20) DEFAULT NULL,
+  `phoneNumber` varchar(20) DEFAULT NULL,
+  `createDate` int(8) NOT NULL,
+  `creatorID` int(8) NOT NULL,
+  `creatorName` varchar(50) DEFAULT NULL,
+  `loginTimes` int(11) DEFAULT '0',
+  `lastLogin` datetime DEFAULT NULL,
+  `validStatus` int(11) DEFAULT '1',
+  PRIMARY KEY (`userID`),
+  UNIQUE KEY `AccountName` (`accountName`),
+  KEY `RoleID` (`roleID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8;
 
 -- 正在导出表  bonjour.bonjour_user 的数据：~31 rows (大约)
 /*!40000 ALTER TABLE `bonjour_user` DISABLE KEYS */;
-INSERT INTO `bonjour_user` (`UserID`, `AccountName`, `UserName`, `UserPass`, `RoleID`, `Email`, `Mobile`, `PhoneNumber`, `CreateDate`, `CreatorID`, `CreatorName`, `LoginTimes`, `LastLogin`, `ValidStatus`) VALUES
-	(1, 'hujianhong', '胡建鸿', '1d42abef5a4a5748edf45448bc8d64c5', 1, 'sammy19871116@gmail.com', NULL, NULL, 20140531, 1, '胡建鸿', 22, '2014-07-28 11:29:50', 1),
+INSERT INTO `bonjour_user` (`userID`, `accountName`, `userName`, `userPass`, `roleID`, `Email`, `mobile`, `phoneNumber`, `createDate`, `creatorID`, `creatorName`, `loginTimes`, `lastLogin`, `validStatus`) VALUES
+	(1, 'hujianhong', '胡建鸿', '1d42abef5a4a5748edf45448bc8d64c5', 1, 'sammy19871116@gmail.com', NULL, NULL, 20140531, 1, '胡建鸿', 24, '2014-08-01 13:47:58', 1),
 	(2, 'test1', '测试帐号1', '1d42abef5a4a5748edf45448bc8d64c5', 3, '', '', '', 20140531, 1, '胡建鸿', 0, '0000-00-00 00:00:00', 1),
 	(3, 'test2', '测试帐号2', '1d42abef5a4a5748edf45448bc8d64c5', 3, '', '15058430233', '057456867933', 20140531, 1, '胡建鸿', 1, '2014-07-17 09:57:34', 1),
 	(4, 'test3', '测试帐号3', '1d42abef5a4a5748edf45448bc8d64c5', 9, NULL, NULL, NULL, 20140531, 1, '胡建鸿', 0, '0000-00-00 00:00:00', 1),

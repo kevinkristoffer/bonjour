@@ -114,6 +114,9 @@ class Bonjour_Model_PrivilegeGateway extends Bonjour_Core_Model_GateWay{
 		$results=$this->db->query($query,array($forumID,$forumID,$forumID))->fetchAll();
 		return $results;
 	}
+	
+	
+	////////////////////////////操作权限管理////////////////////////////
 }
 
 ?>

@@ -14,7 +14,15 @@ class System_PrivilegeController extends Bonjour_Controller_Base{
 	/**
 	 * 版块权限管理
 	 */
-	public function manageForumPrivilegeAction(){
+	public function forumAction(){
+		$pattern=$this->_request->getParam('p');
+		if($pattern=='f'){
+			$this->renderScript('privilege/forum-privilege-forum-pattern.phtml');
+		}elseif($pattern == 'm'){
+			$this->renderScript('privilege/forum-privilege-master-pattern.phtml');
+		}else{
+			$this->_redirect ( 'error' );
+		}
 		
 	}
 	/**

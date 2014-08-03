@@ -141,6 +141,7 @@ class TestController extends Bonjour_Controller_Base{
 // 			$objs=$s3->getObjectsByBucket('bacterium87-bucket');
 			
 // 			var_dump($objs);
+
 		}catch(Exception $e){
 			echo $e->getMessage();
 		}

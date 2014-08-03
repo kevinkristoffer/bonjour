@@ -25,8 +25,7 @@ class System_UserController extends Bonjour_Controller_Base {
 			$roles = $factory->__gateway ( 'User' )->queryRoleSnapList ();
 			$this->view->assign ( 'roles', Zend_Json::encode ( $roles ) );
 		} catch ( Exception $e ) {
-			echo Bonjour_Core_GlobalConstant::BONJOUR_ERROR;
-			exit ();
+			$this->_redirect ( 'error' );
 		}
 	}
 	/**

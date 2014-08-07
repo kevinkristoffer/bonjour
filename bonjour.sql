@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS `bonjour_forum` (
   KEY `menu_id` (`menuID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf16 ROW_FORMAT=COMPACT;
 
--- 正在导出表  bonjour.bonjour_forum 的数据：~23 rows (大约)
+-- 正在导出表  bonjour.bonjour_forum 的数据：~24 rows (大约)
 /*!40000 ALTER TABLE `bonjour_forum` DISABLE KEYS */;
 INSERT INTO `bonjour_forum` (`forumID`, `menuID`, `parentID`, `forumName`, `url`, `forumOrder`, `lockedStatus`, `validStatus`) VALUES
 	(1, 1, 0, '版块管理', NULL, 0, 1, 1),
@@ -105,10 +105,24 @@ INSERT INTO `bonjour_forum` (`forumID`, `menuID`, `parentID`, `forumName`, `url`
 	(19, 1, 0, '权限管理', NULL, 3, 1, 1),
 	(20, 1, 19, '版块权限', NULL, 4, 1, 1),
 	(21, 1, 19, '操作权限', NULL, 5, 1, 1),
-	(22, 2, 7, '车型保费/赔付占比图', NULL, 6, 1, 0),
-	(23, 2, 7, '高级查询', NULL, 7, 1, 0),
-	(24, 2, 0, '续保数据管理', NULL, 0, 1, 0);
+	(22, 2, 0, '工作流管理', NULL, 6, 1, 1),
+	(23, 2, 22, '模板管理', NULL, 1, 1, 1),
+	(24, 2, 22, '审核人设置', NULL, 2, 1, 1),
+	(25, 2, 22, '申请查询', NULL, 3, 1, 1);
 /*!40000 ALTER TABLE `bonjour_forum` ENABLE KEYS */;
+
+
+-- 导出  表 bonjour.bonjour_log 结构
+CREATE TABLE IF NOT EXISTS `bonjour_log` (
+  `priority` int(11) DEFAULT NULL,
+  `priorityName` varchar(20) DEFAULT NULL,
+  `message` varchar(250) DEFAULT NULL,
+  `createTime` bigint(20) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- 正在导出表  bonjour.bonjour_log 的数据：~0 rows (大约)
+/*!40000 ALTER TABLE `bonjour_log` DISABLE KEYS */;
+/*!40000 ALTER TABLE `bonjour_log` ENABLE KEYS */;
 
 
 -- 导出  表 bonjour.bonjour_menu 结构
@@ -131,28 +145,46 @@ INSERT INTO `bonjour_menu` (`menuID`, `menuName`, `menuOrder`, `lockedStatus`, `
 
 -- 导出  表 bonjour.bonjour_privilege_access 结构
 CREATE TABLE IF NOT EXISTS `bonjour_privilege_access` (
-  `forumID` int(11) DEFAULT NULL,
   `accessName` varchar(20) DEFAULT NULL,
   `displayName` varchar(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- 正在导出表  bonjour.bonjour_privilege_access 的数据：~0 rows (大约)
+-- 正在导出表  bonjour.bonjour_privilege_access 的数据：~7 rows (大约)
 /*!40000 ALTER TABLE `bonjour_privilege_access` DISABLE KEYS */;
+INSERT INTO `bonjour_privilege_access` (`accessName`, `displayName`) VALUES
+	('Project', '项目管理'),
+	('Requirement', '需求管理'),
+	('Task', '任务管理'),
+	('Test', '测试管理'),
+	('Team', '团队管理'),
+	('User', '用户管理'),
+	('Privilege', '权限管理');
 /*!40000 ALTER TABLE `bonjour_privilege_access` ENABLE KEYS */;
 
 
 -- 导出  表 bonjour.bonjour_privilege_access_operation 结构
 CREATE TABLE IF NOT EXISTS `bonjour_privilege_access_operation` (
   `accessName` varchar(20) NOT NULL,
-  `operation` varchar(20) NOT NULL,
-  `operationName` varchar(20) NOT NULL,
+  `operation` varchar(50) NOT NULL,
+  `operationName` varchar(30) NOT NULL,
+  `remark` varchar(250) NOT NULL,
   KEY `Operation` (`operation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- 正在导出表  bonjour.bonjour_privilege_access_operation 的数据：~1 rows (大约)
+-- 正在导出表  bonjour.bonjour_privilege_access_operation 的数据：~11 rows (大约)
 /*!40000 ALTER TABLE `bonjour_privilege_access_operation` DISABLE KEYS */;
-INSERT INTO `bonjour_privilege_access_operation` (`accessName`, `operation`, `operationName`) VALUES
-	('Forum', 'ACCESS', '访问');
+INSERT INTO `bonjour_privilege_access_operation` (`accessName`, `operation`, `operationName`, `remark`) VALUES
+	('Project', 'ADD_PARENT_NODE', '新建主节点项目', '确定能访问到“项目全景图”版块'),
+	('Project', 'ADD_ROOT_NODE', '新建根节点项目', '确定能访问到“项目全景图”版块，且有”查看根项目管理“权限'),
+	('Project', 'ADD_COMMON_NODE', '新建普通节点项目', '确定能访问到“项目全景图”版块'),
+	('Project', 'ACCESS_ROOT_NODE', '查看根项目管理', '确定能访问到“项目全景图”版块'),
+	('Project', 'MODIFY_PROJECT', '修改项目', '确定能访问该项目'),
+	('Project', 'LOCK_PROJECT', '锁定项目', '确定能访问该项目'),
+	('Project', 'START_PROJECT', '启动项目', ''),
+	('Project', 'CANCEL_PROJECT', '撤销项目', ''),
+	('Project', 'CLOSE_PROJECT', '关闭项目', ''),
+	('Project', 'UPLOAD_FILE', '上传文件', ''),
+	('Project', 'DOWNLOAD_FILE', '下载文件', '');
 /*!40000 ALTER TABLE `bonjour_privilege_access_operation` ENABLE KEYS */;
 
 
@@ -240,7 +272,7 @@ INSERT INTO `bonjour_project_main` (`projectCode`, `nodeType`, `projectName`, `r
 	('P20140700001', 'P', '撤销测试', 'R20140600001', 'R20140600001', 'R20140600001|P20140700001', '测试项目1|撤销测试', 20140704, 20140723, 5, NULL, 0, NULL, 1, '胡建鸿', 1, '胡建鸿', '', NULL, 0, 0, 'ProjectMain'),
 	('P20140700002', 'P', '关闭测试', 'R20140600001', 'R20140600001', 'R20140600001|P20140700002', '测试项目1|关闭测试', 20140704, 20140725, 7, NULL, 0, NULL, 1, '胡建鸿', 1, '胡建鸿', '关闭测试也要检查子项目', NULL, 0, 0, 'ProjectMain'),
 	('P20140700003', 'P', '需求模块测试1', 'R20140600001', 'R20140600001', 'R20140600001|P20140700003', '测试项目1|需求模块测试1', 20140707, 20140707, 5, 20140707, 0, NULL, 1, '胡建鸿', 1, '胡建鸿', '需求模块测试1', NULL, 0, 1, 'ProjectMain'),
-	('P20140700004', 'P', '状态测试6', 'R20140600001', 'R20140600001', 'R20140600001|P20140700004', '项目状态测试|状态测试6', 20140709, 20140731, 5, NULL, 0, NULL, 1, '胡建鸿', 23, '测试帐号22', '', NULL, 0, 0, 'ProjectMain'),
+	('P20140700004', 'P', '状态测试6', 'R20140600001', 'R20140600001', 'R20140600001|P20140700004', '项目状态测试|状态测试6', 20140709, 20140731, 5, 20140805, 0, NULL, 1, '胡建鸿', 23, '测试帐号22', '', NULL, 0, 1, 'ProjectMain'),
 	('R20140600001', 'R', '项目状态测试', 'R20140600001', '000000000000', 'R20140600001', 'fdsafdsfasdfasdfasdfasdfsdf', 20140604, 20140618, 100, 20140707, 0, NULL, 1, '胡建鸿', 1, '胡建鸿', '项目状态测试', NULL, 0, 1, 'ProjectMain'),
 	('R20140600002', 'R', '测试项目2', 'R20140600002', '000000000000', 'R20140600002', '测试项目28989898', 20140604, 20140604, 100, NULL, 0, NULL, 1, '胡建鸿', 1, '胡建鸿', 'dafdsfdsfsd', NULL, 0, 0, 'ProjectMain'),
 	('R20140600003', 'R', '测试项目4', 'R20140600003', '000000000000', 'R20140600003', 'errwefasdfasdfadsf', 20140604, 20140630, 100, NULL, 0, NULL, 1, '胡建鸿', 23, '测试帐号22', 'fdsfasdfasd', NULL, 0, 0, 'ProjectMain'),
@@ -421,38 +453,6 @@ CREATE TABLE IF NOT EXISTS `bonjour_requirement_main_history` (
 /*!40000 ALTER TABLE `bonjour_requirement_main_history` ENABLE KEYS */;
 
 
--- 导出  表 bonjour.bonjour_requirement_review 结构
-CREATE TABLE IF NOT EXISTS `bonjour_requirement_review` (
-  `applicationID` int(11) NOT NULL AUTO_INCREMENT,
-  `requirementID` int(11) NOT NULL,
-  `applicantID` int(11) NOT NULL,
-  `applicantName` varchar(50) DEFAULT NULL,
-  `applicantRemark` text,
-  `reviewerID` int(11) NOT NULL,
-  `reviewerName` varchar(50) DEFAULT NULL,
-  `reviewType` char(1) NOT NULL,
-  `reviewComment` text,
-  `createTime` datetime NOT NULL,
-  `lastModifiedTime` datetime DEFAULT NULL,
-  `feedbackTime` datetime DEFAULT NULL,
-  `lockedStatus` int(1) NOT NULL DEFAULT '0',
-  `flag` char(8) DEFAULT '00000000',
-  PRIMARY KEY (`applicationID`),
-  KEY `RequirementID` (`requirementID`),
-  KEY `ApplicantID` (`applicantID`),
-  KEY `ReviewerID` (`reviewerID`),
-  KEY `CreateTime` (`createTime`),
-  KEY `Flag` (`flag`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 COMMENT='需求评审表';
-
--- 正在导出表  bonjour.bonjour_requirement_review 的数据：~2 rows (大约)
-/*!40000 ALTER TABLE `bonjour_requirement_review` DISABLE KEYS */;
-INSERT INTO `bonjour_requirement_review` (`applicationID`, `requirementID`, `applicantID`, `applicantName`, `applicantRemark`, `reviewerID`, `reviewerName`, `reviewType`, `reviewComment`, `createTime`, `lastModifiedTime`, `feedbackTime`, `lockedStatus`, `flag`) VALUES
-	(5, 8, 1, '胡建鸿', NULL, 2, '测试帐号1', '1', NULL, '2014-07-08 17:28:58', '2014-07-08 17:28:58', NULL, 0, '00000000'),
-	(6, 3, 1, '胡建鸿', NULL, 1, '胡建鸿', '1', NULL, '2014-07-09 16:55:48', '2014-07-09 16:55:48', NULL, 0, '00000000');
-/*!40000 ALTER TABLE `bonjour_requirement_review` ENABLE KEYS */;
-
-
 -- 导出  表 bonjour.bonjour_role 结构
 CREATE TABLE IF NOT EXISTS `bonjour_role` (
   `roleID` int(11) NOT NULL AUTO_INCREMENT,
@@ -489,10 +489,8 @@ CREATE TABLE IF NOT EXISTS `bonjour_session` (
   PRIMARY KEY (`id`)
 ) ENGINE=MEMORY DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
 
--- 正在导出表  bonjour.bonjour_session 的数据：1 rows
+-- 正在导出表  bonjour.bonjour_session 的数据：0 rows
 /*!40000 ALTER TABLE `bonjour_session` DISABLE KEYS */;
-INSERT INTO `bonjour_session` (`id`, `modified`, `lifetime`, `data`) VALUES
-	('7rfrlpasju37cqpaie01ci26h3', 1406872081, 1800, 'Bonjour_Auth|a:1:{s:11:"currentUser";O:8:"stdClass":4:{s:6:"userID";s:1:"1";s:8:"userName";s:9:"胡建鸿";s:6:"roleID";s:1:"1";s:8:"roleName";s:15:"超级管理员";}}');
 /*!40000 ALTER TABLE `bonjour_session` ENABLE KEYS */;
 
 
@@ -504,13 +502,17 @@ CREATE TABLE IF NOT EXISTS `bonjour_status` (
   `statusValue` int(11) NOT NULL,
   `remark` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`statusENName`),
+  UNIQUE KEY `Index 3` (`entityName`,`statusValue`),
   KEY `EntityName` (`entityName`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- 正在导出表  bonjour.bonjour_status 的数据：~13 rows (大约)
+-- 正在导出表  bonjour.bonjour_status 的数据：~16 rows (大约)
 /*!40000 ALTER TABLE `bonjour_status` DISABLE KEYS */;
 INSERT INTO `bonjour_status` (`entityName`, `statusCNName`, `statusENName`, `statusValue`, `remark`) VALUES
 	('PROJECT', '取消关闭', 'PROJECT_CANCELED', 3, NULL),
+	('PROJECT', '审核通过', 'PROJECT_CHECKED', 5, NULL),
+	('PROJECT', '审核退回', 'PROJECT_CHECK_RETURNED', 6, NULL),
+	('PROJECT', '提交审核', 'PROJECT_CHECK_SUBMITTED', 4, NULL),
 	('PROJECT', '正常关闭', 'PROJECT_CLOSED', 2, NULL),
 	('PROJECT', '初始化', 'PROJECT_INITIALIZED', 0, NULL),
 	('PROJECT', '已启动', 'PROJECT_STARTED', 1, NULL),
@@ -637,6 +639,19 @@ INSERT INTO `bonjour_team_member` (`teamID`, `userID`, `userName`, `roleDesc`, `
 /*!40000 ALTER TABLE `bonjour_team_member` ENABLE KEYS */;
 
 
+-- 导出  表 bonjour.bonjour_test1 结构
+CREATE TABLE IF NOT EXISTS `bonjour_test1` (
+  `vname` varchar(10) NOT NULL,
+  `uname` varchar(10) NOT NULL,
+  `itime` int(11) NOT NULL,
+  `duration` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- 正在导出表  bonjour.bonjour_test1 的数据：~0 rows (大约)
+/*!40000 ALTER TABLE `bonjour_test1` DISABLE KEYS */;
+/*!40000 ALTER TABLE `bonjour_test1` ENABLE KEYS */;
+
+
 -- 导出  表 bonjour.bonjour_user 结构
 CREATE TABLE IF NOT EXISTS `bonjour_user` (
   `userID` int(11) NOT NULL AUTO_INCREMENT,
@@ -661,7 +676,7 @@ CREATE TABLE IF NOT EXISTS `bonjour_user` (
 -- 正在导出表  bonjour.bonjour_user 的数据：~31 rows (大约)
 /*!40000 ALTER TABLE `bonjour_user` DISABLE KEYS */;
 INSERT INTO `bonjour_user` (`userID`, `accountName`, `userName`, `userPass`, `roleID`, `Email`, `mobile`, `phoneNumber`, `createDate`, `creatorID`, `creatorName`, `loginTimes`, `lastLogin`, `validStatus`) VALUES
-	(1, 'hujianhong', '胡建鸿', '1d42abef5a4a5748edf45448bc8d64c5', 1, 'sammy19871116@gmail.com', NULL, NULL, 20140531, 1, '胡建鸿', 24, '2014-08-01 13:47:58', 1),
+	(1, 'hujianhong', '胡建鸿', '1d42abef5a4a5748edf45448bc8d64c5', 1, 'sammy19871116@gmail.com', NULL, NULL, 20140531, 1, '胡建鸿', 28, '2014-08-06 10:58:51', 1),
 	(2, 'test1', '测试帐号1', '1d42abef5a4a5748edf45448bc8d64c5', 3, '', '', '', 20140531, 1, '胡建鸿', 0, '0000-00-00 00:00:00', 1),
 	(3, 'test2', '测试帐号2', '1d42abef5a4a5748edf45448bc8d64c5', 3, '', '15058430233', '057456867933', 20140531, 1, '胡建鸿', 1, '2014-07-17 09:57:34', 1),
 	(4, 'test3', '测试帐号3', '1d42abef5a4a5748edf45448bc8d64c5', 9, NULL, NULL, NULL, 20140531, 1, '胡建鸿', 0, '0000-00-00 00:00:00', 1),
@@ -693,6 +708,89 @@ INSERT INTO `bonjour_user` (`userID`, `accountName`, `userName`, `userPass`, `ro
 	(30, 'wangxiaoya', '王小丫', 'e10adc3949ba59abbe56e057f20f883e', 7, 'wangxiaoya@sina.com.cn', '13695666088', '', 20140719, 1, '胡建鸿', 0, NULL, 1),
 	(31, 'wangbaoqiang01', '王宝强', 'e10adc3949ba59abbe56e057f20f883e', 5, '', '', '', 20140719, 1, '胡建鸿', 0, NULL, 1);
 /*!40000 ALTER TABLE `bonjour_user` ENABLE KEYS */;
+
+
+-- 导出  表 bonjour.bonjour_workflow_application 结构
+CREATE TABLE IF NOT EXISTS `bonjour_workflow_application` (
+  `rootProject` char(12) NOT NULL,
+  `applicationID` int(11) NOT NULL AUTO_INCREMENT,
+  `segmentID` int(11) NOT NULL,
+  `segmentName` varchar(30) DEFAULT NULL,
+  `applicantID` int(11) NOT NULL,
+  `applicantName` varchar(30) DEFAULT NULL,
+  `createTime` datetime NOT NULL,
+  `lastModifiedTime` datetime DEFAULT NULL,
+  `endTime` datetime DEFAULT NULL,
+  `detailUrl` varchar(100) DEFAULT NULL,
+  `flag1` int(1) DEFAULT '0',
+  `flag2` int(1) DEFAULT '0',
+  PRIMARY KEY (`applicationID`),
+  KEY `RootProject` (`rootProject`),
+  KEY `SegmentID` (`segmentID`),
+  KEY `ApplicantID` (`applicantID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- 正在导出表  bonjour.bonjour_workflow_application 的数据：~0 rows (大约)
+/*!40000 ALTER TABLE `bonjour_workflow_application` DISABLE KEYS */;
+/*!40000 ALTER TABLE `bonjour_workflow_application` ENABLE KEYS */;
+
+
+-- 导出  表 bonjour.bonjour_workflow_application_review 结构
+CREATE TABLE IF NOT EXISTS `bonjour_workflow_application_review` (
+  `applicationID` int(11) NOT NULL,
+  `segmentID` int(11) NOT NULL,
+  `segmentName` varchar(30) DEFAULT NULL,
+  `reviewerID` int(11) NOT NULL,
+  `reviewerName` varchar(30) DEFAULT NULL,
+  `remark` varchar(250) DEFAULT NULL,
+  `createTime` datetime NOT NULL,
+  `returnCurrent` tinyint(4) DEFAULT '0',
+  `flag1` int(11) DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- 正在导出表  bonjour.bonjour_workflow_application_review 的数据：~0 rows (大约)
+/*!40000 ALTER TABLE `bonjour_workflow_application_review` DISABLE KEYS */;
+/*!40000 ALTER TABLE `bonjour_workflow_application_review` ENABLE KEYS */;
+
+
+-- 导出  表 bonjour.bonjour_workflow_reviewer 结构
+CREATE TABLE IF NOT EXISTS `bonjour_workflow_reviewer` (
+  `rootProejct` char(12) NOT NULL,
+  `segmentID` int(11) NOT NULL,
+  `reviewerID` int(11) NOT NULL,
+  `reviewerName` varchar(30) DEFAULT NULL,
+  `roleDesc` varchar(30) DEFAULT NULL,
+  `previousID` int(11) NOT NULL,
+  `nextID` int(11) NOT NULL,
+  `proxyID` int(11) DEFAULT '0',
+  `proxyName` varchar(30) DEFAULT NULL,
+  KEY `RootProejct` (`rootProejct`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- 正在导出表  bonjour.bonjour_workflow_reviewer 的数据：~0 rows (大约)
+/*!40000 ALTER TABLE `bonjour_workflow_reviewer` DISABLE KEYS */;
+/*!40000 ALTER TABLE `bonjour_workflow_reviewer` ENABLE KEYS */;
+
+
+-- 导出  表 bonjour.bonjour_workflow_template 结构
+CREATE TABLE IF NOT EXISTS `bonjour_workflow_template` (
+  `segmentID` int(11) NOT NULL AUTO_INCREMENT,
+  `segmentName` varchar(30) DEFAULT NULL,
+  `previousID` int(11) DEFAULT '0',
+  `nextID` int(11) DEFAULT '0',
+  `mileStone` tinyint(4) DEFAULT '0',
+  `entity` varchar(20) NOT NULL,
+  `currentStatus` varchar(30) NOT NULL,
+  `nextStatus` varchar(30) NOT NULL,
+  `detailUrlPattern` varchar(20) DEFAULT NULL,
+  `validStatus` tinyint(4) DEFAULT '1',
+  PRIMARY KEY (`segmentID`),
+  KEY `CurrentStatus` (`currentStatus`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- 正在导出表  bonjour.bonjour_workflow_template 的数据：~0 rows (大约)
+/*!40000 ALTER TABLE `bonjour_workflow_template` DISABLE KEYS */;
+/*!40000 ALTER TABLE `bonjour_workflow_template` ENABLE KEYS */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

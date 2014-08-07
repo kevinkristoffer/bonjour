@@ -28,7 +28,7 @@ class Bonjour_Controller_Base extends Zend_Controller_Action{
 		}
 	}
 	
-	//Database adater session
+	//初始化session
 	protected function initSession(){
 		//$this->session=Zend_Controller_Front::getInstance()->getParam('bootstrap')->getResource('session');
 		$db=Bonjour_Core_Db_Connection::getConnection('master');
@@ -43,6 +43,19 @@ class Bonjour_Controller_Base extends Zend_Controller_Action{
 		);
 		Zend_Session::setSaveHandler(new Zend_Session_SaveHandler_DbTable($config));
 		Zend_Session::start();
+	}
+	
+	//初始化操作权限
+	protected function initOperationPrivilege(){
+		//获取session
+		//检查对应的用户在SSDB中是否已存在记录
+		//如果不存在查询数据库,生成操作权限白名单
+		//超级管理员组和用户编号为1（root帐号）能访问全部权限（访问对象-
+		//将操作权限白名单集合放入SSDB的hashmap中
+	}
+	//初始化模块权限
+	protected function initForumPrivilege(){
+		//同上
 	}
 	
 }

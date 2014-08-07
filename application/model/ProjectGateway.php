@@ -1,4 +1,9 @@
 <?php
+/**
+ * 项目
+ * @author hujianhong05
+ *
+ */
 class Bonjour_Model_ProjectGateway extends Bonjour_Core_Model_GateWay {
 	
 	// /////////////////////////////// 变更操作 /////////////////////////////////

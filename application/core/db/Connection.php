@@ -5,14 +5,11 @@
  *
  */
 class Bonjour_Core_Db_Connection {
-	
 	const KEY = 'Bonjour_Core_Db_Connection_Key';
 	const PREFIX_KEY = 'Bonjour_Core_Db_Connection_TablePrefix';
 	const DEFAULT_PREFIX = 't_';
 	const DEFAULT_SERVERTYPE = 'master';
 	const DEFAULT_SERVERNAME = 'server1'; // if connection die down default will worked
-	
-	
 	public static function getConnection($type = null) {
 		$type = null == $type ? self::DEFAULT_SERVERTYPE : $type;
 		$conn = self::_getConnection ( $type );
@@ -44,7 +41,6 @@ class Bonjour_Core_Db_Connection {
 	 * @return Zend_Db_Adapter_Abstract
 	 */
 	private static function _getConnection($serverType, $serverName = null) {
-		
 		$key = self::KEY . '_' . $serverType;
 		if (! Zend_Registry::isRegistered ( $key )) {
 			$config = Bonjour_Core_Config::getConfig ();

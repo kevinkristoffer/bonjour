@@ -17,9 +17,9 @@ class System_PrivilegeController extends Bonjour_Controller_Base{
 	public function forumAction(){
 		$pattern=$this->_request->getParam('p');
 		if($pattern=='f'){
-			$this->renderScript('privilege/forum-privilege-forum-pattern.phtml');
+			$this->renderScript('privilege/forum/forum-pattern.phtml');
 		}elseif($pattern == 'm'){
-			$this->renderScript('privilege/forum-privilege-master-pattern.phtml');
+			$this->renderScript('privilege/forum/master-pattern.phtml');
 		}else{
 			$this->_redirect ( 'error' );
 		}

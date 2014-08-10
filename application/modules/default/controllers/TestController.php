@@ -170,6 +170,48 @@ class TestController extends Bonjour_Controller_Base{
 	/**
 	 * 测试ssdb
 	 */
+	public function getUserListAction(){
+		$this->_helper->viewRenderer->setNoRender ( true );
+		header ( 'content-type:text/html;charset=utf-8' );
+		try{
+// 			echo xdebug_time_index();
+// 			var_dump(xdebug_get_function_stack());
+//			xdebug_print_function_stack('test message');
+// 			xdebug_start_code_coverage();
+			
+			$ssdb=Bonjour_Core_Cache_SimpleSSDB::getInstance();
+			$userlist=null;
+			if($ssdb->exists('userlist')){
+				$ustr=$ssdb->get('userlist');
+				$userlist=Zend_Json::decode($ustr,Zend_Json::TYPE_OBJECT);
+			}else{
+				$factory = Bonjour_Core_Model_Factory::getInstance ();
+				$db = Bonjour_Core_Db_Connection::getConnection ( 'slave' );
+				if ($db == null) {
+					throw new Exception ();
+				}
+				$query="select userID,userName from bonjour_user";
+				$userlist=$db->query($query)->fetchAll();
+				$ssdb->set('userlist',Zend_Json::encode($userlist));
+			}
+ 			var_dump($userlist);
+
+// 			var_dump(xdebug_get_code_coverage());
+// 			xdebug_stop_code_coverage();
+			
+// 			$factory = Bonjour_Core_Model_Factory::getInstance ();
+// 			$db = Bonjour_Core_Db_Connection::getConnection ( 'slave' );
+// 			if ($db == null) {
+// 				throw new Exception ();
+// 			}
+// 			$query="select userID,userName from bonjour_user";
+// 			$userlist2=$db->query($query)->fetchAll();
+// 			var_dump($userlist2);
+			
+		}catch(Exception $e){
+			echo $e->getMessage();
+		}
+	}
 	public function testSsdb1Action(){
 		$this->_helper->viewRenderer->setNoRender ( true );
 		header ( 'content-type:text/html;charset=utf-8' );
@@ -418,7 +460,7 @@ class TestController extends Bonjour_Controller_Base{
 		}
 	}
 	
-	public function testInfoAction(){
+	public function phpinfoAction(){
 		$this->_helper->viewRenderer->setNoRender ( true );
 		header ( 'content-type:text/html;charset=utf-8' );
 		phpinfo();

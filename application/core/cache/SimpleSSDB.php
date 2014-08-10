@@ -7,19 +7,19 @@
 class Bonjour_Core_Cache_SimpleSSDB{
 	
 	const KEY = 'Bonjour_Core_Cache_SimpleSSDB_Key';
+	const CONFIG_KEY = 'cache';
 	
 	public static function getInstance($serverName = null) {
 		$key = self::KEY;
 		if (! Zend_Registry::isRegistered ( $key )) {
-			$config = Bonjour_Core_Config::getConfig ();
-			$servers = $config->cache->ssdb;
+			$config = Bonjour_Core_Config::getConfig ( self::CONFIG_KEY);
+			$servers = $config['cache']['ssdb'];
 			
 			$chosenServer = $serverName;
 			
 			if (null == $serverName) {
 				// Load balancing algorithm
 				$mtime = explode ( ' ', microtime () );
-				$servers = $servers->toArray ();
 				$i = $mtime [1] % count ( $servers );
 				$j = 0;
 				foreach ( $servers as $key => $value ) {

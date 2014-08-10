@@ -182,7 +182,6 @@ class Zend_Controller_Action_HelperBroker
             require_once 'Zend/Controller/Action/Exception.php';
             throw new Zend_Controller_Action_Exception('Action helper "' . $name . '" has not been registered with the helper broker');
         }
-
         return $stack->{$name};
     }
 
@@ -248,10 +247,13 @@ class Zend_Controller_Action_HelperBroker
     public function __construct(Zend_Controller_Action $actionController)
     {
         $this->_actionController = $actionController;
+        
         foreach (self::getStack() as $helper) {
             $helper->setActionController($actionController);
             $helper->init();
+            
         }
+        
     }
 
     /**

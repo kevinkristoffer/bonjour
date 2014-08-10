@@ -88,7 +88,6 @@ class Zend_Application
             } elseif (!is_array($options)) {
                 throw new Zend_Application_Exception('Invalid options provided; must be location of config file, a config object, or an array');
             }
-
             $this->setOptions($options);
         }
     }

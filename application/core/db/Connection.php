@@ -10,6 +10,8 @@ class Bonjour_Core_Db_Connection {
 	const DEFAULT_PREFIX = 't_';
 	const DEFAULT_SERVERTYPE = 'master';
 	const DEFAULT_SERVERNAME = 'server1'; // if connection die down default will worked
+	const CONFIG_KEY = 'database';
+	
 	public static function getConnection($type = null) {
 		$type = null == $type ? self::DEFAULT_SERVERTYPE : $type;
 		$conn = self::_getConnection ( $type );
@@ -27,8 +29,8 @@ class Bonjour_Core_Db_Connection {
 	 */
 	public static function getDbPrefix() {
 		if (! Zend_Registry::isRegistered ( self::PREFIX_KEY )) {
-			$config = Bonjour_Core_Config::getConfig ();
-			$prefix = (null == $config->db->prefix) ? self::DEFAULT_PREFIX : $config->db->prefix;
+			$config = Bonjour_Core_Config::getConfig ( self::CONFIG_KEY);
+			$prefix = (null == $config['db']['prefix']) ? self::DEFAULT_PREFIX : $config['db']['prefix'];
 			Zend_Registry::set ( self::PREFIX_KEY, $prefix );
 		}
 		
@@ -43,8 +45,8 @@ class Bonjour_Core_Db_Connection {
 	private static function _getConnection($serverType, $serverName = null) {
 		$key = self::KEY . '_' . $serverType;
 		if (! Zend_Registry::isRegistered ( $key )) {
-			$config = Bonjour_Core_Config::getConfig ();
-			$servers = $config->db->$serverType;
+			$config = Bonjour_Core_Config::getConfig ( self::CONFIG_KEY);
+			$servers = $config['db'][$serverType];
 			
 			// Connect to random server
 			// $servers = $servers->toArray();
@@ -55,7 +57,6 @@ class Bonjour_Core_Db_Connection {
 			if (null == $serverName) {
 				// Load balancing algorithm
 				$mtime = explode ( ' ', microtime () );
-				$servers = $servers->toArray ();
 				$i = $mtime [1] % count ( $servers );
 				$j = 0;
 				foreach ( $servers as $key => $value ) {
@@ -67,11 +68,11 @@ class Bonjour_Core_Db_Connection {
 			}
 			
 			// Get database prefix
-			$prefix = (null == $config->db->prefix) ? self::DEFAULT_PREFIX : $config->db->prefix;
+			$prefix = (null == $config['db']['prefix']) ? self::DEFAULT_PREFIX : $config['db']['prefix'];
 			
 			$servers [$chosenServer] ['prefix'] = $prefix;
 			
-			$db = Zend_Db::factory ( $config->db->adapter, $servers [$chosenServer] );
+			$db = Zend_Db::factory ( $config['db']['adapter'], $servers [$chosenServer] );
 			
 			$db->setFetchMode ( Zend_Db::FETCH_OBJ );
 			$db->query ( "SET CHARACTER SET 'utf8'" );

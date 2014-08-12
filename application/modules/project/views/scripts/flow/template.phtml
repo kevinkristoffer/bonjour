@@ -13,17 +13,31 @@ var baseUrl='<?php echo $this->baseUrl();?>';
 <script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/js/client.js"></script>
 <script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/mikoUI/js/mikoui.all.js"></script>
 <!-- JQuery UI -->
-<link rel="stylesheet" href="<?php echo $this->baseUrl();?>/assets/jquery-ui/jquery-ui.min.css">
+<link rel="stylesheet" href="<?php echo $this->baseUrl();?>/assets/jquery-ui/jquery-ui-1.10.3.custom.min.css">
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/jquery-ui/jquery-ui.min.js"></script>
 <script type="text/javascript">
-
-
+$(function() {
+    $('#sortable').sortable();
+    $('#sortable').bind('click',function(){
+        console.log('AAA');
+    });
+});
 </script>
 <style>  
-#sortable { list-style-type: none; margin: 0; padding: 0; width: 60%; }  
+#sortable { list-style-type: none; margin: 0; padding: 0; width: 250px; }  
 #sortable li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; font-size: 1.4em; height: 18px; }  
 #sortable li span { position: absolute; margin-left: -1.3em; }  </style>
 </head>
 <body>
-hello world
+<ul id="sortable">
+<li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>item1</li>
+<li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>item2</li>
+<li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>item1</li>
+<li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>item2</li>
+<li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>item1</li>
+<li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>item2</li>
+<li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>item1</li>
+<li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>item2</li>
+</ul>
 </body>
 </html>

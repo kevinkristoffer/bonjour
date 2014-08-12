@@ -16,9 +16,9 @@ class Bonjour_Core_Config {
 		}
 		
 		if (!Zend_Registry::isRegistered ( $key )) {
-			
 			$cachedConfigFile = APPLICATION_PATH . '/configs/'.$key.'.ini.php';
-			if (! file_exists ( $cachedConfigFile ) || filemtime ( $cachedConfigFile ) < filemtime ( APPLICATION_PATH . '/configs/application.ini' )) {
+			
+			if (! file_exists ( $cachedConfigFile ) || filemtime ( $cachedConfigFile ) < filemtime ( APPLICATION_PATH . '/configs/'.$key.'.ini' )) {
 				require_once 'Zend/Config/Ini.php';
 				$config = new Zend_Config_Ini ( APPLICATION_PATH . '/configs/'.$key.'.ini', APPLICATION_ENV );
 				file_put_contents ( $cachedConfigFile, '<?php ' . PHP_EOL . 'return ' . var_export ( $config->toArray (), true ) . ';' );

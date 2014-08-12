@@ -122,31 +122,6 @@ class TestController extends Bonjour_Controller_Base{
 		return $output;
 	}
 	/**
-	 * 测试s3服务
-	 */
-	public function testS3Action(){
-		$this->_helper->viewRenderer->setNoRender ( true );
-		header ( 'content-type:text/html;charset=utf-8' );
-		
-		try{
-			$s3=new Zend_Service_Amazon_S3('AKIAJPHC5NJDPEQWDJVQ','ia8zEFQNlZJO7WV6Sb46GiRu8TyF9U/5C3xOZAmD');
-			
-			//echo file_get_contents('D:/myfiles/Chahua16.jpg');
-// 			$s3->putFile('D:/myfiles/Chahua16.jpg', 'bacterium87-bucket/test1.jpg',
-// 			array(Zend_Service_Amazon_S3::S3_ACL_HEADER=>Zend_Service_Amazon_S3::S3_ACL_PUBLIC_READ));
-
-			$s3->putObject('bacterium87-bucket/test1.jpg',file_get_contents('D:/myfiles/Chahua16.jpg'),
-			array(Zend_Service_Amazon_S3::S3_ACL_HEADER=>Zend_Service_Amazon_S3::S3_ACL_PUBLIC_READ));
-			
-// 			$objs=$s3->getObjectsByBucket('bacterium87-bucket');
-			
-// 			var_dump($objs);
-
-		}catch(Exception $e){
-			echo $e->getMessage();
-		}
-	}
-	/**
 	 * 测试代理服务器
 	 */
 	public function testProxyClientAction(){
@@ -170,16 +145,12 @@ class TestController extends Bonjour_Controller_Base{
 	/**
 	 * 测试ssdb
 	 */
-	public function getUserListAction(){
-// 		$this->_helper->viewRenderer->setNoRender ( true );
-// 		header ( 'content-type:text/html;charset=utf-8' );
+	public function getUserList1Action(){
+ 		$this->_helper->viewRenderer->setNoRender ( true );
+		header ( 'content-type:text/html;charset=utf-8' );
 		try{
-// 			echo xdebug_time_index();
-// 			var_dump(xdebug_get_function_stack());
-//			xdebug_print_function_stack('test message');
-// 			xdebug_start_code_coverage();
 			
-			$ssdb = Bonjour_Core_Cache_SimpleSSDB::getInstance ();
+			$ssdb = Bonjour_Core_Cache_SimpleSSDB::getInstance ('master');
 			$userlist = null;
 			if ($ssdb->exists ( 'userlist' )) {
 				$ustr = $ssdb->get ( 'userlist' );
@@ -195,25 +166,34 @@ class TestController extends Bonjour_Controller_Base{
 				$ssdb->set ( 'userlist', Zend_Json::encode ( $userlist ) );
 			}
 			
-			$this->view->assign ( 'userlist', $userlist );
-
-// 			var_dump(xdebug_get_code_coverage());
-// 			xdebug_stop_code_coverage();
-			
-// 			$factory = Bonjour_Core_Model_Factory::getInstance ();
-// 			$db = Bonjour_Core_Db_Connection::getConnection ( 'slave' );
-// 			if ($db == null) {
-// 				throw new Exception ();
-// 			}
-// 			$query="select userID,userName from bonjour_user";
-// 			$userlist2=$db->query($query)->fetchAll();
-// 			var_dump($userlist2);
+			var_dump($userlist);
 			
 		}catch(Exception $e){
-// 			echo $e->getMessage();
+			echo $e->getMessage();
 			
 		}
 	}
+	
+	public function getUserList2Action(){
+		$this->_helper->viewRenderer->setNoRender ( true );
+		header ( 'content-type:text/html;charset=utf-8' );
+		try{
+
+			$ssdb = Bonjour_Core_Cache_SimpleSSDB::getInstance ('slave');
+			$userlist = null;
+			if ($ssdb->exists ( 'userlist' )) {
+				$ustr = $ssdb->get ( 'userlist' );
+				$userlist = Zend_Json::decode ( $ustr, Zend_Json::TYPE_OBJECT );
+			} 
+			
+			var_dump($userlist);
+
+		}catch(Exception $e){
+ 			echo $e->getMessage();
+			
+		}
+	}
+	
 	public function testSsdb1Action(){
 		$this->_helper->viewRenderer->setNoRender ( true );
 		header ( 'content-type:text/html;charset=utf-8' );

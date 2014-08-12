@@ -9,11 +9,11 @@ class Bonjour_Core_Cache_SimpleSSDB{
 	const KEY = 'Bonjour_Core_Cache_SimpleSSDB_Key';
 	const CONFIG_KEY = 'cache';
 	
-	public static function getInstance($serverName = null) {
+	public static function getInstance($serverType, $serverName = null) {
 		$key = self::KEY;
 		if (! Zend_Registry::isRegistered ( $key )) {
 			$config = Bonjour_Core_Config::getConfig ( self::CONFIG_KEY);
-			$servers = $config['cache']['ssdb'];
+			$servers = $config['cache']['ssdb'][$serverType];
 			
 			$chosenServer = $serverName;
 			

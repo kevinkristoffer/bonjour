@@ -1,0 +1,300 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<?php echo $this->headTitle('主流程管理'); ?>
+<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+<meta http-equiv="description" content="主流程管理">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<script type="text/javascript">
+var baseUrl='<?php echo $this->baseUrl();?>';
+</script>
+<link rel="stylesheet" type="text/css" href="<?php echo $this->baseUrl();?>/assets/mikoUI/skins/mikoui-icons.css" />
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/jquery/jquery-1.7.2.js"></script>
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/plugins/cookie/jquery.cookie.js"></script>
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/js/client.js"></script>
+<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/mikoUI/js/mikoui.all.js"></script>
+<script type="text/javascript">
+var entityList=$.parseJSON('<?php echo $this->entityList; ?>');
+var statusList=$.parseJSON('<?php echo $this->statusList; ?>');
+</script>
+<script type="text/javascript">
+$(function(){
+	var g=null;
+	var selectedID=0;
+	g=$('#flowListGrid').mikoGrid({
+		url:baseUrl+'/project/flow/query-flow-list',
+		enabledEdit: true, 
+		clickToEdit:false,
+		usePager:false,
+		width:620,
+		columns:[{
+			display:'流程号',name:'flowNo',width:100
+		},{
+			display:'流程名称',name:'flowName',width:120
+		},{
+			display:'所属实体',name:'entity',width:120
+		},{
+			display:'流转状态',name:'status1',width:80
+		},{
+			display:'失败状态',name:'status2',width:80
+		},{
+			display:'成功状态',name:'status3',width:80
+		}],
+		toolbar:{items:[{
+			text:'新建流程',icon:'add',
+			click:function(){
+				$.mikoDialog.open({
+					top:30,
+					height:300,
+					width:400,
+					title:'新建流程',
+					target: $("#target4"),
+					buttons:[{
+						text: '确定', onclick: function (item, dialog) {
+							var f41=$('#f41').val();
+							if(f41==''){
+								$.mikoDialog.warn('流程名称不能为空');
+								return;
+							}
+							var f42=miko.get('f42').getValue();
+							if(f42==''){
+								$.mikoDialog.warn('所属实体不能为空');
+								return;
+							}
+							var f43=miko.get('f43').getValue();
+							if(f43==''){
+								$.mikoDialog.warn('流转状态不能为空');
+								return;
+							}
+							var f44=miko.get('f44').getValue();
+							if(f44==''){
+								$.mikoDialog.warn('失败状态不能为空');
+								return;
+							}
+							var f45=miko.get('f45').getValue();
+							if(f45==''){
+								$.mikoDialog.warn('成功状态不能为空');
+								return;
+							}
+							$.post(baseUrl+'/project/flow/add-flow',
+							{p1:f41,p2:f42,p3:f43,p4:f44,p5:f45},
+							function(data){
+								if(data=='0000'){
+									resetNewForm();
+									dialog.hide();
+									g.reload();
+								}else{
+									$.mikoDialog.warn('保存失败');
+								}
+							});
+							
+						},cls:'l-dialog-btn-highlight' 
+					},{
+						text:'重置',onclick:function(item, dialog){
+							resetNewForm();
+						}
+					}]
+				});
+			}
+		},{line:true},{
+			text:'修改流程',icon:'modify',
+			click:function(){
+				var row=g.getSelectedRow();
+				if(row == null){
+					$.mikoDialog.warn('请选择需要修改的行');
+					return;
+				}
+				selectedID=row.flowNo;
+				miko.get('f51').setValue(row.flowName);
+				miko.get('f52').setValue(row.entity);
+				miko.get('f53').setValue(row.status4);
+				miko.get('f54').setValue(row.status5);
+				miko.get('f55').setValue(row.status6);
+				///
+				$.mikoDialog.open({
+					top:30,
+					height:300,
+					width:400,
+					title:'修改流程',
+					target: $("#target5"),
+					buttons:[{
+						text: '确定', onclick: function (item, dialog) {
+							var f51=$('#f51').val();
+							if(f51==''){
+								$.mikoDialog.warn('流程名称不能为空');
+								return;
+							}
+							var f52=miko.get('f52').getValue();
+							if(f52==''){
+								$.mikoDialog.warn('所属实体不能为空');
+								return;
+							}
+							var f53=miko.get('f53').getValue();
+							if(f53==''){
+								$.mikoDialog.warn('流转状态不能为空');
+								return;
+							}
+							var f54=miko.get('f54').getValue();
+							if(f54==''){
+								$.mikoDialog.warn('失败状态不能为空');
+								return;
+							}
+							var f55=miko.get('f55').getValue();
+							if(f55==''){
+								$.mikoDialog.warn('成功状态不能为空');
+								return;
+							}
+							$.post(baseUrl+'/project/flow/modify-flow',
+							{p0:selectedID,p1:f51,p2:f52,p3:f53,p4:f54,p5:f55},
+							function(data){
+								console.log(data);
+								/*if(data=='0000'){
+									dialog.hide();
+									g.reload();
+								}else{
+									$.mikoDialog.warn('保存失败');
+								}*/
+							});
+							
+						},cls:'l-dialog-btn-highlight' 
+					},{
+						text:'重置',onclick:function(item, dialog){
+							resetNewForm();
+						}
+					}]
+				});
+			}
+		}]}
+	});
+	$('#flowManageButton').mikoButton({
+		width:80,
+		click:function(){
+			$.mikoDialog.open({
+				top:30,
+				height:300,
+				width:660,
+				title:'流程管理',
+				target: $("#target3"),
+				buttons:[{
+					text: '关闭', onclick: function (item, dialog) {
+						dialog.hide();
+					},cls:'l-dialog-btn-highlight' 
+				}]
+			});
+		}
+	});
+
+	$('#f41,#f51').mikoTextBox({ width:180 });
+	$('#f43,#f44,#f45,#f53,#f54,#f55').mikoComboBox({
+		width:120
+	});
+	$('#f42,#f52').mikoComboBox({
+		width:120,
+		data:entityList,
+		onSelected:function(value){
+			var newData = new Array();
+            for (i = 0; i < statusList.length; i++){
+                if (statusList[i].entity == value){
+                    newData.push(statusList[i]);
+                }
+            }
+            if(this.id == 'f42'){
+            	miko.get("f43").setData(newData);
+                miko.get("f44").setData(newData);
+                miko.get("f45").setData(newData);
+            }
+            if(this.id == 'f52'){
+            	miko.get("f53").setData(newData);
+                miko.get("f54").setData(newData);
+                miko.get("f55").setData(newData);
+            }
+		}
+	});
+	///////////////////////////////////////////////////////////////////////////
+	function resetNewForm(){
+		miko.get('f41').setValue('');
+		miko.get('f42').setValue('');
+		miko.get('f43').setValue('');
+		miko.get('f44').setValue('');
+		miko.get('f45').setValue('');
+	}
+});
+</script>
+<style type="text/css">
+body { margin: 0; padding: 0; }
+a { color: #111; }
+a:hover { color: #999; }
+.l-table-edit { }
+.l-table-edit-td { padding:4px; }
+.l-button-submit, .l-button-reset { width:80px; float:left; margin-left:10px; padding-bottom:2px; }
+.l-verify-tip { left:230px; top:120px; }
+</style>
+</head>
+<body>
+<div id="flowListGrid" style="margin:5px;"></div>
+<!-- ----------------------------- -->
+<div id="target4" style="margin:3px;display:none;">
+  <div>
+    <table cellpadding="0" cellspacing="0" class="l-table-edit" >
+      <tr>
+        <td align="right" class="l-table-edit-td"><label>流程名称（必填）</label></td>
+        <td align="left" class="l-table-edit-td"><input type="text" id="f41"/></td>
+        <td align="left"></td>
+      </tr>
+      <tr>
+        <td align="right" class="l-table-edit-td"><label>选择实体（必填）</label></td>
+        <td align="left" class="l-table-edit-td"><input type="text" id="f42"/></td>
+        <td align="left"></td>
+      </tr>
+      <tr>
+        <td align="right" class="l-table-edit-td"><label>选择流转状态（必填）</label></td>
+        <td align="left" class="l-table-edit-td"><input type="text" id="f43"/></td>
+        <td align="left"></td>
+      </tr>
+      <tr>
+        <td align="right" class="l-table-edit-td"><label>选择失败状态（必填）</label></td>
+        <td align="left" class="l-table-edit-td"><input type="text" id="f44"/></td>
+        <td align="left"></td>
+      </tr>
+      <tr>
+        <td align="right" class="l-table-edit-td"><label>选择成功状态（必填）</label></td>
+        <td align="left" class="l-table-edit-td"><input type="text" id="f45"/></td>
+        <td align="left"></td>
+      </tr>
+    </table>
+  </div>
+</div>
+<!-- ----------------------------- -->
+<div id="target5" style="margin:3px;display:none;">
+  <div>
+    <table cellpadding="0" cellspacing="0" class="l-table-edit" >
+      <tr>
+        <td align="right" class="l-table-edit-td"><label>流程名称（必填）</label></td>
+        <td align="left" class="l-table-edit-td"><input type="text" id="f51"/></td>
+        <td align="left"></td>
+      </tr>
+      <tr>
+        <td align="right" class="l-table-edit-td"><label>选择实体（必填）</label></td>
+        <td align="left" class="l-table-edit-td"><input type="text" id="f52"/></td>
+        <td align="left"></td>
+      </tr>
+      <tr>
+        <td align="right" class="l-table-edit-td"><label>选择流转状态（必填）</label></td>
+        <td align="left" class="l-table-edit-td"><input type="text" id="f53"/></td>
+        <td align="left"></td>
+      </tr>
+      <tr>
+        <td align="right" class="l-table-edit-td"><label>选择失败状态（必填）</label></td>
+        <td align="left" class="l-table-edit-td"><input type="text" id="f54"/></td>
+        <td align="left"></td>
+      </tr>
+      <tr>
+        <td align="right" class="l-table-edit-td"><label>选择成功状态（必填）</label></td>
+        <td align="left" class="l-table-edit-td"><input type="text" id="f55"/></td>
+        <td align="left"></td>
+      </tr>
+    </table>
+  </div>
+</div>
+</body>
+</html>

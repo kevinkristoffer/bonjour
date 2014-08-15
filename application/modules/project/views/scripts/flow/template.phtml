@@ -8,36 +8,316 @@
 <script type="text/javascript">
 var baseUrl='<?php echo $this->baseUrl();?>';
 </script>
+<link rel="stylesheet" type="text/css" href="<?php echo $this->baseUrl();?>/assets/mikoUI/skins/mikoui-icons.css" />
 <script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/jquery/jquery-1.7.2.js"></script>
 <script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/plugins/cookie/jquery.cookie.js"></script>
 <script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/js/client.js"></script>
 <script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/mikoUI/js/mikoui.all.js"></script>
-<!-- JQuery UI -->
-<link rel="stylesheet" href="<?php echo $this->baseUrl();?>/assets/jquery-ui/jquery-ui-1.10.3.custom.min.css">
-<script type="text/javascript" src="<?php echo $this->baseUrl();?>/assets/jquery-ui/jquery-ui.min.js"></script>
 <script type="text/javascript">
-$(function() {
-    $('#sortable').sortable();
-    $('#sortable').bind('click',function(){
-        console.log('AAA');
-    });
-});
+var flagData1=[{value:'Y',text:'是'},{value:'N',text:'否'}];
+var flagData2=[{value:'Y',text:'有效'},{value:'N',text:'无效'}];
 </script>
-<style>  
-#sortable { list-style-type: none; margin: 0; padding: 0; width: 250px; }  
-#sortable li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; font-size: 1.4em; height: 18px; }  
-#sortable li span { position: absolute; margin-left: -1.3em; }  </style>
+<script type="text/javascript">
+var g=null,g2=null,cb1=null,cb2=null;
+$(function() {
+	var invalid=0;
+
+	$('#mainflows').mikoComboBox({
+		selectBoxWidth:520,
+		selectBoxHeight:210,
+		valueField:'flowNo',
+		textField:'flowName',
+		slide:true,
+		grid:{
+			url:baseUrl+'/project/flow/query-flow-list-snap',
+			usePager:false,
+			columns:[{
+				display:'流程号',name:'flowNo',width:100
+			},{
+				display:'流程名称',name:'flowName',width:120
+			},{
+				display:'所属实体',name:'entity',width:80
+			}]
+		}
+	});
+	
+	g=$('#segmentListGrid').mikoGrid({
+		url:baseUrl+'/project/flow/query-segment-list/invalid/'+invalid,
+		enabledEdit: true, 
+		clickToEdit:false,
+		usePager:false,
+		columns:[{
+			display:'节点编号',name:'segmentID',width:60
+		},{
+			display:'节点名称',name:'segmentName',width:80
+		},{
+			display:'里程碑',name:'milestone',width:60
+		},{
+			display:'所属实体',name:'currentEntity',width:80
+		},{
+			display:'所属状态',name:'currentStatus',width:80
+		},{
+			display:'详情链接模板',name:'detailUrlPattern',width:150
+		},{
+			display:'是否有效',name:'validStatus',width:60
+		},{
+			display:'前驱节点',name:'prevID',width:60
+		},{
+			display:'前驱节点名称',name:'prevName',width:80
+		},{
+			display:'后继节点',name:'nextID',width:60
+		},{
+			display:'后继节点名称',name:'nextName',width:80
+		}],
+		toolbar:{items:[{
+			text:'新建节点',icon:'add',click:function(item){
+				$.mikoDialog.open({
+					top:30,
+					height:400,
+					width:380,
+					title:'新建节点',
+					target: $("#target1"),
+					buttons:[{
+						text: '确定', onclick: function (item, dialog) {
+							var f11=$('#f11').val();
+							var f12=$('#milestoneValue').val();
+							var f13=$('#entityValue').val();
+							var f14=$('#statusValue').val();
+							var f15=$('#f15').val();
+							var f16=$('#validStatusValue').val();
+							var prevID=cb1.getValue() || 0;
+							var prevName=cb1.getText() || '';
+							var nextID=cb2.getValue() || 0;
+							var nextName=cb2.getText() || '';
+							if(f11==''){
+								$.mikoDialog.warn('节点名称不能为空');
+								return;
+							}
+							if(f13=='' || f14==''){
+								$.mikoDialog.warn('请选择实体和状态');
+								return;
+							}
+							$.post(baseUrl+'/project/flow/add-segment',
+							{p1:f11,p2:f12,p3:f13,p4:f14,p5:f15,p6:f16,p7:prevID+'|'+prevName,p8:nextID+'|'+nextName},
+							function(data){
+								if(data=='0000'){
+									resetNewForm();
+									dialog.hide();
+									g.reload();
+									cb1.reload();
+									cb2.reload();
+								}else{
+									$.mikoDialog.warn('保存失败');
+								}
+							});
+							
+						},cls:'l-dialog-btn-highlight' 
+					},{
+						text:'重置',onclick:function(item, dialog){
+							resetNewForm();
+						}
+					}]
+				});
+			}
+		},{line:true},{
+			text:'查看流程图',icon:'communication',click:function(){
+				alert('C');
+			}
+		},{line:true},{
+			text:'显示/隐藏无效节点',icon:'settings',click:function(){
+				var msg=(invalid == 0) ? '当前为不显示无效节点状态，<br/>确定显示吗？' :
+					 '当前为显示无效节点状态，<br/>确定隐藏吗？';
+				$.mikoDialog.confirm(msg,function(yes){
+					if(yes){
+						alert('OK');
+					}
+				});
+			}
+		}]}
+	});
+
+	$('#f11,#f15').mikoTextBox({ width:180 });
+	$('#f12').mikoComboBox({
+		width:120,
+		data:flagData1,
+		valueField:'value',
+		valueFieldID:'milestoneValue',
+		cancelable:false
+	});
+	miko.get('f12').setValue('N');
+	$('#f14').mikoComboBox({
+		width:120,
+		valueFieldID:'statusValue'
+	});
+	$('#f13').mikoComboBox({
+		width:120,
+		data:entityList,
+		valueFieldID:'entityValue',
+		onSelected:function(value){
+			var newData = new Array();
+            for (i = 0; i < statusList.length; i++){
+                if (statusList[i].entity == value){
+                	console.log('B');
+                    newData.push(statusList[i]);
+                }
+            }
+            miko.get("f14").setData(newData);
+		}
+	});
+	$('#f16').mikoComboBox({
+		width:120,
+		data:flagData2,
+		valueField:'value',
+		valueFieldID:'validStatusValue',
+		cancelable:false
+	});
+	miko.get('f16').setValue('Y');
+	$('#f17').mikoComboBox({
+		isMultiSelect:false,
+		isShowCheckBox:false,
+		selectBoxWidth:280,
+		selectBoxHeight:180,
+		textField:'segmentName',
+		valueField:'segmentID',
+		slide:true,
+		grid:{
+			url:baseUrl+'/project/flow/query-segment-list-snap',
+			usePager:false,
+			columns:[{
+				display:'节点编号',name:'segmentID',width:60
+			},{
+				display:'节点名称',name:'segmentName',width:110
+			},{
+				display:'所属实体',name:'currentEntity',width:60
+			}]
+		}
+	});
+	$('#f18').mikoComboBox({
+		isMultiSelect:false,
+		isShowCheckBox:false,
+		selectBoxWidth:280,
+		selectBoxHeight:180,
+		textField:'segmentName',
+		valueField:'segmentID',
+		slide:true,
+		grid:{
+			url:baseUrl+'/project/flow/query-segment-list-snap',
+			usePager:false,
+			columns:[{
+				display:'节点编号',name:'segmentID',width:60
+			},{
+				display:'节点名称',name:'segmentName',width:110
+			},{
+				display:'所属实体',name:'currentEntity',width:60
+			}]
+		}
+	});
+	
+	cb1=$('#f17').mikoGetComboBoxManager();
+	cb2=$('#f18').mikoGetComboBoxManager();
+
+	///////////////////////////////////////
+	
+
+	function resetNewForm(){
+		miko.get('f11').setValue('');
+		miko.get('f12').setValue('N');
+		miko.get('f13').setValue('');
+		miko.get('f14').setValue('');
+		miko.get('f15').setValue('');
+		miko.get('f16').setValue('Y');
+	}
+});
+
+</script>
+<style type="text/css">
+body { margin: 0; padding: 0; }
+a { color: #111; }
+a:hover { color: #999; }
+#wrapper { float: left; margin: 20px 30px 20px 30px; display: inline; width: 900px; height: 600px; }
+#top { float: left; margin-left: 0px; margin-top: 0px; display: inline; width: 900px; height: 30px; }
+#top ul { list-style: none; }
+#top ul li { float: left; margin-left: 15px; }
+#main { float: left; margin-left: 0px; display: inline; width: 900px; height: 500px; border-top: solid 2px #cccccc; margin-top: 12px; padding-top: 18px; }
+.red-font { color:red; }
+.l-table-edit { }
+.l-table-edit-td { padding:4px; }
+.l-button-submit, .l-button-reset { width:80px; float:left; margin-left:10px; padding-bottom:2px; }
+.l-verify-tip { left:230px; top:120px; }
+</style>
 </head>
 <body>
-<ul id="sortable">
-<li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>item1</li>
-<li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>item2</li>
-<li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>item1</li>
-<li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>item2</li>
-<li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>item1</li>
-<li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>item2</li>
-<li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>item1</li>
-<li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>item2</li>
-</ul>
+<div id="wrapper">
+  <div id="top">
+    <ul>
+      <li>
+        <label>选择主流程：</label>
+      </li>
+      <li>
+        <input type="text" id="mainflows" />
+      </li>
+      <li> </li>
+      <li> </li>
+      <li> </li>
+    </ul>
+  </div>
+  <div id="main">
+    <div id="segmentListGrid" style="margin:5px;"></div>
+    <div id="target1" style="margin:3px;display:none;">
+      <div>
+        <table cellpadding="0" cellspacing="0" class="l-table-edit" >
+          <tr>
+            <td align="right" class="l-table-edit-td"><label>节点名称（必填）</label></td>
+            <td align="left" class="l-table-edit-td"><input type="text" id="f11"/></td>
+            <td align="left"></td>
+          </tr>
+          <tr>
+            <td align="right" class="l-table-edit-td"><label>设置里程碑</label></td>
+            <td align="left" class="l-table-edit-td"><input type="text" id="f12"/></td>
+            <td align="left"></td>
+          </tr>
+          <tr>
+            <td align="right" class="l-table-edit-td"><label>选择实体（必填）</label>
+              <span class="red-font">*</span></td>
+            <td align="left" class="l-table-edit-td"><input type="text" id="f13"/></td>
+            <td align="left"></td>
+          </tr>
+          <tr>
+            <td align="right" class="l-table-edit-td"><label>选择状态（必填）</label>
+              <span class="red-font">*</span></td>
+            <td align="left" class="l-table-edit-td"><input type="text" id="f14"/></td>
+            <td align="left"></td>
+          </tr>
+          <tr>
+            <td align="right" class="l-table-edit-td"><label>详情链接模板</label></td>
+            <td align="left" class="l-table-edit-td"><input type="text" id="f15"/></td>
+            <td align="left"></td>
+          </tr>
+          <tr>
+            <td align="right" class="l-table-edit-td"><label>是否有效</label></td>
+            <td align="left" class="l-table-edit-td"><input type="text" id="f16"/></td>
+            <td align="left"></td>
+          </tr>
+          <tr>
+            <td align="right" class="l-table-edit-td"><label>前驱节点</label></td>
+            <td align="left" class="l-table-edit-td"><input type="text" id="f17"/></td>
+            <td align="left"></td>
+          </tr>
+          <tr>
+            <td align="right" class="l-table-edit-td"><label>后继节点</label></td>
+            <td align="left" class="l-table-edit-td"><input type="text" id="f18"/></td>
+            <td align="left"></td>
+          </tr>
+          <tr>
+            <td align="right" class="l-table-edit-td"><label class="red-font">提示：</label></td>
+            <td align="left" class="l-table-edit-td"><label class="red-font">带有*字段创建以后不能更改</label></td>
+            <td align="left"></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <!--  -->
+  </div>
+</div>
 </body>
 </html>

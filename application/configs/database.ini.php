@@ -12,7 +12,7 @@ return array (
         'username' => 'kristoffer',
         'password' => '616703255',
         'dbname' => 'bonjour',
-        'persistent' => '1',
+        'persistent' => '0',
       ),
     ),
     'slave' => 
@@ -23,7 +23,7 @@ return array (
         'username' => 'kristoffer',
         'password' => '616703255',
         'dbname' => 'bonjour',
-        'persistent' => '1',
+        'persistent' => '0',
       ),
     ),
   ),

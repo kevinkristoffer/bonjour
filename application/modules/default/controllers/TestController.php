@@ -546,6 +546,7 @@ class TestController extends Bonjour_Controller_Base{
 		return $str;
 	}
 	
+	
 	/**
 	 *
 	 * 测试权限管理

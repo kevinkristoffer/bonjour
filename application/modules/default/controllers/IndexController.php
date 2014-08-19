@@ -44,7 +44,18 @@ class IndexController extends Bonjour_Controller_Base {
 	 * 欢迎页面
 	 */
 	public function welcomeAction(){
-		
+		$this->_helper->viewRenderer->setNoRender ( true );
+		header ( 'content-type:text/html;charset=utf-8' );
+		try {
+			$factory=Bonjour_Core_Model_Factory::getInstance();
+			$db=Bonjour_Core_Db_Connection::getConnection('slave');
+			if($db == null)	throw new Exception();
+			
+			echo 'OK';	
+		} catch (Exception $e) {
+			//$this->_redirect('error');
+			echo 'ERROR';
+		}
 	}
 	
 }

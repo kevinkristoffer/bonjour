@@ -8,22 +8,30 @@ return array (
     array (
       'server1' => 
       array (
-        'host' => '127.0.0.1',
-        'username' => 'kristoffer',
+        'host' => '192.168.1.104',
+        'username' => 'root',
         'password' => '616703255',
         'dbname' => 'bonjour',
-        'persistent' => '0',
+        'persistent' => '1',
       ),
     ),
     'slave' => 
     array (
       'server1' => 
       array (
-        'host' => '127.0.0.1',
-        'username' => 'kristoffer',
+        'host' => '192.168.1.106',
+        'username' => 'root',
         'password' => '616703255',
         'dbname' => 'bonjour',
-        'persistent' => '0',
+        'persistent' => '1',
+      ),
+      'server2' => 
+      array (
+        'host' => '192.168.1.107',
+        'username' => 'root',
+        'password' => '616703255',
+        'dbname' => 'bonjour',
+        'persistent' => '1',
       ),
     ),
   ),
